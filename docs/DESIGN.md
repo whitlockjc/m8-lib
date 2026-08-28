@@ -55,40 +55,100 @@ metadata, screenshots, research notes, confidence levels, and broader design
 discussion should live beside the schemas in `fixtures/` and `docs/`, not inside
 Kaitai files.
 
-Schema organization is not final. Two viable options are:
+Use one top-level Kaitai entry schema per verified M8 firmware version or
+version range. The entry schema should read the common M8 file header, identify
+the file kind, and dispatch to the appropriate file body schema.
 
-- Use one Kaitai schema per M8 file type and version/range:
+Top-level entry schemas live directly under `schemas/`:
 
-  ```txt
-  schemas/
-    6.6.x/
+```txt
+schemas/
+  6.6.2A.ksy
+```
+
+Shared schemas that are stable across versions live under `schemas/common/`:
+
+```txt
+schemas/
+  common/
+    file_header.ksy
+```
+
+Version-specific component schemas live under
+`schemas/versions/<version-or-range>/`:
+
+```txt
+schemas/
+  versions/
+    6.6.2A/
       instrument.ksy
       scale.ksy
       song.ksy
       theme.ksy
-  ```
+```
 
-- Or use one top-level Kaitai schema per version/range that reads the common M8
-  header and switches to the correct body schema by file kind:
+The top-level entry schema imports shared common schemas and version-specific
+component schemas. This provides one obvious schema file for tools to use while
+keeping large file-type definitions focused and reviewable.
 
-  ```txt
-  schemas/
-    6.6.x/
-      m8_file.ksy
-      instrument.ksy
-      scale.ksy
-      song.ksy
-      theme.ksy
-  ```
+Use exact firmware versions until fixture evidence proves that a schema applies
+to a broader version range. For example, start with `6.6.2A`; promote to
+`6.6.x` only when fixtures show the relevant structures are stable across that
+range.
 
-The second approach may be useful because all M8 files share a common header and
-file-kind byte. The first approach may be simpler when researching one file type
-at a time. The decision should be made after a small Kaitai prototype covers the
-header and at least two file types.
+Version/range and latest aliases may be added as thin entry schemas:
 
-For the first milestone, start with a shared header schema. The header schema
-should identify the M8 file version and file type, and it should be reusable by
-whatever file organization is chosen later.
+```txt
+schemas/
+  LATEST.ksy
+  6.6.x.ksy
+  6.6.2A.ksy
+```
+
+Exact firmware schemas are canonical because they can be tied directly to
+fixtures. Alias schemas should only point at a specific exact schema or a proven
+version range. They should not hide uncertainty.
+
+Use Dirtywave's firmware label in filenames and directories when practical, such
+as `6.6.2A`. Kaitai `meta.id` values can use normalized identifiers where
+needed, such as `file_6_6_2a`.
+
+## Version Strategy
+
+M8 schema changes usually become the new norm until a later firmware release
+changes the same structure again. Model this with exact schemas first, then
+promote exact schemas into ranges only after fixture evidence supports the
+range.
+
+Changelog entries help identify likely schema boundaries but do not prove binary
+layout by themselves. Treat these as research targets:
+
+- Major releases have often introduced likely schema changes.
+- Minor releases can introduce likely schema changes.
+- Patch and letter releases are often fixes, but can still affect saved files
+  and must not be assumed schema-equivalent without fixtures.
+
+Examples of likely schema boundaries from the changelog:
+
+- `3.0.0`: added Hypersynth and External instruments and replaced envelopes/LFOs
+  with configurable modulation slots.
+- `3.1.0`: added MIDIOUT `PIT` and `VOL` FX commands.
+- `3.2.0`: increased Sampler slice support to 128 markers and added modulation
+  of modulators.
+- `4.0.0`: added EQ structures, changed Wavsynth shapes, added scale tuning,
+  and added several FX commands.
+- `5.0.0`: saved EQ settings with instruments and expanded EQ slot support.
+- `6.0.0`: added theme HSV editing support and multiple new FX/settings.
+- `6.2.0`: replaced Chorus with ModFX and added Reverb Shimmer.
+- `6.5.0`: added `MTT` and groove PPQN.
+- `6.6.0`: added ModFX Comb and Hypersynth `SHAPE`.
+
+When a change affects stored file data, create or update the version-specific
+component schema where the change first appears. Later exact schemas can reuse
+that component until another fixture-proven change requires a new one.
+
+For the first milestone, start with a shared header schema and a `6.6.2A` entry
+schema. The header schema should identify the M8 file version and file type.
 
 ## Research Plan
 
@@ -164,8 +224,6 @@ representation is stable enough to support them.
 These decisions do not need to block the initial draft or the first header
 schema milestone. They should be resolved through research and small prototypes.
 
-- Whether Kaitai organization should be one schema per file type or one
-  top-level schema per version/range with file-kind switching.
 - How fixture evidence should be referenced from schemas.
 - How screenshots and UI labels should be organized.
 - Which schema-derived verification artifacts should be committed versus rebuilt
