@@ -56,12 +56,13 @@ documentation.
 ## Research Workflow
 
 M8 file schemas are not publicly documented. Research should be fixture-driven.
-All research artifacts must be associated with the M8 firmware version that
-created or displayed them.
+All research artifacts must be associated with the M8 firmware version or
+version range that created or displayed them. The M8 file header version is a
+separate file schema version and may differ from the firmware version.
 
 For each M8 file type, UI page, and meaningful setting:
 
-1. Record the M8 firmware version.
+1. Record the M8 firmware version or version range.
 2. Create a baseline M8 file.
 3. Capture a screenshot of the relevant baseline M8 screen.
 4. Create a modified M8 file with one deliberate change where practical.
@@ -80,12 +81,11 @@ Use these top-level directories as the project grows:
 - `docs/`: design notes, research notes, generated human-readable schema
   documentation, and process documentation. Use version names or version ranges
   in document names or contents when a note is version-specific.
-- `schemas/`: canonical language-agnostic schemas. Organize schemas by M8
-  `{MAJOR}.{MINOR}.x` version range, then by file type. Use a more specific
-  patch or letter version only when fixture evidence proves the patch changes
-  stored file structure.
-- `fixtures/`: version-specific sample M8 files, screenshots, and fixture
-  metadata.
+- `schemas/`: canonical language-agnostic schemas. Use top-level
+  `{MAJOR}.{MINOR}.x` entry schemas for M8 firmware ranges, and organize
+  reusable component schemas by M8 file header schema version.
+- `fixtures/`: version-specific sample M8 files, screenshots, and optional
+  fixture metadata.
 - `tools/`: research, diffing, validation, and code-generation tooling.
 
 Only create a directory when there is concrete content for it.
@@ -94,14 +94,17 @@ Suggested schema layout:
 
 ```txt
 schemas/
-  6.6.x.ksy
+  6.5.x.ksy
   common/
     file_header.ksy
-  versions/
-    6.6.x/
+  file-versions/
+    6.0.1/
       instrument.ksy
-      scale.ksy
+    6.5.0/
       song.ksy
+    4.0.1/
+      scale.ksy
+    1.0.2/
       theme.ksy
 ```
 
@@ -109,32 +112,36 @@ Suggested fixture layout:
 
 ```txt
 fixtures/
-  6.6.x/
-    fixture-set.yaml
+  6.5.x/
     instruments/
-      baseline/
-      changes/
+      NONE_DEFAULT.m8i
+      NAME_CHANGED.m8i
       screenshots/
     scales/
-      baseline/
-      changes/
+      CHROMATIC_DEFAULT.m8n
+      INTERVAL_CHANGED.m8n
       screenshots/
     songs/
-      baseline/
-      changes/
+      DEFAULT.m8s
+      TEMPO_CHANGED.m8s
       screenshots/
     themes/
-      baseline/
-      changes/
+      DEFAULT_RGB.m8t
+      DEFAULT_HSV.m8t
       screenshots/
 ```
 
-Use fixture metadata to connect binary files, screenshots, firmware versions,
-UI locations, and intentional changes.
+Use descriptive filenames so fixture purpose can be inferred from the schema
+range, file-type directory, and filename. For fixture files representing a named
+resource, prefer `{TYPE}_{PURPOSE}` names, such as `NONE_DEFAULT.m8i` or
+`CHROMATIC_DEFAULT.m8n`. Add fixture metadata when filenames and directory
+structure are not enough to connect binary files, screenshots, firmware
+versions, UI locations, and intentional changes.
 
-Fixture directories should use the schema range, such as `6.6.x`. Fixture
-metadata must record the exact M8 firmware patch or letter release used to
-create or last refresh the files, such as `6.6.2A`.
+Fixture directories should use the firmware range, such as `6.5.x`. Fixture
+metadata, when present, should record the exact M8 firmware patch or letter
+release used to create or last refresh the files, such as `6.5.2C`. The file
+header schema version is separate and should be read from each M8 file.
 
 ## Schema Documentation
 

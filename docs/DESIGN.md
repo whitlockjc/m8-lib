@@ -8,8 +8,8 @@ reveals how M8 files are actually structured.
 
 ## Goal
 
-Create canonical M8 file schemas that are human-readable,
-computer-parseable, and suitable for verification tooling.
+Create canonical M8 file schemas that are human-readable, computer-parseable,
+and suitable for verification tooling.
 
 The project should support:
 
@@ -55,15 +55,17 @@ metadata, screenshots, research notes, confidence levels, and broader design
 discussion should live beside the schemas in `fixtures/` and `docs/`, not inside
 Kaitai files.
 
-Use one top-level Kaitai entry schema per verified M8 `{MAJOR}.{MINOR}.x`
-version range. The entry schema should read the common M8 file header, identify
-the file kind, and dispatch to the appropriate file body schema.
+Use one top-level Kaitai entry schema per verified M8 firmware
+`{MAJOR}.{MINOR}.x` range. The entry schema should document the exact firmware
+release it was last synchronized with, read the common M8 file header, identify
+the file kind, and dispatch to the appropriate file body schema for that file's
+header schema version.
 
 Top-level entry schemas live directly under `schemas/`:
 
 ```txt
 schemas/
-  6.6.x.ksy
+  6.5.x.ksy
 ```
 
 Shared schemas that are stable across versions live under `schemas/common/`:
@@ -74,28 +76,33 @@ schemas/
     file_header.ksy
 ```
 
-Version-specific component schemas live under
-`schemas/versions/<version-or-range>/`:
+File-schema-version component schemas live under
+`schemas/file-versions/<file-version>/`:
 
 ```txt
 schemas/
-  versions/
-    6.6.x/
+  file-versions/
+    6.0.1/
       instrument.ksy
-      scale.ksy
+    6.5.0/
       song.ksy
+    4.0.1/
+      scale.ksy
+    1.0.2/
       theme.ksy
 ```
 
-The top-level entry schema imports shared common schemas and version-specific
-component schemas. This provides one obvious schema file for tools to use while
-keeping large file-type definitions focused and reviewable.
+The top-level entry schema imports shared common schemas and file-version
+component schemas. This provides one obvious schema file for tools to use for a
+firmware range while keeping large file-type definitions focused and
+reviewable.
 
 Patch and letter firmware releases should normally be treated as verification
-events for the `{MAJOR}.{MINOR}.x` schema, not as new schema targets. When a new
-patch release is available, update the fixtures to the latest patch or letter
-release for that minor version and run verification. If verification passes, the
-same `{MAJOR}.{MINOR}.x` schema remains current.
+events for the firmware `{MAJOR}.{MINOR}.x` entry schema, not as new entry
+schema targets. When a new patch release is available, update the fixtures to
+the latest patch or letter release for that minor version and run verification.
+If verification passes, the same `{MAJOR}.{MINOR}.x` entry schema remains
+current.
 
 If patch-level fixture evidence proves that a patch or letter release changes
 stored file structure, create a more specific schema for that release and
@@ -106,22 +113,33 @@ Version/range and latest aliases may be added as thin entry schemas:
 ```txt
 schemas/
   LATEST.ksy
+  6.5.x.ksy
   6.6.x.ksy
 ```
 
-`{MAJOR}.{MINOR}.x` schemas are canonical when they are backed by fixtures from
-the latest available patch or letter release for that minor version. `LATEST.ksy`
-may point at the latest supported `{MAJOR}.{MINOR}.x` schema.
+Firmware `{MAJOR}.{MINOR}.x` entry schemas are canonical when they are backed by
+fixtures from the latest available patch or letter release for that minor
+version. `LATEST.ksy` may point at the latest supported firmware
+`{MAJOR}.{MINOR}.x` entry schema.
 
 Use Dirtywave's firmware label in filenames and directories when practical, such
-as `6.6.x`. Kaitai `meta.id` values can use normalized identifiers where
-needed, such as `file_6_6_x`.
+as `6.5.x`. Kaitai `meta.id` values can use normalized identifiers where
+needed, such as `file_6_5_x`.
 
 ## Version Strategy
 
+Distinguish firmware versions from file header schema versions:
+
+- Firmware version identifies the M8 release used to create, save, or display a
+  fixture.
+- File header schema version is the version encoded inside an M8 file header.
+  It appears to identify the persisted schema for that file type and may be
+  older than the firmware that produced the file.
+
 M8 schema changes usually become the new norm until a later firmware release
-changes the same structure again. Model this at the `{MAJOR}.{MINOR}.x` level by
-default.
+changes the same structure again. Model firmware compatibility at the
+`{MAJOR}.{MINOR}.x` level by default, but key reusable component schemas by the
+file header schema version they describe.
 
 Changelog entries help identify likely schema boundaries but do not prove binary
 layout by themselves. Treat these as research targets:
@@ -146,18 +164,24 @@ Examples of likely schema boundaries from the changelog:
 - `6.5.0`: added `MTT` and groove PPQN.
 - `6.6.0`: added ModFX Comb and Hypersynth `SHAPE`.
 
-When a change affects stored file data, create or update the version-specific
-component schema for the `{MAJOR}.{MINOR}.x` range where the change first
-appears. Later schemas can reuse that component until another fixture-proven
-change requires a new one.
+When a change affects stored file data, create or update the component schema
+for the file header schema version where the change appears. Later firmware
+entry schemas can reuse that component until another fixture-proven change
+requires a new one.
 
-For the first milestone, start with a shared header schema and a `6.6.x` entry
-schema. The header schema should identify the M8 file version and file type.
+The initial target is `6.5.x` because it is currently practical to generate
+fixtures from M8 headless. Use `6.6.x` as the first follow-on line to validate
+schema reuse and version-specific overrides once suitable fixtures are
+available.
+
+For the first milestone, start with a shared header schema and a `6.5.x` entry
+schema. The header schema should identify the M8 file header schema version and
+file type.
 
 ## Research Plan
 
-Research should start with current M8 6.6.x files, using the latest available
-6.6 patch or letter release for fixtures.
+Research should start with current M8 6.5.x files, using the latest available
+6.5 patch or letter release for fixtures.
 
 For each file type, collect:
 
@@ -165,6 +189,13 @@ For each file type, collect:
 - one or more files with isolated changes,
 - screenshots of the corresponding M8 screens,
 - notes explaining exactly what changed in the UI.
+
+Fixture filenames should be descriptive enough that their role can be inferred
+from the schema range, file-type directory, and filename. For fixture files
+representing a named resource, prefer `{TYPE}_{PURPOSE}` names, such as
+`NONE_DEFAULT.m8i` or `CHROMATIC_DEFAULT.m8n`. Add separate fixture metadata
+only when filenames and directory structure are not enough to document
+relationships, exact firmware provenance, UI location, or intentional changes.
 
 The first research objective is to map visible M8 UI fields to byte ranges.
 
