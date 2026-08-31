@@ -1,0 +1,9 @@
+{
+  "name": "m8-lib",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "inspect:headers": "node tools/inspect-headers.js",
+    "verify": "tools/verify"
+  }
+}

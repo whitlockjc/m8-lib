@@ -1,0 +1,39 @@
+meta:
+  id: file_header
+  endian: le
+  license: Apache-2.0
+  ks-version: 0.11
+doc: |
+  Common header present at the start of M8 files.
+
+  The encoded version appears to describe the persisted file schema version for
+  this file, not necessarily the M8 firmware version used to create it.
+seq:
+  - id: magic
+    contents: M8VERSION
+    doc: ASCII file signature.
+  - id: reserved_0
+    type: u1
+    valid: 0
+  - id: schema_version_raw
+    type: u2
+    doc: Packed schema version as major/minor/patch nibbles.
+  - id: reserved_1
+    type: u1
+    valid: 0
+  - id: file_kind
+    type: u1
+    enum: file_kind
+instances:
+  schema_version_major:
+    value: (schema_version_raw >> 8) & 0xf
+  schema_version_minor:
+    value: (schema_version_raw >> 4) & 0xf
+  schema_version_patch:
+    value: schema_version_raw & 0xf
+enums:
+  file_kind:
+    0x00: song
+    0x10: instrument
+    0x20: theme
+    0x30: scale

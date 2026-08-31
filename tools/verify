@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+
+set -eu
+
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+OUT_DIR="${TMPDIR:-/tmp}/m8-lib-kaitai-check"
+SCHEMA_CHECK_DIR="$OUT_DIR/schemas"
+
+cd "$ROOT"
+
+tools/inspect-headers.js
+
+if command -v kaitai-struct-compiler >/dev/null 2>&1; then
+  rm -rf "$OUT_DIR"
+  mkdir -p "$SCHEMA_CHECK_DIR"
+  cp -R schemas/. "$SCHEMA_CHECK_DIR"
+  (
+    cd "$SCHEMA_CHECK_DIR"
+    kaitai-struct-compiler -t javascript 6.5.x.ksy
+  )
+else
+  echo "warning: kaitai-struct-compiler not found; skipping schema compilation" >&2
+fi
