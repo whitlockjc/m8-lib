@@ -81,7 +81,9 @@ Use these top-level directories as the project grows:
   documentation, and process documentation. Use version names or version ranges
   in document names or contents when a note is version-specific.
 - `schemas/`: canonical language-agnostic schemas. Organize schemas by M8
-  version or version range, then by file type.
+  `{MAJOR}.{MINOR}.x` version range, then by file type. Use a more specific
+  patch or letter version only when fixture evidence proves the patch changes
+  stored file structure.
 - `fixtures/`: version-specific sample M8 files, screenshots, and fixture
   metadata.
 - `tools/`: research, diffing, validation, and code-generation tooling.
@@ -92,11 +94,15 @@ Suggested schema layout:
 
 ```txt
 schemas/
-  6.6.x/
-    instrument.schema.*
-    scale.schema.*
-    song.schema.*
-    theme.schema.*
+  6.6.x.ksy
+  common/
+    file_header.ksy
+  versions/
+    6.6.x/
+      instrument.ksy
+      scale.ksy
+      song.ksy
+      theme.ksy
 ```
 
 Suggested fixture layout:
@@ -104,6 +110,7 @@ Suggested fixture layout:
 ```txt
 fixtures/
   6.6.x/
+    fixture-set.yaml
     instruments/
       baseline/
       changes/
@@ -124,6 +131,10 @@ fixtures/
 
 Use fixture metadata to connect binary files, screenshots, firmware versions,
 UI locations, and intentional changes.
+
+Fixture directories should use the schema range, such as `6.6.x`. Fixture
+metadata must record the exact M8 firmware patch or letter release used to
+create or last refresh the files, such as `6.6.2A`.
 
 ## Schema Documentation
 

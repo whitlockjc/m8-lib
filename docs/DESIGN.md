@@ -55,7 +55,7 @@ metadata, screenshots, research notes, confidence levels, and broader design
 discussion should live beside the schemas in `fixtures/` and `docs/`, not inside
 Kaitai files.
 
-Use one top-level Kaitai entry schema per verified M8 firmware version or
+Use one top-level Kaitai entry schema per verified M8 `{MAJOR}.{MINOR}.x`
 version range. The entry schema should read the common M8 file header, identify
 the file kind, and dispatch to the appropriate file body schema.
 
@@ -63,7 +63,7 @@ Top-level entry schemas live directly under `schemas/`:
 
 ```txt
 schemas/
-  6.6.2A.ksy
+  6.6.x.ksy
 ```
 
 Shared schemas that are stable across versions live under `schemas/common/`:
@@ -80,7 +80,7 @@ Version-specific component schemas live under
 ```txt
 schemas/
   versions/
-    6.6.2A/
+    6.6.x/
       instrument.ksy
       scale.ksy
       song.ksy
@@ -91,10 +91,15 @@ The top-level entry schema imports shared common schemas and version-specific
 component schemas. This provides one obvious schema file for tools to use while
 keeping large file-type definitions focused and reviewable.
 
-Use exact firmware versions until fixture evidence proves that a schema applies
-to a broader version range. For example, start with `6.6.2A`; promote to
-`6.6.x` only when fixtures show the relevant structures are stable across that
-range.
+Patch and letter firmware releases should normally be treated as verification
+events for the `{MAJOR}.{MINOR}.x` schema, not as new schema targets. When a new
+patch release is available, update the fixtures to the latest patch or letter
+release for that minor version and run verification. If verification passes, the
+same `{MAJOR}.{MINOR}.x` schema remains current.
+
+If patch-level fixture evidence proves that a patch or letter release changes
+stored file structure, create a more specific schema for that release and
+document why the normal `{MAJOR}.{MINOR}.x` convention was not sufficient.
 
 Version/range and latest aliases may be added as thin entry schemas:
 
@@ -102,31 +107,29 @@ Version/range and latest aliases may be added as thin entry schemas:
 schemas/
   LATEST.ksy
   6.6.x.ksy
-  6.6.2A.ksy
 ```
 
-Exact firmware schemas are canonical because they can be tied directly to
-fixtures. Alias schemas should only point at a specific exact schema or a proven
-version range. They should not hide uncertainty.
+`{MAJOR}.{MINOR}.x` schemas are canonical when they are backed by fixtures from
+the latest available patch or letter release for that minor version. `LATEST.ksy`
+may point at the latest supported `{MAJOR}.{MINOR}.x` schema.
 
 Use Dirtywave's firmware label in filenames and directories when practical, such
-as `6.6.2A`. Kaitai `meta.id` values can use normalized identifiers where
-needed, such as `file_6_6_2a`.
+as `6.6.x`. Kaitai `meta.id` values can use normalized identifiers where
+needed, such as `file_6_6_x`.
 
 ## Version Strategy
 
 M8 schema changes usually become the new norm until a later firmware release
-changes the same structure again. Model this with exact schemas first, then
-promote exact schemas into ranges only after fixture evidence supports the
-range.
+changes the same structure again. Model this at the `{MAJOR}.{MINOR}.x` level by
+default.
 
 Changelog entries help identify likely schema boundaries but do not prove binary
 layout by themselves. Treat these as research targets:
 
 - Major releases have often introduced likely schema changes.
 - Minor releases can introduce likely schema changes.
-- Patch and letter releases are often fixes, but can still affect saved files
-  and must not be assumed schema-equivalent without fixtures.
+- Patch and letter releases are treated as fixture refresh and verification
+  events unless fixture evidence proves a stored file schema change.
 
 Examples of likely schema boundaries from the changelog:
 
@@ -144,15 +147,17 @@ Examples of likely schema boundaries from the changelog:
 - `6.6.0`: added ModFX Comb and Hypersynth `SHAPE`.
 
 When a change affects stored file data, create or update the version-specific
-component schema where the change first appears. Later exact schemas can reuse
-that component until another fixture-proven change requires a new one.
+component schema for the `{MAJOR}.{MINOR}.x` range where the change first
+appears. Later schemas can reuse that component until another fixture-proven
+change requires a new one.
 
-For the first milestone, start with a shared header schema and a `6.6.2A` entry
+For the first milestone, start with a shared header schema and a `6.6.x` entry
 schema. The header schema should identify the M8 file version and file type.
 
 ## Research Plan
 
-Research should start with current M8 6.6.x files.
+Research should start with current M8 6.6.x files, using the latest available
+6.6 patch or letter release for fixtures.
 
 For each file type, collect:
 
