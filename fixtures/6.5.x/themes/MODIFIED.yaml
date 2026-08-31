@@ -1,0 +1,134 @@
+fileType: theme
+firmware: 6.5.2C
+screen: project.settings.editTheme
+
+changes:
+  - name: background.r
+    original: 0x00
+    new: 0x01
+  - name: background.g
+    original: 0x00
+    new: 0x02
+  - name: background.b
+    original: 0x00
+    new: 0x03
+
+  - name: textEmpty.r
+    original: 0x20
+    new: 0x21
+  - name: textEmpty.g
+    original: 0x28
+    new: 0x29
+  - name: textEmpty.b
+    original: 0x30
+    new: 0x31
+
+  - name: textInfo.r
+    original: 0x48
+    new: 0x49
+  - name: textInfo.g
+    original: 0x50
+    new: 0x51
+  - name: textInfo.b
+    original: 0x60
+    new: 0x61
+
+  - name: textDefault.r
+    original: 0x90
+    new: 0x91
+  - name: textDefault.g
+    original: 0xb0
+    new: 0xb1
+  - name: textDefault.b
+    original: 0xb8
+    new: 0xb9
+
+  - name: textValue.r
+    original: 0xff
+    new: 0xfe
+  - name: textValue.g
+    original: 0xff
+    new: 0xfd
+  - name: textValue.b
+    original: 0xff
+    new: 0xfc
+
+  - name: textTitles.r
+    original: 0xff
+    new: 0xfb
+  - name: textTitles.g
+    original: 0x20
+    new: 0x22
+  - name: textTitles.b
+    original: 0x40
+    new: 0x41
+
+  - name: playMarkers.r
+    original: 0x00
+    new: 0x04
+  - name: playMarkers.g
+    original: 0xff
+    new: 0xfa
+  - name: playMarkers.b
+    original: 0x60
+    new: 0x62
+
+  - name: cursor.r
+    original: 0x00
+    new: 0x05
+  - name: cursor.g
+    original: 0xff
+    new: 0xf9
+  - name: cursor.b
+    original: 0xff
+    new: 0xf8
+
+  - name: selection.r
+    original: 0x00
+    new: 0x06
+  - name: selection.g
+    original: 0xff
+    new: 0xf7
+  - name: selection.b
+    original: 0x80
+    new: 0x81
+
+  - name: scopeSlider.r
+    original: 0x90
+    new: 0x92
+  - name: scopeSlider.g
+    original: 0xb8
+    new: 0xba
+  - name: scopeSlider.b
+    original: 0xb8
+    new: 0xbb
+
+  - name: meterLow.r
+    original: 0x00
+    new: 0x07
+  - name: meterLow.g
+    original: 0xff
+    new: 0xf6
+  - name: meterLow.b
+    original: 0xe0
+    new: 0xe1
+
+  - name: meterMid.r
+    original: 0xff
+    new: 0xf5
+  - name: meterMid.g
+    original: 0xff
+    new: 0xf4
+  - name: meterMid.b
+    original: 0x50
+    new: 0x52
+
+  - name: meterPeak.r
+    original: 0xff
+    new: 0xf3
+  - name: meterPeak.g
+    original: 0x00
+    new: 0x08
+  - name: meterPeak.b
+    original: 0x80
+    new: 0x82

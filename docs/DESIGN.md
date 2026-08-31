@@ -40,6 +40,12 @@ M8 currently has four top-level file types:
 The schema system should represent each file type independently while sharing
 common primitives where appropriate.
 
+Some M8 UI settings may not be stored in the file type whose screen exposes
+them. When fixture evidence shows that a visible setting is absent from the
+expected file, track it as an open research item until it is mapped to another
+file type, Project/Song data, or device/global storage outside portable M8
+files.
+
 ## Schema Format
 
 Use Kaitai Struct (`.ksy`) as the canonical schema format for now.
@@ -202,6 +208,17 @@ The first research objective is to map visible M8 UI fields to byte ranges.
 The first implementation objective is to define and verify the common M8 file
 header. All M8 file types share this header, and the file type byte determines
 whether the body is an instrument, scale, song, or theme.
+
+Research findings that are not yet schema fields should be tracked in
+`docs/RESEARCH_BACKLOG.md`. This includes settings observed in the UI but not
+found in the expected file type.
+
+Known open finding:
+
+- Theme RGB/HSV editing mode is not stored in M8 6.5.x theme files. Theme files
+  should be modeled as color triples plus any other fixture-proven fields, while
+  RGB/HSV mode remains a research target for Song/Project or device/global
+  storage.
 
 ## Schema Documentation Model
 

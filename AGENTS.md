@@ -49,6 +49,8 @@ documentation.
 - Preserve the difference between observed facts, inferred meaning, open
   questions, and proposed API design.
 - Document unknown, reserved, and unverified byte ranges instead of hiding them.
+- Track observed behavior that is not yet mapped to a file field, including
+  settings that may be stored in Song/Project data or outside portable M8 files.
 - Favor small, reviewable changes.
 - Avoid designing ergonomic language APIs before the low-level schema model is
   understood.
@@ -70,7 +72,9 @@ For each M8 file type, UI page, and meaningful setting:
 6. Diff the binary files.
 7. Record changed byte ranges.
 8. Map byte ranges to UI-visible fields when evidence supports it.
-9. Mark unproven interpretations as inferred.
+9. Record settings that do not appear in the expected file so they can be
+   tested against other files or device/global storage later.
+10. Mark unproven interpretations as inferred.
 
 Avoid broad fixture changes when a single-field change is possible.
 
@@ -80,7 +84,9 @@ Use these top-level directories as the project grows:
 
 - `docs/`: design notes, research notes, generated human-readable schema
   documentation, and process documentation. Use version names or version ranges
-  in document names or contents when a note is version-specific.
+  in document names or contents when a note is version-specific. Use
+  `docs/RESEARCH_BACKLOG.md` for observed behavior that still needs targeted
+  fixtures or schema evidence.
 - `schemas/`: canonical language-agnostic schemas. Use top-level
   `{MAJOR}.{MINOR}.x` entry schemas for M8 firmware ranges, and organize
   reusable component schemas by M8 file header schema version.

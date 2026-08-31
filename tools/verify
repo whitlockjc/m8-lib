@@ -10,6 +10,11 @@ cd "$ROOT"
 
 tools/inspect-headers.js
 
+tools/map-fixture.js \
+  fixtures/6.5.x/themes/DEFAULT.m8t \
+  fixtures/6.5.x/themes/MODIFIED.m8t \
+  fixtures/6.5.x/themes/MODIFIED.yaml
+
 if command -v kaitai-struct-compiler >/dev/null 2>&1; then
   rm -rf "$OUT_DIR"
   mkdir -p "$SCHEMA_CHECK_DIR"
