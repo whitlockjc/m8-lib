@@ -1,0 +1,66 @@
+fileType: scale
+firmware: 6.5.2C
+screen: project.scaleEditor
+
+changes:
+  - name: enabledNotes
+    original: 0x0fff
+    new: 0x0555
+    type: u2le
+
+  - name: intervals.0
+    original: 0
+    new: 2399
+    type: i2le
+  - name: intervals.1
+    original: 0
+    new: 102
+    type: i2le
+  - name: intervals.2
+    original: 0
+    new: 304
+    type: i2le
+  - name: intervals.3
+    original: 0
+    new: 506
+    type: i2le
+  - name: intervals.4
+    original: 0
+    new: 708
+    type: i2le
+  - name: intervals.5
+    original: 0
+    new: 910
+    type: i2le
+  - name: intervals.6
+    original: 0
+    new: -2019
+    type: i2le
+  - name: intervals.7
+    original: 0
+    new: -1817
+    type: i2le
+  - name: intervals.8
+    original: 0
+    new: -1615
+    type: i2le
+  - name: intervals.9
+    original: 0
+    new: -1413
+    type: i2le
+  - name: intervals.10
+    original: 0
+    new: -1211
+    type: i2le
+  - name: intervals.11
+    original: 0
+    new: -2298
+    type: i2le
+
+  - name: name
+    originalBytes: 43 48 52 4f 4d 41 54 49 43 ff ff ff ff ff ff ff
+    newBytes: 4d 4f 44 49 46 49 45 44 00 00 00 00 00 00 00 00
+
+  - name: tuningOffset
+    originalBytes: 00 00 00 00
+    newBytes: 80 c2 f5 bc

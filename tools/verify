@@ -11,6 +11,11 @@ cd "$ROOT"
 tools/inspect-headers.js
 
 tools/map-fixture.js \
+  fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n \
+  fixtures/6.5.x/scales/MODIFIED.m8n \
+  fixtures/6.5.x/scales/MODIFIED.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/themes/DEFAULT.m8t \
   fixtures/6.5.x/themes/MODIFIED.m8t \
   fixtures/6.5.x/themes/MODIFIED.yaml

@@ -209,6 +209,10 @@ The first implementation objective is to define and verify the common M8 file
 header. All M8 file types share this header, and the file type byte determines
 whether the body is an instrument, scale, song, or theme.
 
+M8 strings should be modeled as fixed-size byte ranges. The UI-visible text may
+use only part of the range. Padding bytes and maximum stored length should be
+documented from fixture evidence for each string field.
+
 Research findings that are not yet schema fields should be tracked in
 `docs/RESEARCH_BACKLOG.md`. This includes settings observed in the UI but not
 found in the expected file type.

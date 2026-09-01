@@ -51,6 +51,8 @@ documentation.
 - Document unknown, reserved, and unverified byte ranges instead of hiding them.
 - Track observed behavior that is not yet mapped to a file field, including
   settings that may be stored in Song/Project data or outside portable M8 files.
+- Treat M8 strings as fixed-size byte ranges. The UI string value may be shorter
+  than the stored range, and padding bytes must be documented from evidence.
 - Favor small, reviewable changes.
 - Avoid designing ergonomic language APIs before the low-level schema model is
   understood.

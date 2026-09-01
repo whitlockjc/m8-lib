@@ -48,3 +48,21 @@ Needed research:
 
 - Confirm whether the M8 UI derives theme names from `.m8t` filenames.
 - Check whether any companion metadata exists outside the portable `.m8t` file.
+
+## Scale Key
+
+Status: open
+
+Observation:
+
+- Scale key is displayed on the Scale Editor UI screen but is stored in the
+  Song, not in the Scale file.
+
+Implication:
+
+- Scale schemas should not include a `key` field.
+
+Needed research:
+
+- Create Song fixtures that change only the active scale key.
+- Map the stored Song field for scale key once Song settings are researched.
