@@ -6,12 +6,12 @@ meta:
 doc: |
   Body schema for instrument files with header schema version 6.0.1.
 
-  Initial schema verified against M8 6.5.2C NONE and Wavsynth instrument
-  fixtures. The instrument type byte, fixed-size name byte range, and common
-  instrument prefix are mapped. Wavsynth params, filter params, amp params,
-  mixer params, and common EQ assignment are mapped from the WAV_PARAMS
-  fixture. Unknown ranges are preserved until additional instrument fixtures
-  provide evidence for their layout.
+  Initial schema verified against M8 6.5.2C NONE, Wavsynth, and Macrosynth
+  instrument fixtures. The instrument type byte, fixed-size name byte range,
+  and common instrument prefix are mapped. Wavsynth/Macrosynth params, filter
+  params, amp params, mixer params, and common EQ assignment are mapped from the
+  WAV_PARAMS and MAC_PARAMS fixtures. Unknown ranges are preserved until
+  additional instrument fixtures provide evidence for their layout.
 seq:
   - id: instrument_type
     type: u1
@@ -31,12 +31,23 @@ seq:
     doc: Common instrument table TIC setting.
   - id: unknown_common_0
     size: 3
-  - id: body_before_eq
+  - id: instrument_params
+    size: 5
     type:
       switch-on: instrument_type
       cases:
-        'instrument_type::wavsynth': wavsynth_body_before_eq
-        'instrument_type::none': unused_body_before_eq
+        'instrument_type::wavsynth': wavsynth_params
+        'instrument_type::macrosynth': macrosynth_params
+        'instrument_type::none': unused_instrument_params
+    doc: Instrument-specific parameter block.
+  - id: filter
+    type: filter_params
+  - id: amp
+    type: amp_params
+  - id: mixer
+    type: mixer_params
+  - id: unknown_before_eq
+    size: 29
   - id: eq
     type: u1
     doc: |
@@ -45,29 +56,12 @@ seq:
   - id: unknown_tail
     size-eos: true
 types:
-  unused_body_before_eq:
+  unused_instrument_params:
     doc: |
-      Preserved bytes between the common instrument prefix and common EQ field
-      for instrument types whose type-specific body is not yet semantically
-      mapped.
+      Preserved instrument-specific parameter bytes for NONE.
     seq:
-      - id: unknown_body
-        size: 44
-  wavsynth_body_before_eq:
-    doc: |
-      Partially mapped Wavsynth body before the common EQ field. Offsets are
-      relative to the byte after the common instrument prefix.
-    seq:
-      - id: params
-        type: wavsynth_params
-      - id: filter
-        type: filter_params
-      - id: amp
-        type: amp_params
-      - id: mixer
-        type: mixer_params
-      - id: unknown_2
-        size: 29
+      - id: unknown
+        size-eos: true
   wavsynth_params:
     seq:
       - id: shape
@@ -80,6 +74,19 @@ types:
       - id: warp
         type: u1
       - id: scan
+        type: u1
+  macrosynth_params:
+    seq:
+      - id: shape
+        type: u1
+        enum: macrosynth_shape
+      - id: timbre
+        type: u1
+      - id: color
+        type: u1
+      - id: degrade
+        type: u1
+      - id: redux
         type: u1
   filter_params:
     seq:
@@ -112,6 +119,7 @@ types:
 enums:
   instrument_type:
     0x00: wavsynth
+    0x01: macrosynth
     0xff: none
   filter_type:
     0x00: off
@@ -207,3 +215,52 @@ enums:
     0x43: efx_zap
     0x44: vox_braids
     0x45: vox_voxsynth
+  macrosynth_shape:
+    0x00: csaw
+    0x01: morph
+    0x02: saw_square
+    0x03: sine_triangle
+    0x04: buzz
+    0x05: square_sub
+    0x06: saw_sub
+    0x07: square_sync
+    0x08: saw_sync
+    0x09: triple_saw
+    0x0a: triple_square
+    0x0b: triple_triangle
+    0x0c: triple_sin
+    0x0d: triple_rng
+    0x0e: saw_swarm
+    0x0f: saw_comb
+    0x10: toy
+    0x11: digital_filter_lp
+    0x12: digital_filter_pk
+    0x13: digital_filter_bp
+    0x14: digital_filter_hp
+    0x15: vosim
+    0x16: vowel
+    0x17: vowel_fof
+    0x18: harmonics
+    0x19: fm
+    0x1a: feedback_fm
+    0x1b: chaotic_feedback_fm
+    0x1c: plucked
+    0x1d: bowed
+    0x1e: blown
+    0x1f: fluted
+    0x20: struck_bell
+    0x21: struck_drum
+    0x22: kick
+    0x23: cymbal
+    0x24: snare
+    0x25: wavetables
+    0x26: wave_map
+    0x27: wav_line
+    0x28: wav_paraphonic
+    0x29: filtered_noise
+    0x2a: twin_peaks_noise
+    0x2b: clocked_noise
+    0x2c: granular_cloud
+    0x2d: particle_noise
+    0x2e: digital_mod
+    0x2f: morse_noise

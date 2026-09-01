@@ -16,6 +16,11 @@ tools/map-fixture.js \
   fixtures/6.5.x/instruments/WAV_PARAMS.yaml
 
 tools/map-fixture.js \
+  fixtures/6.5.x/instruments/MAC_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/MAC_PARAMS.m8i \
+  fixtures/6.5.x/instruments/MAC_PARAMS.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n \
   fixtures/6.5.x/scales/MODIFIED.m8n \
   fixtures/6.5.x/scales/MODIFIED.yaml
