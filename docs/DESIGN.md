@@ -213,6 +213,11 @@ M8 strings should be modeled as fixed-size byte ranges. The UI-visible text may
 use only part of the range. Padding bytes and maximum stored length should be
 documented from fixture evidence for each string field.
 
+Enumerated fields should document the stored byte value and the UI label. The
+stored value must come from fixture evidence before it is treated as schema
+truth. UI labels can come from official Dirtywave documentation or fixture UI
+evidence, and should be kept separate from the byte-level storage claim.
+
 Research findings that are not yet schema fields should be tracked in
 `docs/RESEARCH_BACKLOG.md`. This includes settings observed in the UI but not
 found in the expected file type.
