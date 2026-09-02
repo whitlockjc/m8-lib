@@ -1,0 +1,83 @@
+fileType: instrument
+firmware: 6.5.2C
+screen: instrument.sampler.params
+
+changes:
+  - name: name
+    originalBytes: 53 41 4d 5f 44 45 46 41 55 4c 54 00
+    newBytes: 53 41 4d 42 5f 50 41 52 41 4d 53 00
+
+  - name: tableTic
+    original: 0x01
+    new: 0x02
+
+  - name: sampler.bpm
+    original: 0x80
+    new: 0xff
+  - name: sampler.playMode
+    original: 0x00
+    new: 0x0e
+    originalLabel: FWD
+    newLabel: BPM.PP
+  - name: sampler.slice
+    original: 0x00
+    new: 0x80
+  - name: sampler.start
+    original: 0x00
+    new: 0xfe
+  - name: sampler.loopStart
+    original: 0x00
+    new: 0xfd
+  - name: sampler.length
+    original: 0xff
+    new: 0xfc
+  - name: sampler.degrade
+    original: 0x00
+    new: 0xfb
+
+  - name: filter.type
+    original: 0x00
+    new: 0x07
+    originalLabel: OFF
+    newLabel: ZDF HP
+  - name: filter.cutoff
+    original: 0xff
+    new: 0xfa
+  - name: filter.resonance
+    original: 0x00
+    new: 0xf9
+
+  - name: amp.amp
+    original: 0x00
+    new: 0xf8
+  - name: amp.limit
+    original: 0x00
+    new: 0x08
+    originalLabel: CLIP
+    newLabel: POST:W3
+  - name: amp.pan
+    original: 0x80
+    new: 0xf7
+
+  - name: mixer.dry
+    original: 0xc0
+    new: 0xf6
+  - name: mixer.modFx
+    original: 0x00
+    new: 0xf5
+  - name: mixer.delay
+    original: 0x00
+    new: 0xf4
+  - name: mixer.reverb
+    original: 0x00
+    new: 0xf3
+
+  - name: eq
+    original: 0x80
+    new: 0x7f
+    originalLabel: --
+    newLabel: 7F
+
+  - name: samplePath
+    originalBytes: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    newBytes: 2f 53 61 6d 70 6c 65 73 2f 4b 69 63 6b 2e 77 61 76

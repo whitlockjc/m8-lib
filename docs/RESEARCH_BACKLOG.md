@@ -66,3 +66,25 @@ Needed research:
 
 - Create Song fixtures that change only the active scale key.
 - Map the stored Song field for scale key once Song settings are researched.
+
+## Sampler Sample Path Length
+
+Status: open
+
+Observation:
+
+- Sampler fixtures store `/Samples/Kick.wav` starting at `0x65`.
+- The current schema reserves `0x65..0xe4` as a fixed 128-byte sample path
+  range.
+
+Implication:
+
+- The start offset and stored path bytes are fixture-verified.
+- The maximum stored path length remains provisional until a longer sample path
+  fixture verifies the boundary.
+
+Needed research:
+
+- Create a Sampler fixture with a substantially longer sample path.
+- Verify whether the path still starts at `0x65`, where it terminates or pads,
+  and whether `0xe4` is the correct final byte for the fixed range.

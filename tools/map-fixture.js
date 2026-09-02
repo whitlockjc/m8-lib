@@ -199,8 +199,18 @@ function main () {
 
     const matches = []
     const size = newBytes.length
+    const expectedOffset = change.offset
 
-    for (let offset = 0; offset <= baseline.length - size; offset++) {
+    if (expectedOffset !== undefined && typeof expectedOffset !== 'number') {
+      throw new Error(`${change.name}: offset must be numeric`)
+    }
+
+    const startOffset = expectedOffset === undefined ? 0 : expectedOffset
+    const endOffset = expectedOffset === undefined
+      ? baseline.length - size
+      : expectedOffset
+
+    for (let offset = startOffset; offset <= endOffset; offset++) {
       const overlapsChangedByte = [...changed].some((changedOffset) => (
         changedOffset >= offset && changedOffset < offset + size
       ))

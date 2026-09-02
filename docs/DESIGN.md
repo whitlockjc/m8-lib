@@ -202,6 +202,10 @@ representing a named resource, prefer `{TYPE}_{PURPOSE}` names, such as
 `NONE_DEFAULT.m8i` or `CHROMATIC_DEFAULT.m8n`. Add separate fixture metadata
 only when filenames and directory structure are not enough to document
 relationships, exact firmware provenance, UI location, or intentional changes.
+Fixture metadata should let tools discover offsets from byte evidence by
+default. Explicit offset hints are acceptable when duplicate byte transitions
+make a field ambiguous and another fixture or schema finding already
+disambiguates the location.
 
 The first research objective is to map visible M8 UI fields to byte ranges.
 

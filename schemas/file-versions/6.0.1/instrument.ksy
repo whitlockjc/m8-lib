@@ -6,11 +6,11 @@ meta:
 doc: |
   Body schema for instrument files with header schema version 6.0.1.
 
-  Initial schema verified against M8 6.5.2C NONE, Wavsynth, and Macrosynth
-  instrument fixtures. The instrument type byte, fixed-size name byte range,
-  and common instrument prefix are mapped. Wavsynth/Macrosynth params, filter
-  params, amp params, mixer params, and common EQ assignment are mapped from the
-  WAV_PARAMS and MAC_PARAMS fixtures. Unknown ranges are preserved until
+  Initial schema verified against M8 6.5.2C NONE, Wavsynth, Macrosynth, and
+  Sampler instrument fixtures. The instrument type byte, fixed-size name byte
+  range, and common instrument prefix are mapped. Wavsynth/Macrosynth/Sampler
+  params, filter params, amp params, mixer params, sample path, and common EQ
+  assignment are mapped from params fixtures. Unknown ranges are preserved until
   additional instrument fixtures provide evidence for their layout.
 seq:
   - id: instrument_type
@@ -30,38 +30,93 @@ seq:
     type: u1
     doc: Common instrument table TIC setting.
   - id: unknown_common_0
-    size: 3
-  - id: instrument_params
-    size: 5
+    size: 2
+  - id: body_before_eq
     type:
       switch-on: instrument_type
       cases:
-        'instrument_type::wavsynth': wavsynth_params
-        'instrument_type::macrosynth': macrosynth_params
-        'instrument_type::none': unused_instrument_params
-    doc: Instrument-specific parameter block.
-  - id: filter
-    type: filter_params
-  - id: amp
-    type: amp_params
-  - id: mixer
-    type: mixer_params
-  - id: unknown_before_eq
-    size: 29
+        'instrument_type::wavsynth': wavsynth_body_before_eq
+        'instrument_type::macrosynth': macrosynth_body_before_eq
+        'instrument_type::sampler': sampler_body_before_eq
+        'instrument_type::none': unused_body_before_eq
+    doc: Instrument-specific body before the common EQ field.
   - id: eq
     type: u1
     doc: |
       Common instrument EQ assignment. Observed values: 0x80 displays as --,
       0x7f displays as 7F.
-  - id: unknown_tail
-    size-eos: true
+  - id: tail
+    type:
+      switch-on: instrument_type
+      cases:
+        'instrument_type::sampler': sampler_tail
+        'instrument_type::wavsynth': unused_tail
+        'instrument_type::macrosynth': unused_tail
+        'instrument_type::none': unused_tail
+    doc: Instrument-specific tail after the common EQ field.
 types:
-  unused_instrument_params:
+  unused_body_before_eq:
     doc: |
-      Preserved instrument-specific parameter bytes for NONE.
+      Preserved bytes between the common instrument prefix and common EQ field
+      for NONE.
     seq:
       - id: unknown
-        size-eos: true
+        size: 45
+  wavsynth_body_before_eq:
+    seq:
+      - id: unknown_before_params
+        size: 1
+      - id: params
+        type: wavsynth_params
+      - id: filter
+        type: filter_params
+      - id: amp
+        type: amp_params
+      - id: mixer
+        type: mixer_params
+      - id: unknown_before_eq
+        size: 29
+  macrosynth_body_before_eq:
+    seq:
+      - id: unknown_before_params
+        size: 1
+      - id: params
+        type: macrosynth_params
+      - id: filter
+        type: filter_params
+      - id: amp
+        type: amp_params
+      - id: mixer
+        type: mixer_params
+      - id: unknown_before_eq
+        size: 29
+  sampler_body_before_eq:
+    seq:
+      - id: mode_value
+        type: u1
+        doc: |
+          Displayed as detune, steps, or BPM depending on play_mode.
+      - id: play_mode
+        type: u1
+        enum: sampler_play_mode
+      - id: slice
+        type: u1
+      - id: start
+        type: u1
+      - id: loop_start
+        type: u1
+      - id: length
+        type: u1
+      - id: degrade
+        type: u1
+      - id: filter
+        type: filter_params
+      - id: amp
+        type: amp_params
+      - id: mixer
+        type: mixer_params
+      - id: unknown_before_eq
+        size: 28
   wavsynth_params:
     seq:
       - id: shape
@@ -116,10 +171,28 @@ types:
         type: u1
       - id: reverb
         type: u1
+  unused_tail:
+    seq:
+      - id: unknown
+        size-eos: true
+  sampler_tail:
+    seq:
+      - id: unknown_before_sample_path
+        size: 24
+      - id: sample_path
+        size: 128
+        doc: |
+          Fixed-size sample path byte range. Start offset and stored path bytes
+          are verified by Sampler fixtures; full maximum length is inferred from
+          the surrounding fixed instrument layout and should be refined if future
+          evidence contradicts it.
+      - id: unknown_after_sample_path
+        size-eos: true
 enums:
   instrument_type:
     0x00: wavsynth
     0x01: macrosynth
+    0x02: sampler
     0xff: none
   filter_type:
     0x00: off
@@ -264,3 +337,19 @@ enums:
     0x2d: particle_noise
     0x2e: digital_mod
     0x2f: morse_noise
+  sampler_play_mode:
+    0x00: fwd
+    0x01: rev
+    0x02: fwdloop
+    0x03: revloop
+    0x04: fwd_ping_pong
+    0x05: rev_ping_pong
+    0x06: osc
+    0x07: osc_rev
+    0x08: osc_ping_pong
+    0x09: repitch
+    0x0a: rep_rev
+    0x0b: rep_ping_pong
+    0x0c: rep_bpm
+    0x0d: bpm_rev
+    0x0e: bpm_ping_pong
