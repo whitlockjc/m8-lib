@@ -33,7 +33,15 @@ instances:
     value: schema_version_raw & 0xf
 enums:
   file_kind:
-    0x00: song
-    0x10: instrument
-    0x20: theme
-    0x30: scale
+    0x00:
+      id: song
+      -label: Song
+    0x10:
+      id: instrument
+      -label: Instrument
+    0x20:
+      id: theme
+      -label: Theme
+    0x30:
+      id: scale
+      -label: Scale
