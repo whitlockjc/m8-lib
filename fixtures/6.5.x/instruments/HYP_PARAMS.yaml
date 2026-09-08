@@ -1,0 +1,119 @@
+fileType: instrument
+firmware: 6.5.2C
+screen: instrument.hypersynth.params
+
+changes:
+  - name: name
+    originalBytes: 48 59 50 5f 44 45 46 41 55 4c 54 00
+    newBytes: 48 59 50 5f 50 41 52 41 4d 53 00 00
+
+  - name: transpose
+    original: 0x01
+    new: 0x00
+    originalLabel: ON
+    newLabel: OFF
+  - name: tableTic
+    original: 0x01
+    new: 0x02
+
+  - name: hypersynth.currentChord.index
+    original: 0x00
+    new: 0x0c
+  - name: hypersynth.scale
+    offset: 0x0027
+    original: 0x00
+    new: 0xff
+  - name: hypersynth.shift
+    original: 0x80
+    new: 0xf9
+  - name: hypersynth.swarm
+    original: 0x00
+    new: 0xf8
+  - name: hypersynth.width
+    original: 0x00
+    new: 0xf7
+  - name: hypersynth.subosc
+    original: 0x80
+    new: 0xf6
+
+  - name: filter.type
+    original: 0x00
+    new: 0x07
+    originalLabel: OFF
+    newLabel: ZDF HP
+  - name: filter.cutoff
+    original: 0xff
+    new: 0xf5
+  - name: filter.resonance
+    original: 0x00
+    new: 0xf4
+
+  - name: amp.amp
+    original: 0x00
+    new: 0xf3
+  - name: amp.limit
+    original: 0x00
+    new: 0x08
+    originalLabel: CLIP
+    newLabel: POST:W3
+  - name: amp.pan
+    original: 0x80
+    new: 0xf2
+
+  - name: mixer.dry
+    original: 0xc0
+    new: 0xf1
+  - name: mixer.modFx
+    original: 0x00
+    new: 0xf0
+  - name: mixer.delay
+    original: 0x00
+    new: 0xef
+  - name: mixer.reverb
+    original: 0x00
+    new: 0xee
+
+  - name: hypersynth.chords.0.enabledNotes
+    offset: 0x0065
+    original: 0xff
+    new: 0xfe
+  - name: hypersynth.chords.0.note2
+    offset: 0x0067
+    original: 0x00
+    new: 0xfe
+  - name: hypersynth.chords.0.note3
+    offset: 0x0068
+    original: 0x00
+    new: 0xfd
+  - name: hypersynth.chords.0.note4
+    offset: 0x0069
+    original: 0x00
+    new: 0xfc
+  - name: hypersynth.chords.0.note5
+    offset: 0x006a
+    original: 0x00
+    new: 0xfb
+  - name: hypersynth.chords.0.note6
+    offset: 0x006b
+    original: 0x00
+    new: 0xfa
+
+  - name: hypersynth.chords.15.enabledNotes
+    offset: 0x00ce
+    original: 0xff
+    new: 0xdf
+  - name: hypersynth.chords.15.note1
+    original: 0x00
+    new: 0x01
+  - name: hypersynth.chords.15.note2
+    original: 0x00
+    new: 0x02
+  - name: hypersynth.chords.15.note3
+    original: 0x00
+    new: 0x03
+  - name: hypersynth.chords.15.note4
+    original: 0x00
+    new: 0x04
+  - name: hypersynth.chords.15.note5
+    original: 0x00
+    new: 0x05

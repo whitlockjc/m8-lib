@@ -3,8 +3,9 @@
 Human-readable schema reference for M8 Instrument files.
 
 This document starts with the common instrument prefix plus the Wavsynth,
-Macrosynth, Sampler, and FM Synth instrument bodies. Other instrument types will
-replace currently unknown ranges as fixture evidence is collected.
+Macrosynth, Sampler, FM Synth, and Hypersynth instrument bodies. Other
+instrument types will replace currently unknown ranges as fixture evidence is
+collected.
 
 ## Schema
 
@@ -50,6 +51,7 @@ The instrument type is stored as one unsigned byte.
 | `macrosynth` | `0x01` |
 | `sampler` | `0x02` |
 | `fmSynth` | `0x04` |
+| `hypersynth` | `0x05` |
 | `none` | `0xff` |
 
 Additional instrument types will be added only after fixture evidence verifies
@@ -76,6 +78,8 @@ The verified fixtures show both full and padded values:
 | `SAMB_PARAMS.m8i` | `SAMB_PARAMS` followed by one `0x00` byte |
 | `FM_DEFAULT.m8i` | `FM_DEFAULT` followed by two `0x00` bytes |
 | `FM_PARAMS.m8i` | `FM_PARAMS` followed by three `0x00` bytes |
+| `HYP_DEFAULT.m8i` | `HYP_DEFAULT` followed by one `0x00` byte |
+| `HYP_PARAMS.m8i` | `HYP_PARAMS` followed by two `0x00` bytes |
 
 ## Body Before EQ
 
@@ -88,6 +92,7 @@ The bytes between the common prefix and the common `eq` field are interpreted by
 | `macrosynth` | `0x1f..0x4b` | 45 | [Wavsynth/Macrosynth Body Before EQ](#wavsynthmacrosynth-body-before-eq) |
 | `sampler` | `0x1f..0x4b` | 45 | [Sampler Body Before EQ](#sampler-body-before-eq) |
 | `fmSynth` | `0x1f..0x4b` | 45 | [FM Synth Body Before EQ](#fm-synth-body-before-eq) |
+| `hypersynth` | `0x1f..0x4b` | 45 | [Hypersynth Body Before EQ](#hypersynth-body-before-eq) |
 | `none` | `0x1f..0x4b` | 45 | preserved bytes |
 
 ### Wavsynth/Macrosynth Body Before EQ
@@ -134,6 +139,19 @@ Offsets are absolute file offsets.
 | `mixer` | `0x47..0x4a` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x4b` | 1 | unknown byte |
 
+### Hypersynth Body Before EQ
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `unknownBeforeParams` | `0x1f` | 1 | unknown byte |
+| `instrumentParams` | `0x20..0x2b` | 12 | [Hypersynth Parameters](#hypersynth-parameters) |
+| `filter` | `0x2c..0x2e` | 3 | [Filter Parameters](#filter-parameters) |
+| `amp` | `0x2f..0x31` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `mixer` | `0x32..0x35` | 4 | [Mixer Parameters](#mixer-parameters) |
+| `unknownBeforeEq` | `0x36..0x4b` | 22 | unknown bytes |
+
 ### Sampler Mode Value
 
 The byte at `0x1f` is displayed according to `playMode`.
@@ -148,14 +166,16 @@ The byte at `0x1f` is displayed according to `playMode`.
 
 Instrument-specific parameter storage depends on `instrumentType`. Wavsynth and
 Macrosynth use a compact five-byte parameter block at `0x20..0x24`. FM Synth
-uses a larger 33-byte block at `0x20..0x40`. Sampler has a distinct body layout
-and does not use either block shape.
+uses a larger 33-byte block at `0x20..0x40`. Hypersynth uses a 12-byte block at
+`0x20..0x2b`. Sampler has a distinct body layout and does not use these block
+shapes.
 
 | Instrument Type | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `wavsynth` | `0x20..0x24` | 5 | [Wavsynth Parameters](#wavsynth-parameters) |
 | `macrosynth` | `0x20..0x24` | 5 | [Macrosynth Parameters](#macrosynth-parameters) |
 | `fmSynth` | `0x20..0x40` | 33 | [FM Synth Parameters](#fm-synth-parameters) |
+| `hypersynth` | `0x20..0x2b` | 12 | [Hypersynth Parameters](#hypersynth-parameters) |
 
 ### Wavsynth Parameters
 
@@ -234,6 +254,50 @@ Each operator level/feedback pair is stored as two adjacent bytes.
 | `level` | `+0x00` | 1 | `u1` |
 | `feedback` | `+0x01` | 1 | `u1` |
 
+### Hypersynth Parameters
+
+Offsets are relative to the start of `instrumentParams` when
+`instrumentType = hypersynth`.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `currentChord` | `+0x00..+0x06` | 7 | [Hypersynth Current Chord](#hypersynth-current-chord) |
+| `scale` | `+0x07` | 1 | `u1` |
+| `shift` | `+0x08` | 1 | `u1` |
+| `swarm` | `+0x09` | 1 | `u1` |
+| `width` | `+0x0a` | 1 | `u1` |
+| `subosc` | `+0x0b` | 1 | `u1` |
+
+The `currentChord` bytes model the current/edit chord as stored in memory. The
+persistent 16-chord table is stored separately in the Hypersynth tail. Observed
+M8 files should keep `currentChord.notes` synchronized with
+`chords[currentChord.index].notes`.
+
+#### Hypersynth Current Chord
+
+Offsets are relative to the start of `currentChord`.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `index` | `+0x00` | 1 | `u1` |
+| `notes` | `+0x01..+0x06` | 6 | [Hypersynth Chord Notes](#hypersynth-chord-notes) |
+
+The `HYP_PARAMS.m8i` fixture verifies `index = 0x0c` when chord `0C` is
+selected.
+
+#### Hypersynth Chord Notes
+
+Offsets are relative to the start of a six-note chord value range.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `note1` | `+0x00` | 1 | `u1` |
+| `note2` | `+0x01` | 1 | `u1` |
+| `note3` | `+0x02` | 1 | `u1` |
+| `note4` | `+0x03` | 1 | `u1` |
+| `note5` | `+0x04` | 1 | `u1` |
+| `note6` | `+0x05` | 1 | `u1` |
+
 ## Common Parameter Groups
 
 The following parameter group layouts are reused across verified instruments,
@@ -288,6 +352,32 @@ Offsets are absolute file offsets.
 The Sampler fixtures verify that the selected sample path `/Samples/Kick.wav`
 starts at `0x65`. The full 128-byte `samplePath` range is provisional until a
 fixture with a longer path verifies the maximum stored length.
+
+### Hypersynth Tail
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `unknownBeforeChords` | `0x4d..0x64` | 24 | unknown bytes |
+| `chords` | `0x65..0xd4` | 112 | [Hypersynth Chord](#hypersynth-chord) |
+| `unknownAfterChords` | `0xd5..0x164` | 144 | unknown bytes |
+
+The `HYP_PARAMS.m8i` fixture verifies chord `0` begins at `0x65` and chord
+`15` begins at `0xce`. This implies 16 chord entries of 7 bytes each.
+
+#### Hypersynth Chord
+
+Offsets are relative to the start of a chord entry.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `enabledNotes` | `+0x00` | 1 | bit mask |
+| `notes` | `+0x01..+0x06` | 6 | [Hypersynth Chord Notes](#hypersynth-chord-notes) |
+
+`enabledNotes` appears to be a bit mask for six chord notes. Chord `0` changed
+from `0xff` to `0xfe` when `note1` was unset. Chord `15` changed from `0xff`
+to `0xdf` when `note6` was unset.
 
 ## Enums
 
@@ -566,6 +656,10 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `macrosynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `fmSynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `fmSynth.unknownBeforeEq` | `0x4b` | 1 | Preserved until future fixtures map this byte |
+| `hypersynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
+| `hypersynth.unknownBeforeEq` | `0x36..0x4b` | 22 | Preserved until MODS fixtures map this region |
+| `hypersynth.unknownBeforeChords` | `0x4d..0x64` | 24 | Preserved until future fixtures map this region |
+| `hypersynth.unknownAfterChords` | `0xd5..0x164` | 144 | Preserved until future fixtures map this region |
 | `none.bodyBeforeEq` | `0x1f..0x4b` | 45 | Preserved for `none` but not modeled as editable parameters |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until MODS fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until MODS fixtures map this region |
@@ -586,8 +680,8 @@ separate `NONE` parameter model.
   when Song instrument regions are mapped.
 - Enumerated values should document both stored representation and UI label.
   Verified instrument type values are `wavsynth = 0x00`,
-  `macrosynth = 0x01`, `sampler = 0x02`, `fmSynth = 0x04`, and
-  `none = 0xff`.
+  `macrosynth = 0x01`, `sampler = 0x02`, `fmSynth = 0x04`,
+  `hypersynth = 0x05`, and `none = 0xff`.
 - `transpose` is modeled as part of the common instrument layout at `0x1b`.
   Verified values are `ON = 0x01` and `OFF = 0x00`.
 - `eq` is modeled as part of the common instrument layout at `0x4c`. Verified
@@ -599,6 +693,17 @@ separate `NONE` parameter model.
 - `FM_PARAMS.m8i` does not change `filter.type` or `amp.limit`; their FM Synth
   offsets are inferred from the surrounding common parameter group layout and
   should be verified by a future fixture.
+- `HYP_PARAMS.m8i` does not change `eq`; common EQ assignment remains verified
+  by the Wavsynth, Macrosynth, Sampler, and FM Synth fixtures.
+- `HYP_PARAMS.m8i` verifies `0x20` as `currentChord.index` by storing `0x0c`
+  when chord `0C` is selected.
+- Instrument files appear to include both durable instrument definitions and
+  persisted UI/editor state. Hypersynth is the clearest verified example so far:
+  `currentChord` is stored in the parameter region, while the persistent
+  16-entry `chords` table is stored in the tail. Historical reference material
+  names some early instrument bytes as volume, pitch, and fine tune, but this
+  schema keeps those regions unknown until fixture evidence verifies their
+  meaning.
 
 ## Evidence
 
@@ -621,6 +726,9 @@ separate `NONE` parameter model.
 | FM Synth baseline fixture | `fixtures/6.5.x/instruments/FM_DEFAULT.m8i` |
 | FM Synth params fixture | `fixtures/6.5.x/instruments/FM_PARAMS.m8i` |
 | FM Synth params manifest | `fixtures/6.5.x/instruments/FM_PARAMS.yaml` |
+| Hypersynth baseline fixture | `fixtures/6.5.x/instruments/HYP_DEFAULT.m8i` |
+| Hypersynth params fixture | `fixtures/6.5.x/instruments/HYP_PARAMS.m8i` |
+| Hypersynth params manifest | `fixtures/6.5.x/instruments/HYP_PARAMS.yaml` |
 | Verification command | `npm run verify` |
 | M8 manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699>, version 6.5.2, 04/21/2026 |
 | Reference material | <https://github.com/whitlockjc/m8-js> |
@@ -649,3 +757,8 @@ The `FM_PARAMS.m8i` fixture verifies common transpose/table TIC values, FM Synth
 params, filter cutoff/resonance, amp/pan values, mixer params, and common EQ
 assignment. The manifest-driven mapper matched all 50 changed bytes exactly and
 reported zero unaccounted changed bytes.
+
+The `HYP_PARAMS.m8i` fixture verifies common transpose/table TIC values,
+Hypersynth params, filter params, amp params, mixer params, and the Hypersynth
+chord table boundary. The manifest-driven mapper matched all 36 changed bytes
+exactly and reported zero unaccounted changed bytes.

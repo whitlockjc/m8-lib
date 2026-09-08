@@ -240,6 +240,8 @@ Known open finding:
 Every byte range should eventually be classified as one of:
 
 - `field`: known stored data with a documented meaning,
+- `state`: persisted UI or editor state,
+- `cache`: duplicated stored data that should match another field,
 - `reserved`: known unused or stable bytes,
 - `unknown`: bytes whose purpose is not yet known,
 - `padding`: alignment or fill bytes,
@@ -252,6 +254,21 @@ Schema documentation should distinguish:
 - inferred meanings,
 - open questions,
 - references to fixture evidence.
+
+Working observation:
+
+- M8 files appear to be memory dumps that can mix durable data definitions with
+  persisted UI/editor state and cached duplicate data. Do not assume every
+  stored byte is primary resource data.
+- Example: Hypersynth stores a persistent 16-entry chord table, but also stores
+  the current/edit chord in the parameter region. The current/edit chord should
+  match the corresponding chord table entry, but both byte ranges exist in the
+  file and should be represented by the raw schema.
+- Example: historical reference material names some early instrument bytes as
+  volume, pitch, and fine tune, but current fixture evidence is not sufficient
+  to classify those bytes. Preserve them as unknown until targeted fixtures
+  prove whether they are musical data, UI/editor state, cached values, or
+  instrument-specific storage.
 
 ## Kaitai Schema Requirements
 

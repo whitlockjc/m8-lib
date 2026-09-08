@@ -7,12 +7,12 @@ doc: |
   Body schema for instrument files with header schema version 6.0.1.
 
   Initial schema verified against M8 6.5.2C NONE, Wavsynth, Macrosynth,
-  Sampler, and FM Synth instrument fixtures. The instrument type byte,
-  fixed-size name byte range, and common instrument prefix are mapped.
-  Wavsynth/Macrosynth/Sampler/FM Synth params, filter params, amp params,
-  mixer params, sample path, and common EQ assignment are mapped from params
-  fixtures. Unknown ranges are preserved until additional instrument fixtures
-  provide evidence for their layout.
+  Sampler, FM Synth, and Hypersynth instrument fixtures. The instrument type
+  byte, fixed-size name byte range, and common instrument prefix are mapped.
+  Wavsynth/Macrosynth/Sampler/FM Synth/Hypersynth params, filter params, amp
+  params, mixer params, sample path, Hypersynth chord table, and common EQ
+  assignment are mapped from params fixtures. Unknown ranges are preserved until
+  additional instrument fixtures provide evidence for their layout.
 seq:
   - id: instrument_type
     type: u1
@@ -40,6 +40,7 @@ seq:
         'instrument_type::macrosynth': macrosynth_body_before_eq
         'instrument_type::sampler': sampler_body_before_eq
         'instrument_type::fm_synth': fm_synth_body_before_eq
+        'instrument_type::hypersynth': hypersynth_body_before_eq
         'instrument_type::none': unused_body_before_eq
     doc: Instrument-specific body before the common EQ field.
   - id: eq
@@ -52,6 +53,7 @@ seq:
       switch-on: instrument_type
       cases:
         'instrument_type::sampler': sampler_tail
+        'instrument_type::hypersynth': hypersynth_tail
         'instrument_type::wavsynth': unused_tail
         'instrument_type::macrosynth': unused_tail
         'instrument_type::fm_synth': unused_tail
@@ -140,6 +142,20 @@ types:
         type: mixer_params
       - id: unknown_before_eq
         size: 1
+  hypersynth_body_before_eq:
+    seq:
+      - id: unknown_before_params
+        size: 1
+      - id: params
+        type: hypersynth_params
+      - id: filter
+        type: filter_params
+      - id: amp
+        type: amp_params
+      - id: mixer
+        type: mixer_params
+      - id: unknown_before_eq
+        size: 22
   wavsynth_params:
     seq:
       - id: shape
@@ -183,6 +199,45 @@ types:
         type: fm_synth_operator_mod_slots
       - id: mods
         type: fm_synth_mod_values
+  hypersynth_params:
+    seq:
+      - id: current_chord
+        type: hypersynth_current_chord
+        doc: |
+          Current/edit chord state. The HYP_PARAMS fixture verifies index 0x0c
+          when chord 0C is selected. The note bytes are a memory representation
+          of the current chord; observed M8 files should keep them synchronized
+          with the matching entry in the persistent Hypersynth tail chord table.
+      - id: scale
+        type: u1
+      - id: shift
+        type: u1
+      - id: swarm
+        type: u1
+      - id: width
+        type: u1
+      - id: subosc
+        type: u1
+  hypersynth_current_chord:
+    seq:
+      - id: index
+        type: u1
+      - id: notes
+        type: hypersynth_chord_notes
+  hypersynth_chord_notes:
+    seq:
+      - id: note_1
+        type: u1
+      - id: note_2
+        type: u1
+      - id: note_3
+        type: u1
+      - id: note_4
+        type: u1
+      - id: note_5
+        type: u1
+      - id: note_6
+        type: u1
   fm_synth_operator_shapes:
     seq:
       - id: operator_1
@@ -298,6 +353,26 @@ types:
           evidence contradicts it.
       - id: unknown_after_sample_path
         size-eos: true
+  hypersynth_tail:
+    seq:
+      - id: unknown_before_chords
+        size: 24
+      - id: chords
+        type: hypersynth_chord
+        repeat: expr
+        repeat-expr: 16
+      - id: unknown_after_chords
+        size-eos: true
+  hypersynth_chord:
+    seq:
+      - id: enabled_notes
+        type: u1
+        doc: |
+          Observed as a bit mask for six chord notes. Chord 0 changed from
+          0xff to 0xfe when note 1 was unset. Chord 15 changed from 0xff to
+          0xdf when note 6 was unset.
+      - id: notes
+        type: hypersynth_chord_notes
 enums:
   instrument_type:
     0x00:
@@ -312,6 +387,9 @@ enums:
     0x04:
       id: fm_synth
       -label: FM Synth
+    0x05:
+      id: hypersynth
+      -label: Hypersynth
     0xff:
       id: none
       -label: NONE
