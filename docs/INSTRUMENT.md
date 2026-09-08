@@ -3,8 +3,8 @@
 Human-readable schema reference for M8 Instrument files.
 
 This document starts with the common instrument prefix plus the Wavsynth,
-Macrosynth, and Sampler instrument bodies. Other instrument types will replace
-currently unknown ranges as fixture evidence is collected.
+Macrosynth, Sampler, and FM Synth instrument bodies. Other instrument types will
+replace currently unknown ranges as fixture evidence is collected.
 
 ## Schema
 
@@ -49,6 +49,7 @@ The instrument type is stored as one unsigned byte.
 | `wavsynth` | `0x00` |
 | `macrosynth` | `0x01` |
 | `sampler` | `0x02` |
+| `fmSynth` | `0x04` |
 | `none` | `0xff` |
 
 Additional instrument types will be added only after fixture evidence verifies
@@ -73,6 +74,8 @@ The verified fixtures show both full and padded values:
 | `SAM_PARAMS.m8i` | `SAM_PARAMS` followed by two `0x00` bytes |
 | `SAMS_PARAMS.m8i` | `SAMS_PARAMS` followed by one `0x00` byte |
 | `SAMB_PARAMS.m8i` | `SAMB_PARAMS` followed by one `0x00` byte |
+| `FM_DEFAULT.m8i` | `FM_DEFAULT` followed by two `0x00` bytes |
+| `FM_PARAMS.m8i` | `FM_PARAMS` followed by three `0x00` bytes |
 
 ## Body Before EQ
 
@@ -84,6 +87,7 @@ The bytes between the common prefix and the common `eq` field are interpreted by
 | `wavsynth` | `0x1f..0x4b` | 45 | [Wavsynth/Macrosynth Body Before EQ](#wavsynthmacrosynth-body-before-eq) |
 | `macrosynth` | `0x1f..0x4b` | 45 | [Wavsynth/Macrosynth Body Before EQ](#wavsynthmacrosynth-body-before-eq) |
 | `sampler` | `0x1f..0x4b` | 45 | [Sampler Body Before EQ](#sampler-body-before-eq) |
+| `fmSynth` | `0x1f..0x4b` | 45 | [FM Synth Body Before EQ](#fm-synth-body-before-eq) |
 | `none` | `0x1f..0x4b` | 45 | preserved bytes |
 
 ### Wavsynth/Macrosynth Body Before EQ
@@ -117,6 +121,19 @@ Offsets are absolute file offsets.
 | `mixer` | `0x2c..0x2f` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x30..0x4b` | 28 | unknown bytes |
 
+### FM Synth Body Before EQ
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `unknownBeforeParams` | `0x1f` | 1 | unknown byte |
+| `instrumentParams` | `0x20..0x40` | 33 | [FM Synth Parameters](#fm-synth-parameters) |
+| `filter` | `0x41..0x43` | 3 | [Filter Parameters](#filter-parameters) |
+| `amp` | `0x44..0x46` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `mixer` | `0x47..0x4a` | 4 | [Mixer Parameters](#mixer-parameters) |
+| `unknownBeforeEq` | `0x4b` | 1 | unknown byte |
+
 ### Sampler Mode Value
 
 The byte at `0x1f` is displayed according to `playMode`.
@@ -129,14 +146,16 @@ The byte at `0x1f` is displayed according to `playMode`.
 
 ## Instrument-Specific Parameters
 
-The five bytes at `0x20..0x24` are interpreted by `instrumentType` for
-Wavsynth and Macrosynth. Sampler has a distinct body layout and does not use
-this five-byte block shape.
+Instrument-specific parameter storage depends on `instrumentType`. Wavsynth and
+Macrosynth use a compact five-byte parameter block at `0x20..0x24`. FM Synth
+uses a larger 33-byte block at `0x20..0x40`. Sampler has a distinct body layout
+and does not use either block shape.
 
 | Instrument Type | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `wavsynth` | `0x20..0x24` | 5 | [Wavsynth Parameters](#wavsynth-parameters) |
 | `macrosynth` | `0x20..0x24` | 5 | [Macrosynth Parameters](#macrosynth-parameters) |
+| `fmSynth` | `0x20..0x40` | 33 | [FM Synth Parameters](#fm-synth-parameters) |
 
 ### Wavsynth Parameters
 
@@ -163,6 +182,57 @@ Offsets are relative to the start of `instrumentParams` when
 | `color` | `+0x02` | 1 | `u1` |
 | `degrade` | `+0x03` | 1 | `u1` |
 | `redux` | `+0x04` | 1 | `u1` |
+
+### FM Synth Parameters
+
+Offsets are relative to the start of `instrumentParams` when
+`instrumentType = fmSynth`.
+
+The raw file stores operator data in grouped columns, not as four complete
+operator structs. A higher-level API can still expose this as `operators[0..3]`
+after decoding.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `algo` | `+0x00` | 1 | [FM Synth Algorithm](#fm-synth-algorithm) |
+| `operatorShapes` | `+0x01..+0x04` | 4 | [FM Synth Operator Shape](#fm-synth-operator-shape) |
+| `operatorRatios` | `+0x05..+0x0c` | 8 | [FM Synth Operator Ratio](#fm-synth-operator-ratio) |
+| `operatorLevels` | `+0x0d..+0x14` | 8 | [FM Synth Operator Level/Feedback](#fm-synth-operator-levelfeedback) |
+| `operatorModA` | `+0x15..+0x18` | 4 | [FM Synth Operator Mod Slot](#fm-synth-operator-mod-slot) |
+| `operatorModB` | `+0x19..+0x1c` | 4 | [FM Synth Operator Mod Slot](#fm-synth-operator-mod-slot) |
+| `mods` | `+0x1d..+0x20` | 4 | `u1[4]` |
+
+#### FM Synth Operator Shape Storage
+
+Offsets are relative to the start of `operatorShapes`.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `operator1` | `+0x00` | 1 | [FM Synth Operator Shape](#fm-synth-operator-shape) |
+| `operator2` | `+0x01` | 1 | [FM Synth Operator Shape](#fm-synth-operator-shape) |
+| `operator3` | `+0x02` | 1 | [FM Synth Operator Shape](#fm-synth-operator-shape) |
+| `operator4` | `+0x03` | 1 | [FM Synth Operator Shape](#fm-synth-operator-shape) |
+
+#### FM Synth Operator Ratio
+
+Each operator ratio is stored as two adjacent bytes.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `ratio` | `+0x00` | 1 | `u1` |
+| `ratioFine` | `+0x01` | 1 | `u1` |
+
+The `FM_PARAMS.m8i` fixture shows ratio display values are stored as decimal
+byte values. For example, display value `99` is stored as `0x63`.
+
+#### FM Synth Operator Level/Feedback
+
+Each operator level/feedback pair is stored as two adjacent bytes.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `level` | `+0x00` | 1 | `u1` |
+| `feedback` | `+0x01` | 1 | `u1` |
 
 ## Common Parameter Groups
 
@@ -202,8 +272,8 @@ Offsets are relative to the start of `mixer`.
 
 ## Tail
 
-The tail layout depends on `instrumentType`. For Wavsynth, Macrosynth, and
-NONE, the tail is currently preserved as unknown bytes.
+The tail layout depends on `instrumentType`. For Wavsynth, Macrosynth,
+FM Synth, and NONE, the tail is currently preserved as unknown bytes.
 
 ### Sampler Tail
 
@@ -251,6 +321,83 @@ fixture with a longer path verifies the maximum stored length.
 | `POST:W1` | `0x06` |
 | `POST:W2` | `0x07` |
 | `POST:W3` | `0x08` |
+
+### FM Synth Algorithm
+
+Algorithms `0x00` and `0x0b` are verified by the FM Synth fixtures. Other
+labels are from the M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `A>B>C>D` | `0x00` |
+| `[A+B]>C>D` | `0x01` |
+| `[A>B+C]>D` | `0x02` |
+| `[A>B+A>C]>D` | `0x03` |
+| `[A+B+C]>D` | `0x04` |
+| `[A>B>C]+D` | `0x05` |
+| `[A>B>C]+[A>B>D]` | `0x06` |
+| `[A>B]+[C>D]` | `0x07` |
+| `[A>B]+[A>C]+[A>D]` | `0x08` |
+| `[A>B]+[A>C]+D` | `0x09` |
+| `[A>B]+C+D` | `0x0a` |
+| `A+B+C+D` | `0x0b` |
+
+### FM Synth Operator Shape
+
+Shapes `0x00`, `0x01`, `0x0f`, `0x10`, and `0x4c` are verified by the FM Synth
+fixtures. The fixture shows `CLK` stored as `0x0f`, `W09` stored as `0x10`,
+and `W45` stored as `0x4c`.
+
+The `W09..W45` labels correspond to the Wavsynth wave table index labels
+`0x09..0x45`. Their stored FM values are offset by `+0x07`: `W09` is stored as
+`0x10`, and `W45` is stored as `0x4c`. Intermediate `W` labels are inferred to
+follow the same contiguous mapping until fixture evidence contradicts it.
+
+| Name | Stored Value |
+| --- | --- |
+| `SIN` | `0x00` |
+| `SW2` | `0x01` |
+| `SW3` | `0x02` |
+| `SW4` | `0x03` |
+| `SW5` | `0x04` |
+| `SW6` | `0x05` |
+| `TRI` | `0x06` |
+| `SAW` | `0x07` |
+| `SQU` | `0x08` |
+| `PUL` | `0x09` |
+| `IMP` | `0x0a` |
+| `NOI` | `0x0b` |
+| `NLP` | `0x0c` |
+| `NHP` | `0x0d` |
+| `NBP` | `0x0e` |
+| `CLK` | `0x0f` |
+| `W09..W45` | `0x10..0x4c` |
+
+### FM Synth Operator Mod Slot
+
+Mod slot values `0x00`, `0x01..0x04`, and `0x0d..0x10` are verified by the FM
+Synth fixtures. Other non-zero labels are inferred from the same storage
+pattern.
+
+| Name | Stored Value |
+| --- | --- |
+| `--` | `0x00` |
+| `1>LEV` | `0x01` |
+| `2>LEV` | `0x02` |
+| `3>LEV` | `0x03` |
+| `4>LEV` | `0x04` |
+| `1>RAT` | `0x05` |
+| `2>RAT` | `0x06` |
+| `3>RAT` | `0x07` |
+| `4>RAT` | `0x08` |
+| `1>PIT` | `0x09` |
+| `2>PIT` | `0x0a` |
+| `3>PIT` | `0x0b` |
+| `4>PIT` | `0x0c` |
+| `1>FBK` | `0x0d` |
+| `2>FBK` | `0x0e` |
+| `3>FBK` | `0x0f` |
+| `4>FBK` | `0x10` |
 
 ### Sampler Play Mode
 
@@ -417,13 +564,15 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `unknownCommon0` | `0x1d..0x1e` | 2 | Preserved until future fixtures map this common region |
 | `wavsynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `macrosynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
+| `fmSynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
+| `fmSynth.unknownBeforeEq` | `0x4b` | 1 | Preserved until future fixtures map this byte |
 | `none.bodyBeforeEq` | `0x1f..0x4b` | 45 | Preserved for `none` but not modeled as editable parameters |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until MODS fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until MODS fixtures map this region |
 | `sampler.unknownBeforeSamplePath` | `0x4d..0x64` | 24 | Preserved until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
 | `sampler.unknownAfterSamplePath` | `0xe5..0x164` | 128 | Preserved until table/sample-path-related regions are mapped |
-| `unusedTail` | `0x4d..0x164` | 280 | Preserved for Wavsynth, Macrosynth, `none`, and any unmapped instrument type |
+| `unusedTail` | `0x4d..0x164` | 280 | Preserved for Wavsynth, Macrosynth, FM Synth, `none`, and any unmapped instrument type |
 
 The `NONE` instrument cannot be meaningfully edited beyond its name, so this
 single fixture is used only to verify the `none` instrument type value, the
@@ -437,7 +586,8 @@ separate `NONE` parameter model.
   when Song instrument regions are mapped.
 - Enumerated values should document both stored representation and UI label.
   Verified instrument type values are `wavsynth = 0x00`,
-  `macrosynth = 0x01`, `sampler = 0x02`, and `none = 0xff`.
+  `macrosynth = 0x01`, `sampler = 0x02`, `fmSynth = 0x04`, and
+  `none = 0xff`.
 - `transpose` is modeled as part of the common instrument layout at `0x1b`.
   Verified values are `ON = 0x01` and `OFF = 0x00`.
 - `eq` is modeled as part of the common instrument layout at `0x4c`. Verified
@@ -446,6 +596,9 @@ separate `NONE` parameter model.
   or `bpm` depending on `playMode`.
 - `SAMB_PARAMS.m8i` does not change `transpose`; its manifest only records the
   byte changes present in the fixture.
+- `FM_PARAMS.m8i` does not change `filter.type` or `amp.limit`; their FM Synth
+  offsets are inferred from the surrounding common parameter group layout and
+  should be verified by a future fixture.
 
 ## Evidence
 
@@ -465,6 +618,9 @@ separate `NONE` parameter model.
 | Sampler steps manifest | `fixtures/6.5.x/instruments/SAMS_PARAMS.yaml` |
 | Sampler BPM fixture | `fixtures/6.5.x/instruments/SAMB_PARAMS.m8i` |
 | Sampler BPM manifest | `fixtures/6.5.x/instruments/SAMB_PARAMS.yaml` |
+| FM Synth baseline fixture | `fixtures/6.5.x/instruments/FM_DEFAULT.m8i` |
+| FM Synth params fixture | `fixtures/6.5.x/instruments/FM_PARAMS.m8i` |
+| FM Synth params manifest | `fixtures/6.5.x/instruments/FM_PARAMS.yaml` |
 | Verification command | `npm run verify` |
 | M8 manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699>, version 6.5.2, 04/21/2026 |
 | Reference material | <https://github.com/whitlockjc/m8-js> |
@@ -488,3 +644,8 @@ offsets, common EQ assignment, and sample path storage. The manifest-driven
 mapper reported zero unaccounted changed bytes for all three fixtures:
 `SAM_PARAMS.m8i` matched 43 changed bytes, `SAMS_PARAMS.m8i` matched 45 changed
 bytes, and `SAMB_PARAMS.m8i` matched 44 changed bytes.
+
+The `FM_PARAMS.m8i` fixture verifies common transpose/table TIC values, FM Synth
+params, filter cutoff/resonance, amp/pan values, mixer params, and common EQ
+assignment. The manifest-driven mapper matched all 50 changed bytes exactly and
+reported zero unaccounted changed bytes.

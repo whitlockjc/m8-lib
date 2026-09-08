@@ -88,3 +88,27 @@ Needed research:
 - Create a Sampler fixture with a substantially longer sample path.
 - Verify whether the path still starts at `0x65`, where it terminates or pads,
   and whether `0xe4` is the correct final byte for the fixed range.
+
+## FM Synth Common Enum Slots
+
+Status: open
+
+Observation:
+
+- The `FM_PARAMS.m8i` fixture changed FM Synth filter cutoff/resonance, amp,
+  pan, mixer values, and EQ, but `filter.type` remained `0x00` and `amp.limit`
+  remained `0x00`.
+- The current FM Synth schema places `filter.type` at `0x41` and `amp.limit` at
+  `0x45` based on the surrounding common parameter group layout.
+
+Implication:
+
+- The FM Synth `filter.type` and `amp.limit` offsets are inferred from layout,
+  not directly verified by byte changes in the current FM fixture.
+
+Needed research:
+
+- Create an FM Synth fixture that changes only `filter.type` and `amp.limit`, or
+  include unique changed values for those fields in a future FM Synth params
+  fixture.
+- Verify whether those bytes match the inferred offsets.
