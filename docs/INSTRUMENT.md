@@ -869,8 +869,7 @@ separate `NONE` parameter model.
   fixture places `CCJ` at `0x38..0x39`, where that older offset model would
   read filter values. This schema follows the fixture evidence and preserves
   `0x3a..0x4b` as unknown.
-- `HYP_PARAMS.m8i` does not change `eq`; common EQ assignment remains verified
-  by the Wavsynth, Macrosynth, Sampler, FM Synth, and External fixtures.
+- `HYP_PARAMS.m8i` verifies common EQ assignment at `0x4c`.
 - `HYP_PARAMS.m8i` verifies `0x20` as `currentChord.index` by storing `0x0c`
   when chord `0C` is selected.
 - `EXT_PARAMS.m8i` verifies that External uses the shared filter, amplification,
@@ -948,8 +947,9 @@ assignment. The manifest-driven mapper matched all 50 changed bytes exactly and
 reported zero unaccounted changed bytes.
 
 The `HYP_PARAMS.m8i` fixture verifies common transpose/table TIC values,
-Hypersynth params, filter params, amp params, mixer params, and the Hypersynth
-chord table boundary. The manifest-driven mapper matched all 36 changed bytes
+Hypersynth params, filter params, amp params, mixer params, common EQ
+assignment, and the Hypersynth chord table boundary. The manifest-driven mapper
+matched all 37 changed bytes
 exactly and reported zero unaccounted changed bytes.
 
 The `EXT_PARAMS.m8i` fixture verifies common transpose/table TIC values,

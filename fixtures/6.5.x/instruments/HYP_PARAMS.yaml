@@ -73,6 +73,12 @@ changes:
     original: 0x00
     new: 0xee
 
+  - name: eq
+    original: 0x80
+    new: 0x7f
+    originalLabel: --
+    newLabel: 7F
+
   - name: hypersynth.chords.0.enabledNotes
     offset: 0x0065
     original: 0xff
