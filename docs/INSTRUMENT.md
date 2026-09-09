@@ -3,7 +3,7 @@
 Human-readable schema reference for M8 Instrument files.
 
 This document starts with the common instrument prefix plus the Wavsynth,
-Macrosynth, Sampler, MIDI Out, FM Synth, and Hypersynth instrument bodies.
+Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument bodies.
 Other instrument types will replace currently unknown ranges as fixture evidence
 is collected.
 
@@ -52,6 +52,7 @@ The instrument type is stored as one unsigned byte.
 | `midiOut` | `0x03` |
 | `fmSynth` | `0x04` |
 | `hypersynth` | `0x05` |
+| `external` | `0x06` |
 | `none` | `0xff` |
 
 Additional instrument types will be added only after fixture evidence verifies
@@ -82,6 +83,8 @@ The verified fixtures show both full and padded values:
 | `FM_PARAMS.m8i` | `FM_PARAMS` followed by three `0x00` bytes |
 | `HYP_DEFAULT.m8i` | `HYP_DEFAULT` followed by one `0x00` byte |
 | `HYP_PARAMS.m8i` | `HYP_PARAMS` followed by two `0x00` bytes |
+| `EXT_DEFAULT.m8i` | `EXT_DEFAULT` followed by one `0x00` byte |
+| `EXT_PARAMS.m8i` | `EXT_PARAMS` followed by two `0x00` bytes |
 
 ## Body Before EQ
 
@@ -96,6 +99,7 @@ The bytes between the common prefix and the common `eq` field are interpreted by
 | `midiOut` | `0x1d..0x4b` | 47 | [MIDI Out Body Before EQ](#midi-out-body-before-eq) |
 | `fmSynth` | `0x1d..0x4b` | 47 | [FM Synth Body Before EQ](#fm-synth-body-before-eq) |
 | `hypersynth` | `0x1d..0x4b` | 47 | [Hypersynth Body Before EQ](#hypersynth-body-before-eq) |
+| `external` | `0x1d..0x4b` | 47 | [External Body Before EQ](#external-body-before-eq) |
 | `none` | `0x1d..0x4b` | 47 | preserved bytes |
 
 ### Wavsynth/Macrosynth Body Before EQ
@@ -172,6 +176,20 @@ Offsets are absolute file offsets.
 | `mixer` | `0x32..0x35` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x36..0x4b` | 22 | unknown bytes |
 
+### External Body Before EQ
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `unknownCommon0` | `0x1d..0x1e` | 2 | unknown bytes |
+| `unknownBeforeParams` | `0x1f` | 1 | unknown byte |
+| `instrumentParams` | `0x20..0x2c` | 13 | [External Parameters](#external-parameters) |
+| `filter` | `0x2d..0x2f` | 3 | [Filter Parameters](#filter-parameters) |
+| `amp` | `0x30..0x32` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `mixer` | `0x33..0x36` | 4 | [Mixer Parameters](#mixer-parameters) |
+| `unknownBeforeEq` | `0x37..0x4b` | 21 | unknown bytes |
+
 ### Sampler Mode Value
 
 The byte at `0x1f` is displayed according to `playMode`.
@@ -188,6 +206,7 @@ Instrument-specific parameter storage depends on `instrumentType`. Wavsynth and
 Macrosynth use a compact five-byte parameter block at `0x20..0x24`. MIDI Out
 uses a 29-byte parameter block at `0x1d..0x39`. FM Synth uses a larger 33-byte
 block at `0x20..0x40`. Hypersynth uses a 12-byte block at `0x20..0x2b`.
+External uses a 13-byte parameter block at `0x20..0x2c`.
 Sampler has a distinct body layout and does not use these block shapes.
 
 | Instrument Type | Offset / Range | Size | Type |
@@ -197,6 +216,7 @@ Sampler has a distinct body layout and does not use these block shapes.
 | `midiOut` | `0x1d..0x39` | 29 | [MIDI Out Parameters](#midi-out-parameters) |
 | `fmSynth` | `0x20..0x40` | 33 | [FM Synth Parameters](#fm-synth-parameters) |
 | `hypersynth` | `0x20..0x2b` | 12 | [Hypersynth Parameters](#hypersynth-parameters) |
+| `external` | `0x20..0x2c` | 13 | [External Parameters](#external-parameters) |
 
 ### Wavsynth Parameters
 
@@ -262,6 +282,44 @@ customCcOffset = 0x26 + (index * 2)
 ```
 
 `CCA` is index `0` and `CCJ` is index `9`.
+
+### External Parameters
+
+Offsets are relative to the start of `instrumentParams` when
+`instrumentType = external`.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `input` | `+0x00` | 1 | [External Input](#external-input) |
+| `port` | `+0x01` | 1 | [External Port](#external-port) |
+| `channel` | `+0x02` | 1 | `u1` |
+| `bank` | `+0x03` | 1 | `u1` |
+| `programChange` | `+0x04` | 1 | `u1` |
+| `customCcs` | `+0x05..+0x0c` | 8 | [External Custom CC](#external-custom-cc) |
+
+The M8 UI displays `channel`, `bank`, `programChange`, and custom CC numbers as
+decimal values. The fixture verifies that those display values are stored as
+their byte equivalents: channel `16` is `0x10`, bank `127` is `0x7f`, program
+change `126` is `0x7e`, CC `125` is `0x7d`, and CC `123` is `0x7b`.
+
+#### External Custom CC
+
+The custom CC table stores four two-byte entries for `CCA` through `CCD`.
+
+Offsets are relative to the start of a custom CC entry.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `cc` | `+0x00` | 1 | `u1` |
+| `value` | `+0x01` | 1 | `u1` |
+
+The entry offset is:
+
+```txt
+customCcOffset = 0x25 + (index * 2)
+```
+
+`CCA` is index `0` and `CCD` is index `3`.
 
 ### FM Synth Parameters
 
@@ -397,7 +455,8 @@ Offsets are relative to the start of `mixer`.
 ## Tail
 
 The tail layout depends on `instrumentType`. For Wavsynth, Macrosynth,
-MIDI Out, FM Synth, and NONE, the tail is currently preserved as unknown bytes.
+MIDI Out, FM Synth, External, and NONE, the tail is currently preserved as
+unknown bytes.
 
 ### Sampler Tail
 
@@ -484,6 +543,35 @@ reference material until future fixtures select those values.
 | `MIDI` | `0x01` |
 | `USB` | `0x02` |
 | `INTERNAL` | `0x03` |
+
+### External Input
+
+Input values `0x00` and `0x08` are verified by the External fixtures. Other
+labels are from the M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `LINE-IN STEREO` | `0x00` |
+| `LINE-IN LEFT` | `0x01` |
+| `LINE-IN RIGHT` | `0x02` |
+| `USB STEREO` | `0x03` |
+| `USB LEFT` | `0x04` |
+| `USB RIGHT` | `0x05` |
+| `ALL STEREO` | `0x06` |
+| `ALL LEFT` | `0x07` |
+| `ALL RIGHT` | `0x08` |
+
+### External Port
+
+Port values `0x01` and `0x03` are verified by the External fixtures. Other
+labels are from the M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `NONE` | `0x00` |
+| `MIDI+USB` | `0x01` |
+| `MIDI` | `0x02` |
+| `USB` | `0x03` |
 
 ### FM Synth Algorithm
 
@@ -724,7 +812,7 @@ the M8 6.5.2 manual until future fixtures select those values.
 
 | Name | Offset / Range | Size | Status |
 | --- | --- | ---: | --- |
-| `unknownCommon0` | `0x1d..0x1e` | 2 | Preserved for Wavsynth, Macrosynth, Sampler, FM Synth, and Hypersynth until future fixtures map this common region |
+| `unknownCommon0` | `0x1d..0x1e` | 2 | Preserved for Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External until future fixtures map this common region |
 | `wavsynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `macrosynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `midiOut.unknownBeforeProgramChange` | `0x20..0x21` | 2 | Preserved until future fixtures map this region |
@@ -736,13 +824,15 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `hypersynth.unknownBeforeEq` | `0x36..0x4b` | 22 | Preserved until MODS fixtures map this region |
 | `hypersynth.unknownBeforeChords` | `0x4d..0x64` | 24 | Preserved until future fixtures map this region |
 | `hypersynth.unknownAfterChords` | `0xd5..0x164` | 144 | Preserved until future fixtures map this region |
+| `external.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
+| `external.unknownBeforeEq` | `0x37..0x4b` | 21 | Preserved until future fixtures map this region |
 | `none.bodyBeforeEq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until MODS fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until MODS fixtures map this region |
 | `sampler.unknownBeforeSamplePath` | `0x4d..0x64` | 24 | Preserved until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
 | `sampler.unknownAfterSamplePath` | `0xe5..0x164` | 128 | Preserved until table/sample-path-related regions are mapped |
-| `unusedTail` | `0x4d..0x164` | 280 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, `none`, and any unmapped instrument type |
+| `unusedTail` | `0x4d..0x164` | 280 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, External, `none`, and any unmapped instrument type |
 
 The `NONE` instrument cannot be meaningfully edited beyond its name, so this
 single fixture is used only to verify the `none` instrument type value, the
@@ -757,7 +847,8 @@ separate `NONE` parameter model.
 - Enumerated values should document both stored representation and UI label.
   Verified instrument type values are `wavsynth = 0x00`,
   `macrosynth = 0x01`, `sampler = 0x02`, `midiOut = 0x03`,
-  `fmSynth = 0x04`, `hypersynth = 0x05`, and `none = 0xff`.
+  `fmSynth = 0x04`, `hypersynth = 0x05`, `external = 0x06`, and
+  `none = 0xff`.
 - `transpose` is modeled as part of the common instrument layout at `0x1b`.
   Verified values are `ON = 0x01` and `OFF = 0x00`.
 - `eq` is modeled as part of the common instrument layout at `0x4c`. Verified
@@ -771,7 +862,7 @@ separate `NONE` parameter model.
   should be verified by a future fixture.
 - `MID_PARAMS.m8i` does not change `eq`; the M8 UI does not expose an EQ
   assignment control for MIDI Out. Common EQ assignment remains verified by the
-  Wavsynth, Macrosynth, Sampler, and FM Synth fixtures.
+  Wavsynth, Macrosynth, Sampler, FM Synth, and External fixtures.
 - MIDI Out does not expose Filter, Amplification, or Mixer parameter groups in
   the M8 UI. Older <https://github.com/whitlockjc/m8-js> reference code reads
   shared groups after the MIDI Out custom CC table, but the 6.5.x MIDI Out
@@ -779,9 +870,11 @@ separate `NONE` parameter model.
   read filter values. This schema follows the fixture evidence and preserves
   `0x3a..0x4b` as unknown.
 - `HYP_PARAMS.m8i` does not change `eq`; common EQ assignment remains verified
-  by the Wavsynth, Macrosynth, Sampler, and FM Synth fixtures.
+  by the Wavsynth, Macrosynth, Sampler, FM Synth, and External fixtures.
 - `HYP_PARAMS.m8i` verifies `0x20` as `currentChord.index` by storing `0x0c`
   when chord `0C` is selected.
+- `EXT_PARAMS.m8i` verifies that External uses the shared filter, amplification,
+  mixer, and EQ layouts after its 13-byte parameter block.
 - Instrument files appear to include both durable instrument definitions and
   persisted UI/editor state. Hypersynth is the clearest verified example so far:
   `currentChord` is stored in the parameter region, while the persistent
@@ -817,6 +910,9 @@ separate `NONE` parameter model.
 | Hypersynth baseline fixture | `fixtures/6.5.x/instruments/HYP_DEFAULT.m8i` |
 | Hypersynth params fixture | `fixtures/6.5.x/instruments/HYP_PARAMS.m8i` |
 | Hypersynth params manifest | `fixtures/6.5.x/instruments/HYP_PARAMS.yaml` |
+| External baseline fixture | `fixtures/6.5.x/instruments/EXT_DEFAULT.m8i` |
+| External params fixture | `fixtures/6.5.x/instruments/EXT_PARAMS.m8i` |
+| External params manifest | `fixtures/6.5.x/instruments/EXT_PARAMS.yaml` |
 | Verification command | `npm run verify` |
 | M8 manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699>, version 6.5.2, 04/21/2026 |
 | Reference material | <https://github.com/whitlockjc/m8-js> |
@@ -855,3 +951,8 @@ The `HYP_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 Hypersynth params, filter params, amp params, mixer params, and the Hypersynth
 chord table boundary. The manifest-driven mapper matched all 36 changed bytes
 exactly and reported zero unaccounted changed bytes.
+
+The `EXT_PARAMS.m8i` fixture verifies common transpose/table TIC values,
+External params, filter params, amp params, mixer params, and common EQ
+assignment. The manifest-driven mapper matched all 28 changed bytes exactly and
+reported zero unaccounted changed bytes.

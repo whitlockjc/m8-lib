@@ -7,9 +7,10 @@ doc: |
   Body schema for instrument files with header schema version 6.0.1.
 
   Initial schema verified against M8 6.5.2C NONE, Wavsynth, Macrosynth,
-  Sampler, MIDI Out, FM Synth, and Hypersynth instrument fixtures. The
+  Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument fixtures. The
   instrument type byte, fixed-size name byte range, and common instrument prefix
-  are mapped. Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth params,
+  are mapped.
+  Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
   filter params, amp params, mixer params, sample path, Hypersynth chord table,
   and common EQ assignment are mapped from params fixtures. Unknown ranges are
   preserved until additional instrument fixtures provide evidence for their
@@ -41,6 +42,7 @@ seq:
         'instrument_type::midi_out': midi_out_body_before_eq
         'instrument_type::fm_synth': fm_synth_body_before_eq
         'instrument_type::hypersynth': hypersynth_body_before_eq
+        'instrument_type::external': external_body_before_eq
         'instrument_type::none': unused_body_before_eq
     doc: Instrument-specific body before the common EQ field.
   - id: eq
@@ -58,6 +60,7 @@ seq:
         'instrument_type::wavsynth': unused_tail
         'instrument_type::macrosynth': unused_tail
         'instrument_type::fm_synth': unused_tail
+        'instrument_type::external': unused_tail
         'instrument_type::none': unused_tail
     doc: Instrument-specific tail after the common EQ field.
 types:
@@ -173,6 +176,22 @@ types:
         type: mixer_params
       - id: unknown_before_eq
         size: 22
+  external_body_before_eq:
+    seq:
+      - id: unknown_common_0
+        size: 2
+      - id: unknown_before_params
+        size: 1
+      - id: params
+        type: external_params
+      - id: filter
+        type: filter_params
+      - id: amp
+        type: amp_params
+      - id: mixer
+        type: mixer_params
+      - id: unknown_before_eq
+        size: 21
   wavsynth_params:
     seq:
       - id: shape
@@ -228,6 +247,40 @@ types:
         repeat: expr
         repeat-expr: 10
   midi_out_custom_cc:
+    seq:
+      - id: cc
+        type: u1
+        doc: Displayed as decimal in the M8 UI.
+      - id: value
+        type: u1
+  external_params:
+    seq:
+      - id: input
+        type: u1
+        enum: external_input
+      - id: port
+        type: u1
+        enum: external_port
+      - id: channel
+        type: u1
+        doc: |
+          Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies
+          displayed channel 16 is stored as 0x10.
+      - id: bank
+        type: u1
+        doc: |
+          Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies
+          displayed bank 127 is stored as 0x7f.
+      - id: program_change
+        type: u1
+        doc: |
+          Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies
+          displayed program change 126 is stored as 0x7e.
+      - id: custom_ccs
+        type: external_custom_cc
+        repeat: expr
+        repeat-expr: 4
+  external_custom_cc:
     seq:
       - id: cc
         type: u1
@@ -445,6 +498,9 @@ enums:
     0x05:
       id: hypersynth
       -label: Hypersynth
+    0x06:
+      id: external
+      -label: External
     0xff:
       id: none
       -label: NONE
@@ -461,6 +517,47 @@ enums:
     0x03:
       id: internal
       -label: INTERNAL
+  external_input:
+    0x00:
+      id: line_in_stereo
+      -label: LINE-IN STEREO
+    0x01:
+      id: line_in_left
+      -label: LINE-IN LEFT
+    0x02:
+      id: line_in_right
+      -label: LINE-IN RIGHT
+    0x03:
+      id: usb_stereo
+      -label: USB STEREO
+    0x04:
+      id: usb_left
+      -label: USB LEFT
+    0x05:
+      id: usb_right
+      -label: USB RIGHT
+    0x06:
+      id: all_stereo
+      -label: ALL STEREO
+    0x07:
+      id: all_left
+      -label: ALL LEFT
+    0x08:
+      id: all_right
+      -label: ALL RIGHT
+  external_port:
+    0x00:
+      id: none
+      -label: NONE
+    0x01:
+      id: midi_usb
+      -label: MIDI+USB
+    0x02:
+      id: midi
+      -label: MIDI
+    0x03:
+      id: usb
+      -label: USB
   filter_type:
     0x00:
       id: off

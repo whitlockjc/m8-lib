@@ -1,0 +1,109 @@
+fileType: instrument
+firmware: 6.5.2C
+screen: instrument.external.params
+
+changes:
+  - name: name
+    originalBytes: 45 58 54 5f 44 45 46 41 55 4c 54 00
+    newBytes: 45 58 54 5f 50 41 52 41 4d 53 00 00
+
+  - name: transpose
+    original: 0x01
+    new: 0x00
+    originalLabel: ON
+    newLabel: OFF
+  - name: tableTic
+    original: 0x01
+    new: 0x02
+
+  - name: external.input
+    offset: 0x0020
+    original: 0x00
+    new: 0x08
+    originalLabel: LINE-IN STEREO
+    newLabel: ALL RIGHT
+  - name: external.port
+    original: 0x01
+    new: 0x03
+    originalLabel: MIDI+USB
+    newLabel: USB
+  - name: external.channel
+    original: 0x01
+    new: 0x10
+    originalLabel: 1
+    newLabel: 16
+  - name: external.bank
+    original: 0xff
+    new: 0x7f
+    originalLabel: --
+    newLabel: 127
+  - name: external.programChange
+    original: 0xff
+    new: 0x7e
+    originalLabel: --
+    newLabel: 126
+
+  - name: external.customCcs.0.cc
+    original: 0x01
+    new: 0x7d
+    originalLabel: 1
+    newLabel: 125
+  - name: external.customCcs.0.value
+    original: 0xff
+    new: 0x7c
+    originalLabel: --
+    newLabel: 7C
+  - name: external.customCcs.3.cc
+    original: 0x04
+    new: 0x7b
+    originalLabel: 4
+    newLabel: 123
+  - name: external.customCcs.3.value
+    original: 0xff
+    new: 0x7a
+    originalLabel: --
+    newLabel: 7A
+
+  - name: filter.type
+    original: 0x00
+    new: 0x07
+    originalLabel: OFF
+    newLabel: ZDF HP
+  - name: filter.cutoff
+    original: 0xff
+    new: 0xfe
+  - name: filter.resonance
+    original: 0x00
+    new: 0xfd
+
+  - name: amp.amp
+    original: 0x00
+    new: 0xfc
+  - name: amp.limit
+    offset: 0x0031
+    original: 0x00
+    new: 0x08
+    originalLabel: CLIP
+    newLabel: POST:W3
+  - name: amp.pan
+    original: 0x80
+    new: 0xfb
+
+  - name: mixer.dry
+    original: 0xc0
+    new: 0xfa
+  - name: mixer.modFx
+    original: 0x00
+    new: 0xf9
+  - name: mixer.delay
+    original: 0x00
+    new: 0xf8
+  - name: mixer.reverb
+    original: 0x00
+    new: 0xf7
+
+  - name: eq
+    original: 0x80
+    new: 0x7f
+    originalLabel: --
+    newLabel: 7F
