@@ -75,6 +75,8 @@ The verified fixtures show both full and padded values:
 | `WAV_MODS_B.m8i` | `WAV_MODS_B` followed by two `0x00` bytes |
 | `MAC_DEFAULT.m8i` | `MAC_DEFAULT` followed by one `0x00` byte |
 | `MAC_PARAMS.m8i` | `MAC_PARAMS` followed by two `0x00` bytes |
+| `MAC_MODS_A.m8i` | `MAC_MODS_A` followed by two `0x00` bytes |
+| `MAC_MODS_B.m8i` | `MAC_MODS_B` followed by two `0x00` bytes |
 | `SAM_DEFAULT.m8i` | `SAM_DEFAULT` followed by one `0x00` byte |
 | `SAM_PARAMS.m8i` | `SAM_PARAMS` followed by two `0x00` bytes |
 | `SAMS_PARAMS.m8i` | `SAMS_PARAMS` followed by one `0x00` byte |
@@ -516,7 +518,8 @@ to `0xdf` when `note6` was unset.
 Instrument modulation is stored as four six-byte slots at `0x4d..0x64`.
 `WAV_MODS_A.m8i` verifies the slot storage for `TRACKING`, `TRIG ENV`,
 `AHD ENV`, and `ADSR ENV`. `WAV_MODS_B.m8i` verifies the slot storage for
-`LFO` and `DRUM ENV`.
+`LFO` and `DRUM ENV`. `MAC_MODS_A.m8i` and `MAC_MODS_B.m8i` verify the same
+storage layout for Macrosynth.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -548,7 +551,8 @@ destination = typeAndDestination & 0x0f
 
 Destination labels are instrument-specific. `WAV_MODS_A.m8i` verifies Wavsynth
 destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
-`MOD AMT = 0x0b`.
+`MOD AMT = 0x0b`. `MAC_MODS_A.m8i` verifies those same high modulation
+destination values for Macrosynth.
 
 ### Modulation Parameters
 
@@ -609,6 +613,30 @@ M8 6.5.2 manual until future fixtures select those values.
 | `OFF` | `0x00` |
 | `VOLUME` | `0x01` |
 | `PITCH` | `0x02` |
+| `TIMBRE` | `0x03` |
+| `COLOR` | `0x04` |
+| `DEGRADE` | `0x05` |
+| `REDUX` | `0x06` |
+| `CUTOFF` | `0x07` |
+| `RES` | `0x08` |
+| `AMP` | `0x09` |
+| `PAN` | `0x0a` |
+| `MOD AMT` | `0x0b` |
+| `MOD RATE` | `0x0c` |
+| `MOD BOTH` | `0x0d` |
+| `MOD BINV` | `0x0e` |
+
+### Macrosynth Modulation Destination
+
+Macrosynth destination values `0x0b..0x0e` are verified by
+`MAC_MODS_A.m8i`. `MAC_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other
+labels are from the M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `OFF` | `0x00` |
+| `VOLUME` | `0x01` |
+| `PITCH` | `0x02` |
 | `SIZE` | `0x03` |
 | `MULT` | `0x04` |
 | `WARP` | `0x05` |
@@ -624,8 +652,9 @@ M8 6.5.2 manual until future fixtures select those values.
 
 ### Modulation LFO Oscillator
 
-Oscillator value `0x13` is verified by `WAV_MODS_B.m8i`. Other labels are from
-the M8 6.5.2 manual until future fixtures select those values.
+Oscillator value `0x13` is verified by `WAV_MODS_B.m8i` and
+`MAC_MODS_B.m8i`. Other labels are from the M8 6.5.2 manual until future
+fixtures select those values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -652,8 +681,9 @@ the M8 6.5.2 manual until future fixtures select those values.
 
 ### Modulation LFO Trigger
 
-Trigger value `0x03` is verified by `WAV_MODS_B.m8i`. Other labels are from the
-M8 6.5.2 manual until future fixtures select those values.
+Trigger value `0x03` is verified by `WAV_MODS_B.m8i` and `MAC_MODS_B.m8i`.
+Other labels are from the M8 6.5.2 manual until future fixtures select those
+values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1062,6 +1092,11 @@ separate `NONE` parameter model.
   still interpreted according to the old type; the manifest names those payload
   byte positions according to the new type layout being verified.
 - `WAV_MODS_B.m8i` verifies the parameter layouts for `LFO` and `DRUM ENV`.
+- `MAC_MODS_A.m8i` verifies that Macrosynth uses the common modulation slot
+  width, offset, packed type/destination byte, and parameter layouts for
+  `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
+- `MAC_MODS_B.m8i` verifies that Macrosynth uses the common modulation
+  parameter layouts for `LFO` and `DRUM ENV`.
 - Instrument files appear to include both durable instrument definitions and
   persisted UI/editor state. Hypersynth is the clearest verified example so far:
   `currentChord` is stored in the parameter region, while the persistent
@@ -1085,6 +1120,10 @@ separate `NONE` parameter model.
 | Macrosynth baseline fixture | `fixtures/6.5.x/instruments/MAC_DEFAULT.m8i` |
 | Macrosynth params fixture | `fixtures/6.5.x/instruments/MAC_PARAMS.m8i` |
 | Macrosynth params manifest | `fixtures/6.5.x/instruments/MAC_PARAMS.yaml` |
+| Macrosynth MODS fixture | `fixtures/6.5.x/instruments/MAC_MODS_A.m8i` |
+| Macrosynth MODS manifest | `fixtures/6.5.x/instruments/MAC_MODS_A.yaml` |
+| Macrosynth MODS B fixture | `fixtures/6.5.x/instruments/MAC_MODS_B.m8i` |
+| Macrosynth MODS B manifest | `fixtures/6.5.x/instruments/MAC_MODS_B.yaml` |
 | Sampler baseline fixture | `fixtures/6.5.x/instruments/SAM_DEFAULT.m8i` |
 | Sampler params fixture | `fixtures/6.5.x/instruments/SAM_PARAMS.m8i` |
 | Sampler params manifest | `fixtures/6.5.x/instruments/SAM_PARAMS.yaml` |
@@ -1130,6 +1169,17 @@ The `MAC_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 Macrosynth params, filter params, amp params, mixer params, and common EQ
 assignment. The manifest-driven mapper matched all 24 changed bytes exactly and
 reported zero unaccounted changed bytes.
+
+The `MAC_MODS_A.m8i` fixture verifies the common instrument modulation block
+at `0x4d..0x64` using Macrosynth as the carrier instrument. It verifies
+`TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV` slot storage. The
+manifest-driven mapper matched all 29 changed bytes exactly and reported zero
+unaccounted changed bytes.
+
+The `MAC_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
+the common instrument modulation block using Macrosynth as the carrier
+instrument. The manifest-driven mapper matched all 17 changed bytes exactly
+and reported zero unaccounted changed bytes.
 
 The `SAM_PARAMS.m8i`, `SAMS_PARAMS.m8i`, and `SAMB_PARAMS.m8i` fixtures verify
 Sampler params, play-mode-dependent `modeValue`, shifted filter/amp/mixer
