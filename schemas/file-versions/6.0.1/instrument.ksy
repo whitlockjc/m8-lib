@@ -11,10 +11,10 @@ doc: |
   instrument type byte, fixed-size name byte range, and common instrument prefix
   are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
-  filter params, amp params, mixer params, sample path, Hypersynth chord table,
-  and common EQ assignment are mapped from params fixtures. Unknown ranges are
-  preserved until additional instrument fixtures provide evidence for their
-  layout.
+  filter params, amp params, mixer params, modulators, sample path, Hypersynth
+  chord table, and common EQ assignment are mapped from params and MODS
+  fixtures. Unknown ranges are preserved until additional instrument fixtures
+  provide evidence for their layout.
 seq:
   - id: instrument_type
     type: u1
@@ -56,11 +56,11 @@ seq:
       cases:
         'instrument_type::sampler': sampler_tail
         'instrument_type::hypersynth': hypersynth_tail
-        'instrument_type::midi_out': unused_tail
-        'instrument_type::wavsynth': unused_tail
-        'instrument_type::macrosynth': unused_tail
-        'instrument_type::fm_synth': unused_tail
-        'instrument_type::external': unused_tail
+        'instrument_type::midi_out': modulated_tail
+        'instrument_type::wavsynth': modulated_tail
+        'instrument_type::macrosynth': modulated_tail
+        'instrument_type::fm_synth': modulated_tail
+        'instrument_type::external': modulated_tail
         'instrument_type::none': unused_tail
     doc: Instrument-specific tail after the common EQ field.
 types:
@@ -441,14 +441,20 @@ types:
         type: u1
       - id: reverb
         type: u1
+  modulated_tail:
+    seq:
+      - id: modulators
+        type: instrument_modulators
+      - id: unknown_after_modulators
+        size-eos: true
   unused_tail:
     seq:
       - id: unknown
         size-eos: true
   sampler_tail:
     seq:
-      - id: unknown_before_sample_path
-        size: 24
+      - id: modulators
+        type: instrument_modulators
       - id: sample_path
         size: 128
         doc: |
@@ -460,8 +466,8 @@ types:
         size-eos: true
   hypersynth_tail:
     seq:
-      - id: unknown_before_chords
-        size: 24
+      - id: modulators
+        type: instrument_modulators
       - id: chords
         type: hypersynth_chord
         repeat: expr
@@ -478,7 +484,253 @@ types:
           0xdf when note 6 was unset.
       - id: notes
         type: hypersynth_chord_notes
+  instrument_modulators:
+    seq:
+      - id: slots
+        type: modulation_slot
+        repeat: expr
+        repeat-expr: 4
+  modulation_slot:
+    seq:
+      - id: type_and_destination
+        type: u1
+        doc: |
+          Packed byte: high nibble stores modulation type, low nibble stores
+          destination. Destination labels are instrument-specific.
+      - id: amount
+        type: u1
+      - id: params
+        type:
+          switch-on: modulation_type
+          cases:
+            'modulation_type::ahd_env': modulation_ahd_env_params
+            'modulation_type::adsr_env': modulation_adsr_env_params
+            'modulation_type::drum_env': modulation_drum_env_params
+            'modulation_type::lfo': modulation_lfo_params
+            'modulation_type::trig_env': modulation_trig_env_params
+            'modulation_type::tracking': modulation_tracking_params
+    instances:
+      modulation_type:
+        value: type_and_destination >> 4
+        enum: modulation_type
+      destination:
+        value: type_and_destination & 0x0f
+        doc: |
+          Instrument-specific destination value. Wavsynth destination labels are
+          documented in wavsynth_modulation_destination.
+  modulation_ahd_env_params:
+    seq:
+      - id: attack
+        type: u1
+      - id: hold
+        type: u1
+      - id: decay
+        type: u1
+      - id: unused
+        type: u1
+  modulation_adsr_env_params:
+    seq:
+      - id: attack
+        type: u1
+      - id: decay
+        type: u1
+      - id: sustain
+        type: u1
+      - id: release
+        type: u1
+  modulation_drum_env_params:
+    seq:
+      - id: peak
+        type: u1
+      - id: body
+        type: u1
+      - id: decay
+        type: u1
+      - id: unused
+        type: u1
+  modulation_lfo_params:
+    seq:
+      - id: oscillator
+        type: u1
+        enum: modulation_lfo_oscillator
+      - id: trigger
+        type: u1
+        enum: modulation_lfo_trigger
+      - id: frequency
+        type: u1
+      - id: unused
+        type: u1
+  modulation_trig_env_params:
+    seq:
+      - id: attack
+        type: u1
+      - id: hold
+        type: u1
+      - id: decay
+        type: u1
+      - id: source
+        type: u1
+  modulation_tracking_params:
+    seq:
+      - id: source
+        type: u1
+        enum: modulation_tracking_source
+      - id: lowest_value
+        type: u1
+      - id: highest_value
+        type: u1
+      - id: unused
+        type: u1
 enums:
+  modulation_type:
+    0x00:
+      id: ahd_env
+      -label: AHD ENV
+    0x01:
+      id: adsr_env
+      -label: ADSR ENV
+    0x02:
+      id: drum_env
+      -label: DRUM ENV
+    0x03:
+      id: lfo
+      -label: LFO
+    0x04:
+      id: trig_env
+      -label: TRIG ENV
+    0x05:
+      id: tracking
+      -label: TRACKING
+  modulation_tracking_source:
+    0x00:
+      id: note
+      -label: NOTE
+    0x01:
+      id: velocity
+      -label: VELOCITY
+    0x02:
+      id: velocity_take
+      -label: VEL.TAKE
+  modulation_lfo_oscillator:
+    0x00:
+      id: triangle
+      -label: TRI
+    0x01:
+      id: sine
+      -label: SIN
+    0x02:
+      id: ramp_down
+      -label: RAMP DN
+    0x03:
+      id: ramp_up
+      -label: RAMP UP
+    0x04:
+      id: exp_down
+      -label: EXP DN
+    0x05:
+      id: exp_up
+      -label: EXP UP
+    0x06:
+      id: square_down
+      -label: SQU DN
+    0x07:
+      id: square_up
+      -label: SQU UP
+    0x08:
+      id: random
+      -label: RANDOM
+    0x09:
+      id: drunk
+      -label: DRUNK
+    0x0a:
+      id: triangle_t
+      -label: TRI T
+    0x0b:
+      id: sine_t
+      -label: SIN T
+    0x0c:
+      id: ramp_down_t
+      -label: RAMPDN T
+    0x0d:
+      id: ramp_up_t
+      -label: RAMPUP T
+    0x0e:
+      id: exp_down_t
+      -label: EXP DN T
+    0x0f:
+      id: exp_up_t
+      -label: EXP UP T
+    0x10:
+      id: square_down_t
+      -label: SQU DN T
+    0x11:
+      id: square_up_t
+      -label: SQU UP T
+    0x12:
+      id: random_t
+      -label: RAND T
+    0x13:
+      id: drunk_t
+      -label: DRUNK T
+  modulation_lfo_trigger:
+    0x00:
+      id: free
+      -label: FREE
+    0x01:
+      id: retrig
+      -label: RETRIG
+    0x02:
+      id: hold
+      -label: HOLD
+    0x03:
+      id: once
+      -label: ONCE
+  wavsynth_modulation_destination:
+    0x00:
+      id: off
+      -label: OFF
+    0x01:
+      id: volume
+      -label: VOLUME
+    0x02:
+      id: pitch
+      -label: PITCH
+    0x03:
+      id: size
+      -label: SIZE
+    0x04:
+      id: mult
+      -label: MULT
+    0x05:
+      id: warp
+      -label: WARP
+    0x06:
+      id: scan
+      -label: SCAN
+    0x07:
+      id: cutoff
+      -label: CUTOFF
+    0x08:
+      id: resonance
+      -label: RES
+    0x09:
+      id: amp
+      -label: AMP
+    0x0a:
+      id: pan
+      -label: PAN
+    0x0b:
+      id: mod_amount
+      -label: MOD AMT
+    0x0c:
+      id: mod_rate
+      -label: MOD RATE
+    0x0d:
+      id: mod_both
+      -label: MOD BOTH
+    0x0e:
+      id: mod_binv
+      -label: MOD BINV
   instrument_type:
     0x00:
       id: wavsynth

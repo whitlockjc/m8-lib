@@ -1,0 +1,112 @@
+fileType: instrument
+firmware: 6.5.2C
+screen: instrument.wavsynth.mods
+
+changes:
+  - name: name
+    originalBytes: 57 41 56 5f 44 45 46 41 55 4c 54 00
+    newBytes: 57 41 56 5f 4d 4f 44 53 5f 41 00 00
+
+  - name: modulators.0.typeAndDestination
+    offset: 0x004d
+    original: 0x00
+    new: 0x5e
+    originalLabel: AHD ENV / OFF
+    newLabel: TRACKING / MOD BINV
+  - name: modulators.0.amount
+    offset: 0x004e
+    original: 0xff
+    new: 0xfe
+  - name: modulators.0.source
+    offset: 0x004f
+    original: 0x00
+    new: 0x02
+    originalLabel: NOTE
+    newLabel: VEL.TAKE
+  - name: modulators.0.lowestValue
+    offset: 0x0050
+    original: 0x00
+    new: 0x7f
+  - name: modulators.0.highestValue
+    offset: 0x0051
+    original: 0x80
+    new: 0x7e
+
+  - name: modulators.1.typeAndDestination
+    offset: 0x0053
+    original: 0x00
+    new: 0x4d
+    originalLabel: AHD ENV / OFF
+    newLabel: TRIG ENV / MOD BOTH
+  - name: modulators.1.amount
+    offset: 0x0054
+    original: 0xff
+    new: 0xfd
+  - name: modulators.1.attack
+    offset: 0x0055
+    original: 0x00
+    new: 0xfc
+  - name: modulators.1.hold
+    offset: 0x0056
+    original: 0x00
+    new: 0xfb
+  - name: modulators.1.decay
+    offset: 0x0057
+    original: 0x80
+    new: 0xfa
+  - name: modulators.1.source
+    offset: 0x0058
+    original: 0xff
+    new: 0x87
+    originalLabel: --
+    newLabel: TRACK 8
+
+  - name: modulators.2.typeAndDestination
+    offset: 0x0059
+    original: 0x30
+    new: 0x0c
+    originalLabel: LFO / OFF
+    newLabel: AHD ENV / MOD RATE
+  - name: modulators.2.amount
+    offset: 0x005a
+    original: 0xff
+    new: 0xf9
+  - name: modulators.2.attack
+    offset: 0x005b
+    original: 0x00
+    new: 0xf8
+  - name: modulators.2.hold
+    offset: 0x005c
+    original: 0x00
+    new: 0xf7
+  - name: modulators.2.decay
+    offset: 0x005d
+    original: 0x10
+    new: 0xf6
+
+  - name: modulators.3.typeAndDestination
+    offset: 0x005f
+    original: 0x30
+    new: 0x1b
+    originalLabel: LFO / OFF
+    newLabel: ADSR ENV / MOD AMT
+  - name: modulators.3.amount
+    offset: 0x0060
+    original: 0xff
+    new: 0xf5
+  - name: modulators.3.attack
+    offset: 0x0061
+    original: 0x00
+    new: 0xf4
+  - name: modulators.3.decay
+    offset: 0x0062
+    original: 0x00
+    new: 0xf3
+  - name: modulators.3.sustain
+    offset: 0x0063
+    original: 0x10
+    new: 0xf2
+  - name: modulators.3.release
+    offset: 0x0064
+    original: 0xff
+    new: 0xf1

@@ -1,0 +1,58 @@
+fileType: instrument
+firmware: 6.5.2C
+screen: instrument.wavsynth.mods
+
+changes:
+  - name: name
+    originalBytes: 57 41 56 5f 44 45 46 41 55 4c 54 00
+    newBytes: 57 41 56 5f 4d 4f 44 53 5f 42 00 00
+
+  - name: modulators.0.typeAndDestination
+    offset: 0x004d
+    original: 0x00
+    new: 0x3e
+    originalLabel: AHD ENV / OFF
+    newLabel: LFO / MOD BINV
+  - name: modulators.0.amount
+    offset: 0x004e
+    original: 0xff
+    new: 0xfe
+  - name: modulators.0.oscillator
+    offset: 0x004f
+    original: 0x00
+    new: 0x13
+    originalLabel: TRI
+    newLabel: DRUNK T
+  - name: modulators.0.trigger
+    offset: 0x0050
+    original: 0x00
+    new: 0x03
+    originalLabel: FREE
+    newLabel: ONCE
+  - name: modulators.0.frequency
+    offset: 0x0051
+    original: 0x80
+    new: 0xfd
+
+  - name: modulators.1.typeAndDestination
+    offset: 0x0053
+    original: 0x00
+    new: 0x2d
+    originalLabel: AHD ENV / OFF
+    newLabel: DRUM ENV / MOD BOTH
+  - name: modulators.1.amount
+    offset: 0x0054
+    original: 0xff
+    new: 0xfc
+  - name: modulators.1.peak
+    offset: 0x0055
+    original: 0x00
+    new: 0xfb
+  - name: modulators.1.body
+    offset: 0x0056
+    original: 0x00
+    new: 0xfa
+  - name: modulators.1.decay
+    offset: 0x0057
+    original: 0x80
+    new: 0xf9

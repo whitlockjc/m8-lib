@@ -71,6 +71,8 @@ The verified fixtures show both full and padded values:
 | `NONE_DEFAULT.m8i` | `NONE_DEFAULT`, filling all 12 bytes |
 | `WAV_DEFAULT.m8i` | `WAV_DEFAULT` followed by one `0x00` byte |
 | `WAV_PARAMS.m8i` | `WAV_PARAMS` followed by two `0x00` bytes |
+| `WAV_MODS_A.m8i` | `WAV_MODS_A` followed by two `0x00` bytes |
+| `WAV_MODS_B.m8i` | `WAV_MODS_B` followed by two `0x00` bytes |
 | `MAC_DEFAULT.m8i` | `MAC_DEFAULT` followed by one `0x00` byte |
 | `MAC_PARAMS.m8i` | `MAC_PARAMS` followed by two `0x00` bytes |
 | `SAM_DEFAULT.m8i` | `SAM_DEFAULT` followed by one `0x00` byte |
@@ -455,8 +457,19 @@ Offsets are relative to the start of `mixer`.
 ## Tail
 
 The tail layout depends on `instrumentType`. For Wavsynth, Macrosynth,
-MIDI Out, FM Synth, External, and NONE, the tail is currently preserved as
-unknown bytes.
+MIDI Out, FM Synth, and External, the tail starts with a shared 24-byte
+modulation block followed by currently unknown bytes. For `none`, the tail is
+preserved as unknown bytes because the M8 UI does not expose editable `NONE`
+instrument modulators.
+
+### Modulated Tail
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
+| `unknownAfterModulators` | `0x65..0x164` | 256 | unknown bytes |
 
 ### Sampler Tail
 
@@ -464,7 +477,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `unknownBeforeSamplePath` | `0x4d..0x64` | 24 | unknown bytes |
+| `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `samplePath` | `0x65..0xe4` | 128 | [Fixed String](#fixed-strings) |
 | `unknownAfterSamplePath` | `0xe5..0x164` | 128 | unknown bytes |
 
@@ -478,7 +491,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `unknownBeforeChords` | `0x4d..0x64` | 24 | unknown bytes |
+| `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `chords` | `0x65..0xd4` | 112 | [Hypersynth Chord](#hypersynth-chord) |
 | `unknownAfterChords` | `0xd5..0x164` | 144 | unknown bytes |
 
@@ -498,7 +511,177 @@ Offsets are relative to the start of a chord entry.
 from `0xff` to `0xfe` when `note1` was unset. Chord `15` changed from `0xff`
 to `0xdf` when `note6` was unset.
 
+## Instrument Modulation
+
+Instrument modulation is stored as four six-byte slots at `0x4d..0x64`.
+`WAV_MODS_A.m8i` verifies the slot storage for `TRACKING`, `TRIG ENV`,
+`AHD ENV`, and `ADSR ENV`. `WAV_MODS_B.m8i` verifies the slot storage for
+`LFO` and `DRUM ENV`.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `slots` | `+0x00..+0x17` | 24 | [Modulation Slot](#modulation-slot) |
+
+The slot offset is:
+
+```txt
+slotOffset = 0x4d + (index * 6)
+```
+
+### Modulation Slot
+
+Offsets are relative to the start of a modulation slot.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `typeAndDestination` | `+0x00` | 1 | packed byte |
+| `amount` | `+0x01` | 1 | `u1` |
+| `params` | `+0x02..+0x05` | 4 | type-dependent params |
+
+`typeAndDestination` packs modulation type in the high nibble and destination
+in the low nibble:
+
+```txt
+type = typeAndDestination >> 4
+destination = typeAndDestination & 0x0f
+```
+
+Destination labels are instrument-specific. `WAV_MODS_A.m8i` verifies Wavsynth
+destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
+`MOD AMT = 0x0b`.
+
+### Modulation Parameters
+
+Offsets are relative to the start of `params`.
+
+| Modulation Type | Field | Relative Offset | Size | Type |
+| --- | --- | --- | ---: | --- |
+| `AHD ENV` | `attack` | `+0x00` | 1 | `u1` |
+| `AHD ENV` | `hold` | `+0x01` | 1 | `u1` |
+| `AHD ENV` | `decay` | `+0x02` | 1 | `u1` |
+| `AHD ENV` | `unused` | `+0x03` | 1 | preserved byte |
+| `ADSR ENV` | `attack` | `+0x00` | 1 | `u1` |
+| `ADSR ENV` | `decay` | `+0x01` | 1 | `u1` |
+| `ADSR ENV` | `sustain` | `+0x02` | 1 | `u1` |
+| `ADSR ENV` | `release` | `+0x03` | 1 | `u1` |
+| `DRUM ENV` | `peak` | `+0x00` | 1 | `u1` |
+| `DRUM ENV` | `body` | `+0x01` | 1 | `u1` |
+| `DRUM ENV` | `decay` | `+0x02` | 1 | `u1` |
+| `DRUM ENV` | `unused` | `+0x03` | 1 | preserved byte |
+| `LFO` | `oscillator` | `+0x00` | 1 | [Modulation LFO Oscillator](#modulation-lfo-oscillator) |
+| `LFO` | `trigger` | `+0x01` | 1 | [Modulation LFO Trigger](#modulation-lfo-trigger) |
+| `LFO` | `frequency` | `+0x02` | 1 | `u1` |
+| `LFO` | `unused` | `+0x03` | 1 | preserved byte |
+| `TRIG ENV` | `attack` | `+0x00` | 1 | `u1` |
+| `TRIG ENV` | `hold` | `+0x01` | 1 | `u1` |
+| `TRIG ENV` | `decay` | `+0x02` | 1 | `u1` |
+| `TRIG ENV` | `source` | `+0x03` | 1 | [Modulation Trigger Source](#modulation-trigger-source) |
+| `TRACKING` | `source` | `+0x00` | 1 | [Modulation Tracking Source](#modulation-tracking-source) |
+| `TRACKING` | `lowestValue` | `+0x01` | 1 | `u1` |
+| `TRACKING` | `highestValue` | `+0x02` | 1 | `u1` |
+| `TRACKING` | `unused` | `+0x03` | 1 | preserved byte |
+
 ## Enums
+
+### Modulation Type
+
+Values `0x00`, `0x01`, `0x04`, and `0x05` are verified by the
+`WAV_MODS_A.m8i` fixture. Values `0x02` and `0x03` are verified by the
+`WAV_MODS_B.m8i` fixture.
+
+| Name | Stored Value |
+| --- | --- |
+| `AHD ENV` | `0x00` |
+| `ADSR ENV` | `0x01` |
+| `DRUM ENV` | `0x02` |
+| `LFO` | `0x03` |
+| `TRIG ENV` | `0x04` |
+| `TRACKING` | `0x05` |
+
+### Wavsynth Modulation Destination
+
+Wavsynth destination values `0x0b..0x0e` are verified by `WAV_MODS_A.m8i`.
+`WAV_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
+M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `OFF` | `0x00` |
+| `VOLUME` | `0x01` |
+| `PITCH` | `0x02` |
+| `SIZE` | `0x03` |
+| `MULT` | `0x04` |
+| `WARP` | `0x05` |
+| `SCAN` | `0x06` |
+| `CUTOFF` | `0x07` |
+| `RES` | `0x08` |
+| `AMP` | `0x09` |
+| `PAN` | `0x0a` |
+| `MOD AMT` | `0x0b` |
+| `MOD RATE` | `0x0c` |
+| `MOD BOTH` | `0x0d` |
+| `MOD BINV` | `0x0e` |
+
+### Modulation LFO Oscillator
+
+Oscillator value `0x13` is verified by `WAV_MODS_B.m8i`. Other labels are from
+the M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `TRI` | `0x00` |
+| `SIN` | `0x01` |
+| `RAMP DN` | `0x02` |
+| `RAMP UP` | `0x03` |
+| `EXP DN` | `0x04` |
+| `EXP UP` | `0x05` |
+| `SQU DN` | `0x06` |
+| `SQU UP` | `0x07` |
+| `RANDOM` | `0x08` |
+| `DRUNK` | `0x09` |
+| `TRI T` | `0x0a` |
+| `SIN T` | `0x0b` |
+| `RAMPDN T` | `0x0c` |
+| `RAMPUP T` | `0x0d` |
+| `EXP DN T` | `0x0e` |
+| `EXP UP T` | `0x0f` |
+| `SQU DN T` | `0x10` |
+| `SQU UP T` | `0x11` |
+| `RAND T` | `0x12` |
+| `DRUNK T` | `0x13` |
+
+### Modulation LFO Trigger
+
+Trigger value `0x03` is verified by `WAV_MODS_B.m8i`. Other labels are from the
+M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `FREE` | `0x00` |
+| `RETRIG` | `0x01` |
+| `HOLD` | `0x02` |
+| `ONCE` | `0x03` |
+
+### Modulation Tracking Source
+
+Source value `0x02` is verified by `WAV_MODS_A.m8i`. Other labels are from the
+M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `NOTE` | `0x00` |
+| `VELOCITY` | `0x01` |
+| `VEL.TAKE` | `0x02` |
+
+### Modulation Trigger Source
+
+The trigger source byte can refer to an instrument or track. `WAV_MODS_A.m8i`
+verifies `TRACK 8 = 0x87`.
+
+| Range | Meaning |
+| --- | --- |
+| `0x00..0x7f` | Instrument reference |
+| `0x80..0x87` | Track reference, where `track = value - 0x7f` |
 
 ### Filter Type
 
@@ -821,18 +1004,17 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `fmSynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `fmSynth.unknownBeforeEq` | `0x4b` | 1 | Preserved until future fixtures map this byte |
 | `hypersynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
-| `hypersynth.unknownBeforeEq` | `0x36..0x4b` | 22 | Preserved until MODS fixtures map this region |
-| `hypersynth.unknownBeforeChords` | `0x4d..0x64` | 24 | Preserved until future fixtures map this region |
+| `hypersynth.unknownBeforeEq` | `0x36..0x4b` | 22 | Preserved until future fixtures map this region |
 | `hypersynth.unknownAfterChords` | `0xd5..0x164` | 144 | Preserved until future fixtures map this region |
 | `external.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `external.unknownBeforeEq` | `0x37..0x4b` | 21 | Preserved until future fixtures map this region |
 | `none.bodyBeforeEq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
-| `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until MODS fixtures map this region |
-| `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until MODS fixtures map this region |
-| `sampler.unknownBeforeSamplePath` | `0x4d..0x64` | 24 | Preserved until future fixtures map this region |
+| `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until future fixtures map this region |
+| `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
 | `sampler.unknownAfterSamplePath` | `0xe5..0x164` | 128 | Preserved until table/sample-path-related regions are mapped |
-| `unusedTail` | `0x4d..0x164` | 280 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, External, `none`, and any unmapped instrument type |
+| `unknownAfterModulators` | `0x65..0x164` | 256 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, and External until table-related regions are mapped |
+| `none.tail` | `0x4d..0x164` | 280 | Preserved for `none` because the M8 UI does not expose editable `NONE` modulators |
 
 The `NONE` instrument cannot be meaningfully edited beyond its name, so this
 single fixture is used only to verify the `none` instrument type value, the
@@ -874,6 +1056,12 @@ separate `NONE` parameter model.
   when chord `0C` is selected.
 - `EXT_PARAMS.m8i` verifies that External uses the shared filter, amplification,
   mixer, and EQ layouts after its 13-byte parameter block.
+- `WAV_MODS_A.m8i` verifies the common modulation slot width, offset, packed
+  type/destination byte, and parameter layouts for `TRACKING`, `TRIG ENV`,
+  `AHD ENV`, and `ADSR ENV`. When a slot changes type, the original bytes are
+  still interpreted according to the old type; the manifest names those payload
+  byte positions according to the new type layout being verified.
+- `WAV_MODS_B.m8i` verifies the parameter layouts for `LFO` and `DRUM ENV`.
 - Instrument files appear to include both durable instrument definitions and
   persisted UI/editor state. Hypersynth is the clearest verified example so far:
   `currentChord` is stored in the parameter region, while the persistent
@@ -890,6 +1078,10 @@ separate `NONE` parameter model.
 | Wavsynth baseline fixture | `fixtures/6.5.x/instruments/WAV_DEFAULT.m8i` |
 | Wavsynth params fixture | `fixtures/6.5.x/instruments/WAV_PARAMS.m8i` |
 | Wavsynth params manifest | `fixtures/6.5.x/instruments/WAV_PARAMS.yaml` |
+| Wavsynth MODS fixture | `fixtures/6.5.x/instruments/WAV_MODS_A.m8i` |
+| Wavsynth MODS manifest | `fixtures/6.5.x/instruments/WAV_MODS_A.yaml` |
+| Wavsynth MODS B fixture | `fixtures/6.5.x/instruments/WAV_MODS_B.m8i` |
+| Wavsynth MODS B manifest | `fixtures/6.5.x/instruments/WAV_MODS_B.yaml` |
 | Macrosynth baseline fixture | `fixtures/6.5.x/instruments/MAC_DEFAULT.m8i` |
 | Macrosynth params fixture | `fixtures/6.5.x/instruments/MAC_PARAMS.m8i` |
 | Macrosynth params manifest | `fixtures/6.5.x/instruments/MAC_PARAMS.yaml` |
@@ -923,6 +1115,16 @@ The `WAV_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 Wavsynth params, filter params, amp params, mixer params, and common EQ
 assignment. The manifest-driven mapper matched all 24 changed bytes exactly and
 reported zero unaccounted changed bytes.
+
+The `WAV_MODS_A.m8i` fixture verifies the common instrument modulation block
+at `0x4d..0x64` using Wavsynth as the carrier instrument. It verifies
+`TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV` slot storage. The
+manifest-driven mapper matched all 29 changed bytes exactly and reported zero
+unaccounted changed bytes.
+
+The `WAV_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
+the common instrument modulation block. The manifest-driven mapper matched all
+17 changed bytes exactly and reported zero unaccounted changed bytes.
 
 The `MAC_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 Macrosynth params, filter params, amp params, mixer params, and common EQ
