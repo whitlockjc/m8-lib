@@ -7,12 +7,13 @@ doc: |
   Body schema for instrument files with header schema version 6.0.1.
 
   Initial schema verified against M8 6.5.2C NONE, Wavsynth, Macrosynth,
-  Sampler, FM Synth, and Hypersynth instrument fixtures. The instrument type
-  byte, fixed-size name byte range, and common instrument prefix are mapped.
-  Wavsynth/Macrosynth/Sampler/FM Synth/Hypersynth params, filter params, amp
-  params, mixer params, sample path, Hypersynth chord table, and common EQ
-  assignment are mapped from params fixtures. Unknown ranges are preserved until
-  additional instrument fixtures provide evidence for their layout.
+  Sampler, MIDI Out, FM Synth, and Hypersynth instrument fixtures. The
+  instrument type byte, fixed-size name byte range, and common instrument prefix
+  are mapped. Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth params,
+  filter params, amp params, mixer params, sample path, Hypersynth chord table,
+  and common EQ assignment are mapped from params fixtures. Unknown ranges are
+  preserved until additional instrument fixtures provide evidence for their
+  layout.
 seq:
   - id: instrument_type
     type: u1
@@ -30,8 +31,6 @@ seq:
   - id: table_tic
     type: u1
     doc: Common instrument table TIC setting.
-  - id: unknown_common_0
-    size: 2
   - id: body_before_eq
     type:
       switch-on: instrument_type
@@ -39,6 +38,7 @@ seq:
         'instrument_type::wavsynth': wavsynth_body_before_eq
         'instrument_type::macrosynth': macrosynth_body_before_eq
         'instrument_type::sampler': sampler_body_before_eq
+        'instrument_type::midi_out': midi_out_body_before_eq
         'instrument_type::fm_synth': fm_synth_body_before_eq
         'instrument_type::hypersynth': hypersynth_body_before_eq
         'instrument_type::none': unused_body_before_eq
@@ -54,6 +54,7 @@ seq:
       cases:
         'instrument_type::sampler': sampler_tail
         'instrument_type::hypersynth': hypersynth_tail
+        'instrument_type::midi_out': unused_tail
         'instrument_type::wavsynth': unused_tail
         'instrument_type::macrosynth': unused_tail
         'instrument_type::fm_synth': unused_tail
@@ -66,9 +67,11 @@ types:
       for NONE.
     seq:
       - id: unknown
-        size: 45
+        size: 47
   wavsynth_body_before_eq:
     seq:
+      - id: unknown_common_0
+        size: 2
       - id: unknown_before_params
         size: 1
       - id: params
@@ -83,6 +86,8 @@ types:
         size: 29
   macrosynth_body_before_eq:
     seq:
+      - id: unknown_common_0
+        size: 2
       - id: unknown_before_params
         size: 1
       - id: params
@@ -97,6 +102,8 @@ types:
         size: 29
   sampler_body_before_eq:
     seq:
+      - id: unknown_common_0
+        size: 2
       - id: mode_value
         type: u1
         doc: |
@@ -122,8 +129,16 @@ types:
         type: mixer_params
       - id: unknown_before_eq
         size: 28
+  midi_out_body_before_eq:
+    seq:
+      - id: params
+        type: midi_out_params
+      - id: unknown_before_eq
+        size: 18
   fm_synth_body_before_eq:
     seq:
+      - id: unknown_common_0
+        size: 2
       - id: unknown_before_params
         size: 1
       - id: params
@@ -144,6 +159,8 @@ types:
         size: 1
   hypersynth_body_before_eq:
     seq:
+      - id: unknown_common_0
+        size: 2
       - id: unknown_before_params
         size: 1
       - id: params
@@ -181,6 +198,41 @@ types:
       - id: degrade
         type: u1
       - id: redux
+        type: u1
+  midi_out_params:
+    seq:
+      - id: port
+        type: u1
+        enum: midi_out_port
+      - id: channel
+        type: u1
+        doc: |
+          Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
+          displayed channel 16 is stored as 0x10.
+      - id: bank
+        type: u1
+        doc: |
+          Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
+          displayed bank 127 is stored as 0x7f.
+      - id: unknown_before_program_change
+        size: 2
+      - id: program_change
+        type: u1
+        doc: |
+          Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
+          displayed program change 126 is stored as 0x7e.
+      - id: unknown_before_custom_ccs
+        size: 3
+      - id: custom_ccs
+        type: midi_out_custom_cc
+        repeat: expr
+        repeat-expr: 10
+  midi_out_custom_cc:
+    seq:
+      - id: cc
+        type: u1
+        doc: Displayed as decimal in the M8 UI.
+      - id: value
         type: u1
   fm_synth_params:
     seq:
@@ -384,6 +436,9 @@ enums:
     0x02:
       id: sampler
       -label: Sampler
+    0x03:
+      id: midi_out
+      -label: MIDI Out
     0x04:
       id: fm_synth
       -label: FM Synth
@@ -393,6 +448,19 @@ enums:
     0xff:
       id: none
       -label: NONE
+  midi_out_port:
+    0x00:
+      id: midi_usb
+      -label: MIDI+USB
+    0x01:
+      id: midi
+      -label: MIDI
+    0x02:
+      id: usb
+      -label: USB
+    0x03:
+      id: internal
+      -label: INTERNAL
   filter_type:
     0x00:
       id: off

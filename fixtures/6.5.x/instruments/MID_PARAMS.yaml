@@ -1,0 +1,59 @@
+fileType: instrument
+firmware: 6.5.2C
+screen: instrument.midiOut.params
+
+changes:
+  - name: name
+    originalBytes: 4d 49 44 5f 44 45 46 41 55 4c 54 00
+    newBytes: 4d 49 44 5f 50 41 52 41 4d 53 00 00
+
+  - name: transpose
+    original: 0x01
+    new: 0x00
+    originalLabel: ON
+    newLabel: OFF
+  - name: tableTic
+    original: 0x01
+    new: 0x02
+
+  - name: midiOut.port
+    original: 0x00
+    new: 0x03
+    originalLabel: MIDI+USB
+    newLabel: INTERNAL
+  - name: midiOut.channel
+    original: 0x01
+    new: 0x10
+    originalLabel: 1
+    newLabel: 16
+  - name: midiOut.bank
+    original: 0xff
+    new: 0x7f
+    originalLabel: --
+    newLabel: 127
+  - name: midiOut.programChange
+    original: 0xff
+    new: 0x7e
+    originalLabel: --
+    newLabel: 126
+
+  - name: midiOut.customCcs.0.cc
+    original: 0xff
+    new: 0x7d
+    originalLabel: --
+    newLabel: 125
+  - name: midiOut.customCcs.0.value
+    original: 0xff
+    new: 0x7c
+    originalLabel: --
+    newLabel: FC
+  - name: midiOut.customCcs.9.cc
+    original: 0xff
+    new: 0x7b
+    originalLabel: --
+    newLabel: 123
+  - name: midiOut.customCcs.9.value
+    original: 0xff
+    new: 0x7a
+    originalLabel: --
+    newLabel: FA

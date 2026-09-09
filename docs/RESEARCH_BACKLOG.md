@@ -112,3 +112,31 @@ Needed research:
   include unique changed values for those fields in a future FM Synth params
   fixture.
 - Verify whether those bytes match the inferred offsets.
+
+## MIDI Out Post-CC Bytes
+
+Status: open
+
+Observation:
+
+- MIDI Out does not expose Filter, Amplification, or Mixer parameter groups in
+  the M8 UI.
+- The `MID_PARAMS.m8i` fixture maps visible MIDI Out parameters through the
+  custom CC table ending at `0x39`, then preserves `0x3a..0x4b` as unknown.
+- Older <https://github.com/whitlockjc/m8-js> reference code reads shared
+  filter, amp, and mixer groups after its MIDI Out custom CC table, but its
+  expected offsets do not match the current 6.5.x fixture evidence.
+
+Implication:
+
+- The bytes at `0x3a..0x4b` should not be modeled as Filter, Amplification, or
+  Mixer fields for MIDI Out without additional fixture evidence.
+- They may be unused bytes, hidden shared state, cached UI state, or a
+  MIDI-Out-specific region.
+
+Needed research:
+
+- Create MIDI Out fixtures that exercise any available pages beyond the visible
+  params screen, especially MODS, table, and EQ-adjacent behavior.
+- Compare MIDI Out instances embedded in Song files once Song instrument regions
+  are mapped.
