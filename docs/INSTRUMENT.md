@@ -83,6 +83,7 @@ The verified fixtures show both full and padded values:
 | `SAM_PARAMS.m8i` | `SAM_PARAMS` followed by two `0x00` bytes |
 | `SAM_MODS_A.m8i` | `SAM_MODS_A` followed by two `0x00` bytes |
 | `SAM_MODS_B.m8i` | `SAM_MODS_B` followed by two `0x00` bytes |
+| `SAM_TABLE.m8i` | `SAM_TABLE` followed by three `0x00` bytes |
 | `SAMS_PARAMS.m8i` | `SAMS_PARAMS` followed by one `0x00` byte |
 | `SAMB_PARAMS.m8i` | `SAMB_PARAMS` followed by one `0x00` byte |
 | `MID_DEFAULT.m8i` | `MID_DEFAULT` followed by one `0x00` byte |
@@ -471,13 +472,13 @@ Offsets are relative to the start of `mixer`.
 ## Tail
 
 The tail layout depends on `instrumentType`. Verified editable instruments
-start with a shared 24-byte modulation block. `WAV_TABLE.m8i` and
-`MAC_TABLE.m8i` verify that the Wavsynth and Macrosynth instrument tables are
-stored at `0xe5..0x164`. Other instrument table locations should be verified
-with per-instrument table fixtures before their unknown tail ranges are
-promoted to the common table structure. For `none`, the tail is preserved as
-unknown bytes because the M8 UI does not expose editable `NONE` instrument
-modulators.
+start with a shared 24-byte modulation block. `WAV_TABLE.m8i`,
+`MAC_TABLE.m8i`, and `SAM_TABLE.m8i` verify that the Wavsynth, Macrosynth, and
+Sampler instrument tables are stored at `0xe5..0x164`. Other instrument table
+locations should be verified with per-instrument table fixtures before their
+unknown tail ranges are promoted to the common table structure. For `none`, the
+tail is preserved as unknown bytes because the M8 UI does not expose editable
+`NONE` instrument modulators.
 
 ### Table Tail
 
@@ -506,7 +507,7 @@ Offsets are absolute file offsets.
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `samplePath` | `0x65..0xe4` | 128 | [Fixed String](#fixed-strings) |
-| `unknownAfterSamplePath` | `0xe5..0x164` | 128 | unknown bytes |
+| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
 
 The Sampler fixtures verify that the selected sample path `/Samples/Kick.wav`
 starts at `0x65`. The full 128-byte `samplePath` range is provisional until a
@@ -631,9 +632,9 @@ Offsets are relative to the start of `params`.
 
 ## Instrument Table
 
-The Wavsynth and Macrosynth instrument tables are stored as 16 eight-byte rows
-at `0xe5..0x164`. Row labels are displayed as hexadecimal values `0..F` in the
-M8 UI.
+The Wavsynth, Macrosynth, and Sampler instrument tables are stored as 16
+eight-byte rows at `0xe5..0x164`. Row labels are displayed as hexadecimal
+values `0..F` in the M8 UI.
 
 The row offset is:
 
@@ -653,10 +654,10 @@ Offsets are relative to the start of a table row.
 | `fx2` | `+0x04..+0x05` | 2 | [Instrument Table FX](#instrument-table-fx) |
 | `fx3` | `+0x06..+0x07` | 2 | [Instrument Table FX](#instrument-table-fx) |
 
-The `WAV_TABLE.m8i` and `MAC_TABLE.m8i` fixtures verify every `transpose` and
-`volume` byte across all 16 table rows. They verify all three FX slots for rows
-`0..5`, the first two FX slots for row `6`, and leave the remaining FX slots at
-their baseline values.
+The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, and `SAM_TABLE.m8i` fixtures verify every
+`transpose` and `volume` byte across all 16 table rows. They verify all three
+FX slots for rows `0..5`, the first two FX slots for row `6`, and leave the
+remaining FX slots at their baseline values.
 
 ### Instrument Table FX
 
@@ -975,6 +976,36 @@ range.
 | `SDL` | `0x90` |
 | `SRV` | `0x91` |
 | `TRG` | `0xa6` |
+| `ERR` | `0xa7` |
+| `--` | `0xff` |
+
+### Sampler Table FX Command
+
+The `SAM_TABLE.m8i` fixture verifies the following Sampler table command
+values. `SLI` and `ERR` are non-contiguous with the surrounding verified command
+range.
+
+| Name | Stored Value |
+| --- | --- |
+| `VOL` | `0x80` |
+| `PIT` | `0x81` |
+| `FIN` | `0x82` |
+| `PLY` | `0x83` |
+| `STA` | `0x84` |
+| `LOP` | `0x85` |
+| `LEN` | `0x86` |
+| `DEG` | `0x87` |
+| `FLT` | `0x88` |
+| `CUT` | `0x89` |
+| `RES` | `0x8a` |
+| `AMP` | `0x8b` |
+| `LIM` | `0x8c` |
+| `PAN` | `0x8d` |
+| `DRY` | `0x8e` |
+| `SMX` | `0x8f` |
+| `SDL` | `0x90` |
+| `SRV` | `0x91` |
+| `SLI` | `0xa6` |
 | `ERR` | `0xa7` |
 | `--` | `0xff` |
 
@@ -1308,7 +1339,6 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
 | `unknownBeforeTable` | `0x65..0xe4` | 128 | Preserved for Wavsynth and Macrosynth until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
-| `sampler.unknownAfterSamplePath` | `0xe5..0x164` | 128 | Preserved until table/sample-path-related regions are mapped |
 | `unknownAfterModulators` | `0x65..0x164` | 256 | Preserved for MIDI Out, FM Synth, and External until table-related regions are mapped |
 | `none.tail` | `0x4d..0x164` | 280 | Preserved for `none` because the M8 UI does not expose editable `NONE` modulators |
 
@@ -1375,6 +1405,10 @@ separate `NONE` parameter model.
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `SAM_MODS_B.m8i` verifies that Sampler uses the common modulation parameter
   layouts for `LFO` and `DRUM ENV`.
+- `SAM_TABLE.m8i` verifies that the Sampler instrument table starts at `0xe5`,
+  contains 16 rows, and uses the same eight-byte row layout as Wavsynth and
+  Macrosynth. In Sampler files, this places the table immediately after the
+  128-byte `samplePath` region.
 - `MID_MODS_A.m8i` verifies that MIDI Out uses the common modulation slot
   width, offset, packed type/destination byte, and parameter layouts for
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
@@ -1433,6 +1467,8 @@ separate `NONE` parameter model.
 | Sampler MODS manifest | `fixtures/6.5.x/instruments/SAM_MODS_A.yaml` |
 | Sampler MODS B fixture | `fixtures/6.5.x/instruments/SAM_MODS_B.m8i` |
 | Sampler MODS B manifest | `fixtures/6.5.x/instruments/SAM_MODS_B.yaml` |
+| Sampler table fixture | `fixtures/6.5.x/instruments/SAM_TABLE.m8i` |
+| Sampler table manifest | `fixtures/6.5.x/instruments/SAM_TABLE.yaml` |
 | Sampler steps fixture | `fixtures/6.5.x/instruments/SAMS_PARAMS.m8i` |
 | Sampler steps manifest | `fixtures/6.5.x/instruments/SAMS_PARAMS.yaml` |
 | Sampler BPM fixture | `fixtures/6.5.x/instruments/SAMB_PARAMS.m8i` |
@@ -1530,6 +1566,12 @@ The `SAM_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
 the common instrument modulation block using Sampler as the carrier instrument.
 The manifest-driven mapper matched all 17 changed bytes exactly and reported
 zero unaccounted changed bytes.
+
+The `SAM_TABLE.m8i` fixture verifies the Sampler instrument table at
+`0xe5..0x164` as 16 eight-byte rows immediately after `samplePath`. Each row
+stores `transpose`, `volume`, and three two-byte FX slots. The manifest-driven
+mapper matched all 79 changed bytes exactly and reported zero unaccounted
+changed bytes.
 
 The `MID_PARAMS.m8i` fixture verifies common transpose/table TIC values, MIDI
 Out port, channel, bank, program change, and custom CC table storage. The

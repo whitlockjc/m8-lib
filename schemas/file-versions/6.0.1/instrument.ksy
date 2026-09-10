@@ -11,8 +11,8 @@ doc: |
   instrument type byte, fixed-size name byte range, and common instrument prefix
   are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
-  filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth
-  instrument tables, sample path, Hypersynth chord table, and common EQ
+  filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
+  Sampler instrument tables, sample path, Hypersynth chord table, and common EQ
   assignment are mapped from params, MODS, and table fixtures. Unknown ranges
   are preserved until additional instrument fixtures provide evidence for their
   layout.
@@ -471,8 +471,8 @@ types:
           are verified by Sampler fixtures; full maximum length is inferred from
           the surrounding fixed instrument layout and should be refined if future
           evidence contradicts it.
-      - id: unknown_after_sample_path
-        size-eos: true
+      - id: table
+        type: instrument_table
   hypersynth_tail:
     seq:
       - id: modulators
@@ -761,6 +761,70 @@ enums:
     0xa6:
       id: trigger
       -label: TRG
+    0xa7:
+      id: err
+      -label: ERR
+    0xff:
+      id: unset
+      -label: --
+  sampler_table_fx_command:
+    0x80:
+      id: volume
+      -label: VOL
+    0x81:
+      id: pitch
+      -label: PIT
+    0x82:
+      id: fine
+      -label: FIN
+    0x83:
+      id: play
+      -label: PLY
+    0x84:
+      id: start
+      -label: STA
+    0x85:
+      id: loop
+      -label: LOP
+    0x86:
+      id: length
+      -label: LEN
+    0x87:
+      id: degrade
+      -label: DEG
+    0x88:
+      id: filter
+      -label: FLT
+    0x89:
+      id: cutoff
+      -label: CUT
+    0x8a:
+      id: resonance
+      -label: RES
+    0x8b:
+      id: amp
+      -label: AMP
+    0x8c:
+      id: limit
+      -label: LIM
+    0x8d:
+      id: pan
+      -label: PAN
+    0x8e:
+      id: dry
+      -label: DRY
+    0x8f:
+      id: smx
+      -label: SMX
+    0x90:
+      id: send_delay
+      -label: SDL
+    0x91:
+      id: send_reverb
+      -label: SRV
+    0xa6:
+      id: slice
+      -label: SLI
     0xa7:
       id: err
       -label: ERR
