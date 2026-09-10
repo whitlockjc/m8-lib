@@ -11,6 +11,11 @@ cd "$ROOT"
 tools/inspect-headers.js
 
 tools/map-fixture.js \
+  fixtures/6.5.x/instruments/NONE_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/NONE_TABLE.m8i \
+  fixtures/6.5.x/instruments/NONE_TABLE.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/instruments/WAV_DEFAULT.m8i \
   fixtures/6.5.x/instruments/WAV_PARAMS.m8i \
   fixtures/6.5.x/instruments/WAV_PARAMS.yaml

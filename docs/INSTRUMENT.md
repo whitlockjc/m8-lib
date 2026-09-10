@@ -68,6 +68,7 @@ The verified fixtures show both full and padded values:
 | Fixture | Stored Value |
 | --- | --- |
 | `NONE_DEFAULT.m8i` | `NONE_DEFAULT`, filling all 12 bytes |
+| `NONE_TABLE.m8i` | `NONE_TABLE` followed by two `0x00` bytes |
 | `WAV_DEFAULT.m8i` | `WAV_DEFAULT` followed by one `0x00` byte |
 | `WAV_PARAMS.m8i` | `WAV_PARAMS` followed by two `0x00` bytes |
 | `WAV_MODS_A.m8i` | `WAV_MODS_A` followed by two `0x00` bytes |
@@ -480,9 +481,9 @@ start with a shared 24-byte modulation block. `WAV_TABLE.m8i`,
 `EXT_TABLE.m8i` verify that the Wavsynth, Macrosynth, Sampler, MIDI Out, FM
 Synth, and External instrument tables are stored at `0xe5..0x164`.
 `HYP_TABLE.m8i` verifies the same table location for Hypersynth, after its
-chord table and a 16-byte unknown gap. For `none`, the tail is preserved as
-unknown bytes because the M8 UI does not expose editable `NONE` instrument
-modulators.
+chord table and a 16-byte unknown gap. `NONE_TABLE.m8i` verifies the same table
+location for `none`, after a larger preserved pre-table region because the M8 UI
+does not expose editable `NONE` instrument modulators.
 
 ### Table Tail
 
@@ -492,6 +493,15 @@ Offsets are absolute file offsets.
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `unknownBeforeTable` | `0x65..0xe4` | 128 | unknown bytes |
+| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
+
+### NONE Tail
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `unknownBeforeTable` | `0x4d..0xe4` | 152 | unknown bytes |
 | `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
 
 ### Sampler Tail
@@ -628,9 +638,9 @@ Offsets are relative to the start of `params`.
 
 ## Instrument Table
 
-The Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, and External
-instrument tables are stored as 16 eight-byte rows at `0xe5..0x164`. Row
-labels are displayed as hexadecimal values `0..F` in the M8 UI.
+The Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, External,
+and NONE instrument tables are stored as 16 eight-byte rows at `0xe5..0x164`.
+Row labels are displayed as hexadecimal values `0..F` in the M8 UI.
 
 The row offset is:
 
@@ -651,10 +661,12 @@ Offsets are relative to the start of a table row.
 | `fx3` | `+0x06..+0x07` | 2 | [Instrument Table FX](#instrument-table-fx) |
 
 The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`,
-`FM_TABLE.m8i`, `HYP_TABLE.m8i`, and `EXT_TABLE.m8i` fixtures verify every
-`transpose` and `volume` byte across all 16 table rows. They verify all three
-FX slots for rows `0..5` where supported, then leave the remaining FX slots at
-their baseline values.
+`FM_TABLE.m8i`, `HYP_TABLE.m8i`, `EXT_TABLE.m8i`, and `NONE_TABLE.m8i`
+fixtures verify every `transpose` and `volume` byte across all 16 table rows.
+They verify all three FX slots for rows `0..5` where fixture values were
+provided, then leave the remaining FX slots at their baseline values.
+`NONE_TABLE.m8i` leaves every FX slot unset, so it verifies the FX slot layout
+but not the available command-family values for NONE tables.
 
 ### Instrument Table FX
 
@@ -662,11 +674,14 @@ Offsets are relative to the start of a table FX slot.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
-| `command` | `+0x00` | 1 | instrument-specific command |
+| `command` | `+0x00` | 1 | table FX command |
 | `amount` | `+0x01` | 1 | `u1` |
 
-The command byte `0xff` displays as unset (`--`). Command labels are
-instrument-specific.
+The command byte `0xff` displays as unset (`--`). Some command labels are
+specific to the active instrument, while other command labels belong to
+Sequencer, Mixer & Effects, Current Instrument, or Instrument Mods command
+families. See [FX Commands](FX_COMMANDS.md) for the command-family model and
+verification plan.
 
 ## Enums
 
@@ -919,8 +934,9 @@ verifies `TRACK 8 = 0x87`.
 ### Wavsynth Table FX Command
 
 The `WAV_TABLE.m8i` fixture verifies the following Wavsynth table command
-values. `SNC` and `ERR` are non-contiguous with the surrounding verified command
-range.
+values. This fixture focuses on instrument table command storage and does not
+exhaustively cover every [FX command family](FX_COMMANDS.md). `SNC` and `ERR`
+are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
 | --- | --- |
@@ -949,8 +965,9 @@ range.
 ### Macrosynth Table FX Command
 
 The `MAC_TABLE.m8i` fixture verifies the following Macrosynth table command
-values. `TRG` and `ERR` are non-contiguous with the surrounding verified command
-range.
+values. This fixture focuses on instrument table command storage and does not
+exhaustively cover every [FX command family](FX_COMMANDS.md). `TRG` and `ERR`
+are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
 | --- | --- |
@@ -979,8 +996,9 @@ range.
 ### Sampler Table FX Command
 
 The `SAM_TABLE.m8i` fixture verifies the following Sampler table command
-values. `SLI` and `ERR` are non-contiguous with the surrounding verified command
-range.
+values. This fixture focuses on instrument table command storage and does not
+exhaustively cover every [FX command family](FX_COMMANDS.md). `SLI` and `ERR`
+are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1009,8 +1027,9 @@ range.
 ### FM Synth Table FX Command
 
 The `FM_TABLE.m8i` fixture verifies the following FM Synth table command
-values. `SNC` and `ERR` are non-contiguous with the surrounding verified command
-range.
+values. This fixture focuses on instrument table command storage and does not
+exhaustively cover every [FX command family](FX_COMMANDS.md). `SNC` and `ERR`
+are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1039,7 +1058,8 @@ range.
 ### MIDI Out Table FX Command
 
 The `MID_TABLE.m8i` fixture verifies the following MIDI Out table command
-values.
+values. This fixture focuses on instrument table command storage and does not
+exhaustively cover every [FX command family](FX_COMMANDS.md).
 
 | Name | Stored Value |
 | --- | --- |
@@ -1064,8 +1084,9 @@ values.
 ### Hypersynth Table FX Command
 
 The `HYP_TABLE.m8i` fixture verifies the following Hypersynth table command
-values. `SNC` and `ERR` are non-contiguous with the surrounding verified command
-range.
+values. This fixture focuses on instrument table command storage and does not
+exhaustively cover every [FX command family](FX_COMMANDS.md). `SNC` and `ERR`
+are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1094,8 +1115,9 @@ range.
 ### External Table FX Command
 
 The `EXT_TABLE.m8i` fixture verifies the following External table command
-values. `ADD` and `CHD` are non-contiguous with the surrounding verified command
-range.
+values. This fixture focuses on instrument table command storage and does not
+exhaustively cover every [FX command family](FX_COMMANDS.md). `ADD` and `CHD`
+are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1119,6 +1141,16 @@ range.
 | `SRV` | `0x91` |
 | `ADD` | `0xa6` |
 | `CHD` | `0xa7` |
+| `--` | `0xff` |
+
+### NONE Table FX Command
+
+The `NONE_TABLE.m8i` fixture leaves every table FX command unset. This verifies
+that the NONE table uses the standard FX slot layout, but it does not identify
+available command values from any [FX command family](FX_COMMANDS.md).
+
+| Name | Stored Value |
+| --- | --- |
 | `--` | `0xff` |
 
 ### Filter Type
@@ -1451,12 +1483,12 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
 | `unknownBeforeTable` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, and External until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
-| `none.tail` | `0x4d..0x164` | 280 | Preserved for `none` because the M8 UI does not expose editable `NONE` modulators |
+| `none.unknownBeforeTable` | `0x4d..0xe4` | 152 | Preserved for `none` until future fixtures map this region |
 
-The `NONE` instrument cannot be meaningfully edited beyond its name, so this
-single fixture is used only to verify the `none` instrument type value, the
-fixed name location, and preservation of unused bytes. It should not drive a
-separate `NONE` parameter model.
+The `NONE` instrument does not expose editable instrument parameters or
+modulators, but it can store an editable table. `NONE_DEFAULT.m8i` verifies the
+`none` instrument type value, the fixed name location, and preservation of
+unused body bytes. `NONE_TABLE.m8i` verifies the table location and row layout.
 
 ## Notes
 
@@ -1501,6 +1533,10 @@ separate `NONE` parameter model.
 - `WAV_MODS_B.m8i` verifies the parameter layouts for `LFO` and `DRUM ENV`.
 - `WAV_TABLE.m8i` verifies that the Wavsynth instrument table starts at
   `0xe5`, contains 16 rows, and uses an eight-byte row layout.
+- `NONE_TABLE.m8i` verifies that the NONE instrument table starts at `0xe5`,
+  contains 16 rows, and uses the same eight-byte row layout for transpose,
+  volume, and FX slots. Its FX slots remain unset, so command-family values
+  still need dedicated fixture coverage.
 - `MAC_MODS_A.m8i` verifies that Macrosynth uses the common modulation slot
   width, offset, packed type/destination byte, and parameter layouts for
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
@@ -1564,6 +1600,8 @@ separate `NONE` parameter model.
 | Name | Path |
 | --- | --- |
 | NONE fixture | `fixtures/6.5.x/instruments/NONE_DEFAULT.m8i` |
+| NONE table fixture | `fixtures/6.5.x/instruments/NONE_TABLE.m8i` |
+| NONE table manifest | `fixtures/6.5.x/instruments/NONE_TABLE.yaml` |
 | Wavsynth baseline fixture | `fixtures/6.5.x/instruments/WAV_DEFAULT.m8i` |
 | Wavsynth params fixture | `fixtures/6.5.x/instruments/WAV_PARAMS.m8i` |
 | Wavsynth params manifest | `fixtures/6.5.x/instruments/WAV_PARAMS.yaml` |
@@ -1637,6 +1675,13 @@ separate `NONE` parameter model.
 
 The `NONE_DEFAULT.m8i` fixture verifies the file header, instrument type byte,
 and 12-byte name location.
+
+The `NONE_TABLE.m8i` fixture verifies the NONE instrument table at
+`0xe5..0x164` as 16 eight-byte rows after a preserved `0x4d..0xe4` pre-table
+region. Each row stores `transpose`, `volume`, and three two-byte FX slots.
+Every FX slot remains unset in this fixture, so it verifies FX slot placement
+but not command-family values. The manifest-driven mapper matched all 39 changed
+bytes exactly and reported zero unaccounted changed bytes.
 
 The `WAV_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 Wavsynth params, filter params, amp params, mixer params, and common EQ

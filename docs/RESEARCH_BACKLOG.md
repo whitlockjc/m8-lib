@@ -140,3 +140,40 @@ Needed research:
   params screen, especially MODS, table, and EQ-adjacent behavior.
 - Compare MIDI Out instances embedded in Song files once Song instrument regions
   are mapped.
+
+## FX Command Families
+
+Status: open
+
+Observation:
+
+- The M8 UI groups FX commands into Sequencer, Mixer & Effects, Current
+  Instrument, and Instrument Mods sections.
+- Instrument table fixtures verify the two-byte FX slot shape and selected
+  command byte values for Current Instrument commands.
+- Instrument Mods command labels can change based on the target modulator slot
+  and selected modulation type.
+- `NONE_TABLE.m8i` verifies that NONE tables use the same FX slot shape, but all
+  FX slots in that fixture remain unset.
+
+Implication:
+
+- FX command storage should remain a raw command byte plus amount byte in the
+  binary schema.
+- Command decoding and validation should be contextual. The valid labels may
+  depend on whether the slot is in a phrase or table, and on the active
+  instrument for Current Instrument and Instrument Mods commands.
+- Instrument Mods should be modeled as modulator-specific command sets, not one
+  flat command set.
+
+Needed research:
+
+- Create fixtures that exercise Sequencer, Mixer & Effects, Current Instrument,
+  and Instrument Mods commands in phrase FX slots.
+- Create fixtures that exercise Sequencer, Mixer & Effects, Current Instrument,
+  and Instrument Mods commands in instrument table FX slots.
+- Create a NONE table fixture with non-Current-Instrument commands selected.
+- For Instrument Mods, create fixtures that cover every modulation type:
+  `AHD ENV`, `ADSR ENV`, `DRUM ENV`, `LFO`, `TRIG ENV`, and `TRACKING`.
+- Promote verified command byte values into schema/doc references only after
+  fixture mapping accounts for every changed byte.

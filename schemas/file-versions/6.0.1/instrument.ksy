@@ -8,8 +8,8 @@ doc: |
 
   Initial schema verified against M8 6.5.2C NONE, Wavsynth, Macrosynth,
   Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument fixtures. The
-  instrument type byte, fixed-size name byte range, and common instrument prefix
-  are mapped.
+  instrument type byte, fixed-size name byte range, common instrument prefix,
+  and NONE table are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
   filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
   Sampler/MIDI Out/FM Synth/Hypersynth/External instrument tables, sample path,
@@ -62,7 +62,7 @@ seq:
         'instrument_type::macrosynth': table_tail
         'instrument_type::fm_synth': table_tail
         'instrument_type::external': table_tail
-        'instrument_type::none': unused_tail
+        'instrument_type::none': none_tail
     doc: Instrument-specific tail after the common EQ field.
 types:
   unused_body_before_eq:
@@ -450,10 +450,12 @@ types:
         size: 128
       - id: table
         type: instrument_table
-  unused_tail:
+  none_tail:
     seq:
-      - id: unknown
-        size-eos: true
+      - id: unknown_before_table
+        size: 152
+      - id: table
+        type: instrument_table
   sampler_tail:
     seq:
       - id: modulators
@@ -519,9 +521,10 @@ types:
       - id: command
         type: u1
         doc: |
-          Instrument-specific command byte. Observed value 0xff displays as --.
-          Verified command labels are documented in instrument-specific table
-          FX command enums.
+          Table FX command byte. Observed value 0xff displays as --. Command
+          meaning depends on the surrounding FX context and active instrument.
+          Verified command labels are documented in table FX command enums.
+          Command family organization is documented in docs/FX_COMMANDS.md.
       - id: amount
         type: u1
   modulation_slot:
@@ -1068,6 +1071,10 @@ enums:
     0xa7:
       id: chord
       -label: CHD
+    0xff:
+      id: unset
+      -label: --
+  none_table_fx_command:
     0xff:
       id: unset
       -label: --
