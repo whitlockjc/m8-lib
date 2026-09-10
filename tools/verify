@@ -111,6 +111,11 @@ tools/map-fixture.js \
   fixtures/6.5.x/instruments/FM_MODS_B.yaml
 
 tools/map-fixture.js \
+  fixtures/6.5.x/instruments/FM_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/FM_TABLE.m8i \
+  fixtures/6.5.x/instruments/FM_TABLE.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/instruments/HYP_DEFAULT.m8i \
   fixtures/6.5.x/instruments/HYP_PARAMS.m8i \
   fixtures/6.5.x/instruments/HYP_PARAMS.yaml

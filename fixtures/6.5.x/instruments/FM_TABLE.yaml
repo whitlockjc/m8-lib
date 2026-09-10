@@ -1,0 +1,80 @@
+fileType: instrument
+firmware: 6.5.2C
+screen: instrument.fmSynth.table
+
+changes:
+  - name: name
+    originalBytes: 46 4d 5f 44 45 46 41 55 4c 54 00 00
+    newBytes: 46 4d 5f 54 41 42 4c 45 00 00 00 00
+
+  - name: table.rows.0
+    offset: 0x00e5
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: ff 7f 80 01 81 02 82 03
+    newLabel: VOL / PIT / FIN
+  - name: table.rows.1
+    offset: 0x00ed
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: fe 7e 83 11 84 12 85 13
+    newLabel: ALG / FM1 / FM2
+  - name: table.rows.2
+    offset: 0x00f5
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: fd 7d 86 21 87 22 88 23
+    newLabel: FM3 / FM4 / FIL
+  - name: table.rows.3
+    offset: 0x00fd
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: fc 7c 89 31 8a 32 8b 33
+    newLabel: CUT / RES / AMP
+  - name: table.rows.4
+    offset: 0x0105
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: fb 7b 8c 41 8d 42 a6 43
+    newLabel: LIM / PAN / SNC
+  - name: table.rows.5
+    offset: 0x010d
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: fa 7a a7 51 8e 52 8f 53
+    newLabel: ERR / DRY / SMX
+  - name: table.rows.6
+    offset: 0x0115
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f9 79 90 61 91 62 ff 00
+    newLabel: SDL / SRV / --
+  - name: table.rows.7
+    offset: 0x011d
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f8 78 ff 00 ff 00 ff 00
+  - name: table.rows.8
+    offset: 0x0125
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f7 77 ff 00 ff 00 ff 00
+  - name: table.rows.9
+    offset: 0x012d
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f6 76 ff 00 ff 00 ff 00
+  - name: table.rows.10
+    offset: 0x0135
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f5 75 ff 00 ff 00 ff 00
+  - name: table.rows.11
+    offset: 0x013d
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f4 74 ff 00 ff 00 ff 00
+  - name: table.rows.12
+    offset: 0x0145
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f3 73 ff 00 ff 00 ff 00
+  - name: table.rows.13
+    offset: 0x014d
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f2 72 ff 00 ff 00 ff 00
+  - name: table.rows.14
+    offset: 0x0155
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f1 71 ff 00 ff 00 ff 00
+  - name: table.rows.15
+    offset: 0x015d
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: f0 70 ff 00 ff 00 ff 00

@@ -12,10 +12,10 @@ doc: |
   are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
   filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
-  Sampler instrument tables, sample path, Hypersynth chord table, and common EQ
-  assignment are mapped from params, MODS, and table fixtures. Unknown ranges
-  are preserved until additional instrument fixtures provide evidence for their
-  layout.
+  Sampler/FM Synth instrument tables, sample path, Hypersynth chord table, and
+  common EQ assignment are mapped from params, MODS, and table fixtures.
+  Unknown ranges are preserved until additional instrument fixtures provide
+  evidence for their layout.
 seq:
   - id: instrument_type
     type: u1
@@ -60,7 +60,7 @@ seq:
         'instrument_type::midi_out': modulated_tail
         'instrument_type::wavsynth': table_tail
         'instrument_type::macrosynth': table_tail
-        'instrument_type::fm_synth': modulated_tail
+        'instrument_type::fm_synth': table_tail
         'instrument_type::external': modulated_tail
         'instrument_type::none': unused_tail
     doc: Instrument-specific tail after the common EQ field.
@@ -825,6 +825,70 @@ enums:
     0xa6:
       id: slice
       -label: SLI
+    0xa7:
+      id: err
+      -label: ERR
+    0xff:
+      id: unset
+      -label: --
+  fm_synth_table_fx_command:
+    0x80:
+      id: volume
+      -label: VOL
+    0x81:
+      id: pitch
+      -label: PIT
+    0x82:
+      id: fine
+      -label: FIN
+    0x83:
+      id: algorithm
+      -label: ALG
+    0x84:
+      id: fm1
+      -label: FM1
+    0x85:
+      id: fm2
+      -label: FM2
+    0x86:
+      id: fm3
+      -label: FM3
+    0x87:
+      id: fm4
+      -label: FM4
+    0x88:
+      id: filter
+      -label: FIL
+    0x89:
+      id: cutoff
+      -label: CUT
+    0x8a:
+      id: resonance
+      -label: RES
+    0x8b:
+      id: amp
+      -label: AMP
+    0x8c:
+      id: limit
+      -label: LIM
+    0x8d:
+      id: pan
+      -label: PAN
+    0x8e:
+      id: dry
+      -label: DRY
+    0x8f:
+      id: smx
+      -label: SMX
+    0x90:
+      id: send_delay
+      -label: SDL
+    0x91:
+      id: send_reverb
+      -label: SRV
+    0xa6:
+      id: snc
+      -label: SNC
     0xa7:
       id: err
       -label: ERR
