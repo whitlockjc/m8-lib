@@ -213,6 +213,11 @@ The first implementation objective is to define and verify the common M8 file
 header. All M8 file types share this header, and the file type byte determines
 whether the body is an instrument, scale, song, or theme.
 
+Research should proceed file type by file type until the 6.5.x portable file
+set is structurally mapped. Instrument is considered structurally complete for
+the current fixture evidence: remaining FX command-family coverage and semantic
+classification of preserved bytes should not block Song research.
+
 M8 strings should be modeled as fixed-size byte ranges. The UI-visible text may
 use only part of the range. Padding bytes and maximum stored length should be
 documented from fixture evidence for each string field.
@@ -234,6 +239,28 @@ Known open finding:
   should be modeled as color triples plus any other fixture-proven fields, while
   RGB/HSV mode remains a research target for Song/Project or device/global
   storage.
+
+## Post-Song Schema Review
+
+Defer broad schema reorganization until after the Song file is structurally
+mapped. Song is expected to expose the final reuse boundaries because it embeds
+or references many structures that also appear in standalone files.
+
+After Song research, review the schemas and documentation for shared components:
+
+- Instrument body and embedded Song instrument storage,
+- instrument table row and FX slot storage,
+- phrase row and FX slot storage,
+- FX command-family metadata,
+- fixed strings,
+- scale/key references,
+- EQ structures,
+- mixer/effects structures,
+- preserved unknown/reserved byte regions.
+
+Only promote a component to a shared schema when fixture evidence shows a real
+common binary layout. Until then, prefer local duplication over premature
+abstraction that might hide context-specific behavior.
 
 ## Schema Documentation Model
 

@@ -2,9 +2,11 @@
 
 Human-readable schema reference for M8 Instrument files.
 
-This document starts with the common instrument prefix plus the Wavsynth,
-Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument
-bodies. Unknown ranges will be replaced as fixture evidence is collected.
+This document describes the structurally complete 6.5.x Instrument file schema.
+Structurally complete means the file container, verified instrument body
+variants, modulation storage, table storage, and preserved unknown/reserved
+regions are represented. FX command-family coverage and semantic
+classification of preserved bytes are tracked separately.
 
 ## Schema
 
@@ -16,9 +18,35 @@ bodies. Unknown ranges will be replaced as fixture evidence is collected.
 | Verified firmware range | `6.5.x` |
 | Verified firmware | `6.5.2C` |
 | Kaitai schema | `schemas/file-versions/6.0.1/instrument.ksy` |
+| Structural status | Complete for 6.5.x fixture evidence |
 | Total file size | 357 bytes |
 | Header size | 14 bytes |
 | Body size | 343 bytes |
+
+## Completion Status
+
+The 6.5.x Instrument schema is considered structurally complete for the current
+fixture set.
+
+Completed structural coverage:
+
+- the shared M8 file header and file size,
+- the common instrument prefix,
+- every known 6.5.x instrument type body,
+- common filter, amplification, mixer, modulation, and table storage,
+- Sampler sample path storage,
+- Hypersynth chord table storage,
+- NONE instrument table storage,
+- preserved unknown/reserved regions needed for byte-level fidelity.
+
+Remaining work is semantic rather than container-structural:
+
+- finish FX command-family labels, byte values, availability, and amount
+  semantics in [FX Commands](FX_COMMANDS.md),
+- classify preserved bytes as `field`, `state`, `cache`, `reserved`,
+  `padding`, or `unknown` when targeted fixtures provide evidence,
+- compare standalone Instrument files with embedded Song instruments after the
+  Song schema is mapped.
 
 ## Common Layout
 

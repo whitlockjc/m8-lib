@@ -89,6 +89,33 @@ Needed research:
 - Verify whether the path still starts at `0x65`, where it terminates or pads,
   and whether `0xe4` is the correct final byte for the fixed range.
 
+## Instrument Preserved Bytes
+
+Status: deferred
+
+Observation:
+
+- The 6.5.x Instrument schema is structurally complete for the current fixture
+  set, but some preserved bytes are not semantically classified.
+- Historical <https://github.com/whitlockjc/m8-js> reference material names
+  some early instrument bytes as volume, pitch, and fine tune, but current
+  fixture evidence is not sufficient to classify those bytes.
+
+Implication:
+
+- These bytes should remain represented as preserved unknown/reserved regions in
+  the raw schema.
+- The Instrument schema can be treated as complete for moving on to Song work,
+  because byte-level fidelity does not depend on assigning semantic names to
+  every preserved byte.
+
+Needed research:
+
+- Revisit preserved Instrument bytes only when targeted fixtures or Song
+  embedding evidence can prove their meaning.
+- Compare standalone Instrument files with embedded Song instruments after the
+  Song schema is mapped.
+
 ## FM Synth Common Enum Slots
 
 Status: open
