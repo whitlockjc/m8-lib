@@ -12,10 +12,10 @@ doc: |
   are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
   filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
-  Sampler/FM Synth/Hypersynth instrument tables, sample path, Hypersynth chord
-  table, and common EQ assignment are mapped from params, MODS, and table
-  fixtures. Unknown ranges are preserved until additional instrument fixtures
-  provide evidence for their layout.
+  Sampler/MIDI Out/FM Synth/Hypersynth instrument tables, sample path,
+  Hypersynth chord table, and common EQ assignment are mapped from params,
+  MODS, and table fixtures. Unknown ranges are preserved until additional
+  instrument fixtures provide evidence for their layout.
 seq:
   - id: instrument_type
     type: u1
@@ -57,7 +57,7 @@ seq:
       cases:
         'instrument_type::sampler': sampler_tail
         'instrument_type::hypersynth': hypersynth_tail
-        'instrument_type::midi_out': modulated_tail
+        'instrument_type::midi_out': table_tail
         'instrument_type::wavsynth': table_tail
         'instrument_type::macrosynth': table_tail
         'instrument_type::fm_synth': table_tail
@@ -526,8 +526,8 @@ types:
         type: u1
         doc: |
           Instrument-specific command byte. Observed value 0xff displays as --.
-          Verified Wavsynth and Macrosynth command labels are documented in
-          instrument-specific table FX command enums.
+          Verified command labels are documented in instrument-specific table
+          FX command enums.
       - id: amount
         type: u1
   modulation_slot:
@@ -894,6 +894,58 @@ enums:
     0xa7:
       id: err
       -label: ERR
+    0xff:
+      id: unset
+      -label: --
+  midi_out_table_fx_command:
+    0x80:
+      id: volume
+      -label: VOL
+    0x81:
+      id: pitch
+      -label: PIT
+    0x82:
+      id: midi_program
+      -label: MPG
+    0x83:
+      id: midi_program_bank
+      -label: MPB
+    0x84:
+      id: add
+      -label: ADD
+    0x85:
+      id: chord
+      -label: CHD
+    0x86:
+      id: cc_a
+      -label: CCA
+    0x87:
+      id: cc_b
+      -label: CCB
+    0x88:
+      id: cc_c
+      -label: CCC
+    0x89:
+      id: cc_d
+      -label: CCD
+    0x8a:
+      id: cc_e
+      -label: CCE
+    0x8b:
+      id: cc_f
+      -label: CCF
+    0x8c:
+      id: cc_g
+      -label: CCG
+    0x8d:
+      id: cc_h
+      -label: CCH
+    0x8e:
+      id: cc_i
+      -label: CCI
+    0x8f:
+      id: cc_j
+      -label: CCJ
     0xff:
       id: unset
       -label: --

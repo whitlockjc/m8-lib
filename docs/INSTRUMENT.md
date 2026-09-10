@@ -90,6 +90,7 @@ The verified fixtures show both full and padded values:
 | `MID_PARAMS.m8i` | `MID_PARAMS` followed by two `0x00` bytes |
 | `MID_MODS_A.m8i` | `MID_MODS_A` followed by two `0x00` bytes |
 | `MID_MODS_B.m8i` | `MID_MODS_B` followed by two `0x00` bytes |
+| `MID_TABLE.m8i` | `MID_TABLE` followed by three `0x00` bytes |
 | `FM_DEFAULT.m8i` | `FM_DEFAULT` followed by two `0x00` bytes |
 | `FM_PARAMS.m8i` | `FM_PARAMS` followed by three `0x00` bytes |
 | `FM_MODS_A.m8i` | `FM_MODS_A` followed by three `0x00` bytes |
@@ -475,14 +476,14 @@ Offsets are relative to the start of `mixer`.
 
 The tail layout depends on `instrumentType`. Verified editable instruments
 start with a shared 24-byte modulation block. `WAV_TABLE.m8i`,
-`MAC_TABLE.m8i`, `SAM_TABLE.m8i`, and `FM_TABLE.m8i` verify that the Wavsynth,
-Macrosynth, Sampler, and FM Synth instrument tables are stored at
-`0xe5..0x164`. `HYP_TABLE.m8i` verifies the same table location for
-Hypersynth, after its chord table and a 16-byte unknown gap. Other instrument
-table locations should be verified with per-instrument table fixtures before
-their unknown tail ranges are promoted to the common table structure. For
-`none`, the tail is preserved as unknown bytes because the M8 UI does not
-expose editable `NONE` instrument modulators.
+`MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`, and `FM_TABLE.m8i` verify
+that the Wavsynth, Macrosynth, Sampler, MIDI Out, and FM Synth instrument
+tables are stored at `0xe5..0x164`. `HYP_TABLE.m8i` verifies the same table
+location for Hypersynth, after its chord table and a 16-byte unknown gap. Other
+instrument table locations should be verified with per-instrument table
+fixtures before their unknown tail ranges are promoted to the common table
+structure. For `none`, the tail is preserved as unknown bytes because the M8 UI
+does not expose editable `NONE` instrument modulators.
 
 ### Table Tail
 
@@ -637,9 +638,9 @@ Offsets are relative to the start of `params`.
 
 ## Instrument Table
 
-The Wavsynth, Macrosynth, Sampler, FM Synth, and Hypersynth instrument tables
-are stored as 16 eight-byte rows at `0xe5..0x164`. Row labels are displayed as
-hexadecimal values `0..F` in the M8 UI.
+The Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, and Hypersynth
+instrument tables are stored as 16 eight-byte rows at `0xe5..0x164`. Row
+labels are displayed as hexadecimal values `0..F` in the M8 UI.
 
 The row offset is:
 
@@ -659,10 +660,11 @@ Offsets are relative to the start of a table row.
 | `fx2` | `+0x04..+0x05` | 2 | [Instrument Table FX](#instrument-table-fx) |
 | `fx3` | `+0x06..+0x07` | 2 | [Instrument Table FX](#instrument-table-fx) |
 
-The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `FM_TABLE.m8i`, and
-`HYP_TABLE.m8i` fixtures verify every `transpose` and `volume` byte across all
-16 table rows. They verify all three FX slots for rows `0..5`, the first two FX
-slots for row `6`, and leave the remaining FX slots at their baseline values.
+The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`,
+`FM_TABLE.m8i`, and `HYP_TABLE.m8i` fixtures verify every `transpose` and
+`volume` byte across all 16 table rows. They verify all three FX slots for rows
+`0..5` where supported, then leave the remaining FX slots at their baseline
+values.
 
 ### Instrument Table FX
 
@@ -1044,6 +1046,31 @@ range.
 | `ERR` | `0xa7` |
 | `--` | `0xff` |
 
+### MIDI Out Table FX Command
+
+The `MID_TABLE.m8i` fixture verifies the following MIDI Out table command
+values.
+
+| Name | Stored Value |
+| --- | --- |
+| `VOL` | `0x80` |
+| `PIT` | `0x81` |
+| `MPG` | `0x82` |
+| `MPB` | `0x83` |
+| `ADD` | `0x84` |
+| `CHD` | `0x85` |
+| `CCA` | `0x86` |
+| `CCB` | `0x87` |
+| `CCC` | `0x88` |
+| `CCD` | `0x89` |
+| `CCE` | `0x8a` |
+| `CCF` | `0x8b` |
+| `CCG` | `0x8c` |
+| `CCH` | `0x8d` |
+| `CCI` | `0x8e` |
+| `CCJ` | `0x8f` |
+| `--` | `0xff` |
+
 ### Hypersynth Table FX Command
 
 The `HYP_TABLE.m8i` fixture verifies the following Hypersynth table command
@@ -1402,9 +1429,9 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `none.bodyBeforeEq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until future fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
-| `unknownBeforeTable` | `0x65..0xe4` | 128 | Preserved for Wavsynth and Macrosynth until future fixtures map this region |
+| `unknownBeforeTable` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, and FM Synth until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
-| `unknownAfterModulators` | `0x65..0x164` | 256 | Preserved for MIDI Out and External until table-related regions are mapped |
+| `unknownAfterModulators` | `0x65..0x164` | 256 | Preserved for External until table-related regions are mapped |
 | `none.tail` | `0x4d..0x164` | 280 | Preserved for `none` because the M8 UI does not expose editable `NONE` modulators |
 
 The `NONE` instrument cannot be meaningfully edited beyond its name, so this
@@ -1454,9 +1481,7 @@ separate `NONE` parameter model.
   byte positions according to the new type layout being verified.
 - `WAV_MODS_B.m8i` verifies the parameter layouts for `LFO` and `DRUM ENV`.
 - `WAV_TABLE.m8i` verifies that the Wavsynth instrument table starts at
-  `0xe5`, contains 16 rows, and uses an eight-byte row layout. Other instrument
-  table locations remain unverified until their own `*_TABLE.m8i` fixtures are
-  mapped.
+  `0xe5`, contains 16 rows, and uses an eight-byte row layout.
 - `MAC_MODS_A.m8i` verifies that Macrosynth uses the common modulation slot
   width, offset, packed type/destination byte, and parameter layouts for
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
@@ -1479,6 +1504,9 @@ separate `NONE` parameter model.
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `MID_MODS_B.m8i` verifies that MIDI Out uses the common modulation parameter
   layouts for `LFO` and `DRUM ENV`.
+- `MID_TABLE.m8i` verifies that the MIDI Out instrument table starts at
+  `0xe5`, contains 16 rows, and uses the same eight-byte row layout as
+  Wavsynth, Macrosynth, Sampler, FM Synth, and Hypersynth.
 - `FM_MODS_A.m8i` verifies that FM Synth uses the common modulation slot width,
   offset, packed type/destination byte, and parameter layouts for `TRACKING`,
   `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
@@ -1552,6 +1580,8 @@ separate `NONE` parameter model.
 | MIDI Out MODS manifest | `fixtures/6.5.x/instruments/MID_MODS_A.yaml` |
 | MIDI Out MODS B fixture | `fixtures/6.5.x/instruments/MID_MODS_B.m8i` |
 | MIDI Out MODS B manifest | `fixtures/6.5.x/instruments/MID_MODS_B.yaml` |
+| MIDI Out table fixture | `fixtures/6.5.x/instruments/MID_TABLE.m8i` |
+| MIDI Out table manifest | `fixtures/6.5.x/instruments/MID_TABLE.yaml` |
 | FM Synth baseline fixture | `fixtures/6.5.x/instruments/FM_DEFAULT.m8i` |
 | FM Synth params fixture | `fixtures/6.5.x/instruments/FM_PARAMS.m8i` |
 | FM Synth params manifest | `fixtures/6.5.x/instruments/FM_PARAMS.yaml` |
@@ -1664,6 +1694,11 @@ The `MID_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
 the common instrument modulation block using MIDI Out as the carrier instrument.
 The manifest-driven mapper matched all 17 changed bytes exactly and reported
 zero unaccounted changed bytes.
+
+The `MID_TABLE.m8i` fixture verifies the MIDI Out instrument table at
+`0xe5..0x164` as 16 eight-byte rows. Each row stores `transpose`, `volume`, and
+three two-byte FX slots. The manifest-driven mapper matched all 71 changed
+bytes exactly and reported zero unaccounted changed bytes.
 
 The `FM_PARAMS.m8i` fixture verifies common transpose/table TIC values, FM Synth
 params, filter cutoff/resonance, amp/pan values, mixer params, and common EQ
