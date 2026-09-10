@@ -12,10 +12,10 @@ doc: |
   are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
   filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
-  Sampler/FM Synth instrument tables, sample path, Hypersynth chord table, and
-  common EQ assignment are mapped from params, MODS, and table fixtures.
-  Unknown ranges are preserved until additional instrument fixtures provide
-  evidence for their layout.
+  Sampler/FM Synth/Hypersynth instrument tables, sample path, Hypersynth chord
+  table, and common EQ assignment are mapped from params, MODS, and table
+  fixtures. Unknown ranges are preserved until additional instrument fixtures
+  provide evidence for their layout.
 seq:
   - id: instrument_type
     type: u1
@@ -482,7 +482,9 @@ types:
         repeat: expr
         repeat-expr: 16
       - id: unknown_after_chords
-        size-eos: true
+        size: 16
+      - id: table
+        type: instrument_table
   hypersynth_chord:
     seq:
       - id: enabled_notes
@@ -856,6 +858,70 @@ enums:
     0x87:
       id: fm4
       -label: FM4
+    0x88:
+      id: filter
+      -label: FIL
+    0x89:
+      id: cutoff
+      -label: CUT
+    0x8a:
+      id: resonance
+      -label: RES
+    0x8b:
+      id: amp
+      -label: AMP
+    0x8c:
+      id: limit
+      -label: LIM
+    0x8d:
+      id: pan
+      -label: PAN
+    0x8e:
+      id: dry
+      -label: DRY
+    0x8f:
+      id: smx
+      -label: SMX
+    0x90:
+      id: send_delay
+      -label: SDL
+    0x91:
+      id: send_reverb
+      -label: SRV
+    0xa6:
+      id: snc
+      -label: SNC
+    0xa7:
+      id: err
+      -label: ERR
+    0xff:
+      id: unset
+      -label: --
+  hypersynth_table_fx_command:
+    0x80:
+      id: volume
+      -label: VOL
+    0x81:
+      id: pitch
+      -label: PIT
+    0x82:
+      id: fine
+      -label: FIN
+    0x83:
+      id: chord
+      -label: CRD
+    0x84:
+      id: chord_volume
+      -label: CVO
+    0x85:
+      id: swarm
+      -label: SWM
+    0x86:
+      id: width
+      -label: WID
+    0x87:
+      id: subosc
+      -label: SUB
     0x88:
       id: filter
       -label: FIL

@@ -99,6 +99,7 @@ The verified fixtures show both full and padded values:
 | `HYP_PARAMS.m8i` | `HYP_PARAMS` followed by two `0x00` bytes |
 | `HYP_MODS_A.m8i` | `HYP_MODS_A` followed by two `0x00` bytes |
 | `HYP_MODS_B.m8i` | `HYP_MODS_B` followed by two `0x00` bytes |
+| `HYP_TABLE.m8i` | `HYP_TABLE` followed by three `0x00` bytes |
 | `EXT_DEFAULT.m8i` | `EXT_DEFAULT` followed by one `0x00` byte |
 | `EXT_PARAMS.m8i` | `EXT_PARAMS` followed by two `0x00` bytes |
 | `EXT_MODS_A.m8i` | `EXT_MODS_A` followed by two `0x00` bytes |
@@ -476,10 +477,12 @@ The tail layout depends on `instrumentType`. Verified editable instruments
 start with a shared 24-byte modulation block. `WAV_TABLE.m8i`,
 `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, and `FM_TABLE.m8i` verify that the Wavsynth,
 Macrosynth, Sampler, and FM Synth instrument tables are stored at
-`0xe5..0x164`. Other instrument table locations should be verified with
-per-instrument table fixtures before their unknown tail ranges are promoted to
-the common table structure. For `none`, the tail is preserved as unknown bytes
-because the M8 UI does not expose editable `NONE` instrument modulators.
+`0xe5..0x164`. `HYP_TABLE.m8i` verifies the same table location for
+Hypersynth, after its chord table and a 16-byte unknown gap. Other instrument
+table locations should be verified with per-instrument table fixtures before
+their unknown tail ranges are promoted to the common table structure. For
+`none`, the tail is preserved as unknown bytes because the M8 UI does not
+expose editable `NONE` instrument modulators.
 
 ### Table Tail
 
@@ -522,7 +525,8 @@ Offsets are absolute file offsets.
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `chords` | `0x65..0xd4` | 112 | [Hypersynth Chord](#hypersynth-chord) |
-| `unknownAfterChords` | `0xd5..0x164` | 144 | unknown bytes |
+| `unknownAfterChords` | `0xd5..0xe4` | 16 | unknown bytes |
+| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
 
 The `HYP_PARAMS.m8i` fixture verifies chord `0` begins at `0x65` and chord
 `15` begins at `0xce`. This implies 16 chord entries of 7 bytes each.
@@ -633,9 +637,9 @@ Offsets are relative to the start of `params`.
 
 ## Instrument Table
 
-The Wavsynth, Macrosynth, Sampler, and FM Synth instrument tables are stored as
-16 eight-byte rows at `0xe5..0x164`. Row labels are displayed as hexadecimal
-values `0..F` in the M8 UI.
+The Wavsynth, Macrosynth, Sampler, FM Synth, and Hypersynth instrument tables
+are stored as 16 eight-byte rows at `0xe5..0x164`. Row labels are displayed as
+hexadecimal values `0..F` in the M8 UI.
 
 The row offset is:
 
@@ -655,10 +659,10 @@ Offsets are relative to the start of a table row.
 | `fx2` | `+0x04..+0x05` | 2 | [Instrument Table FX](#instrument-table-fx) |
 | `fx3` | `+0x06..+0x07` | 2 | [Instrument Table FX](#instrument-table-fx) |
 
-The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, and `FM_TABLE.m8i`
-fixtures verify every `transpose` and `volume` byte across all 16 table rows.
-They verify all three FX slots for rows `0..5`, the first two FX slots for row
-`6`, and leave the remaining FX slots at their baseline values.
+The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `FM_TABLE.m8i`, and
+`HYP_TABLE.m8i` fixtures verify every `transpose` and `volume` byte across all
+16 table rows. They verify all three FX slots for rows `0..5`, the first two FX
+slots for row `6`, and leave the remaining FX slots at their baseline values.
 
 ### Instrument Table FX
 
@@ -1040,6 +1044,36 @@ range.
 | `ERR` | `0xa7` |
 | `--` | `0xff` |
 
+### Hypersynth Table FX Command
+
+The `HYP_TABLE.m8i` fixture verifies the following Hypersynth table command
+values. `SNC` and `ERR` are non-contiguous with the surrounding verified command
+range.
+
+| Name | Stored Value |
+| --- | --- |
+| `VOL` | `0x80` |
+| `PIT` | `0x81` |
+| `FIN` | `0x82` |
+| `CRD` | `0x83` |
+| `CVO` | `0x84` |
+| `SWM` | `0x85` |
+| `WID` | `0x86` |
+| `SUB` | `0x87` |
+| `FIL` | `0x88` |
+| `CUT` | `0x89` |
+| `RES` | `0x8a` |
+| `AMP` | `0x8b` |
+| `LIM` | `0x8c` |
+| `PAN` | `0x8d` |
+| `DRY` | `0x8e` |
+| `SMX` | `0x8f` |
+| `SDL` | `0x90` |
+| `SRV` | `0x91` |
+| `SNC` | `0xa6` |
+| `ERR` | `0xa7` |
+| `--` | `0xff` |
+
 ### Filter Type
 
 | Name | Stored Value | Scope |
@@ -1362,7 +1396,7 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `fmSynth.unknownBeforeEq` | `0x4b` | 1 | Preserved until future fixtures map this byte |
 | `hypersynth.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `hypersynth.unknownBeforeEq` | `0x36..0x4b` | 22 | Preserved until future fixtures map this region |
-| `hypersynth.unknownAfterChords` | `0xd5..0x164` | 144 | Preserved until future fixtures map this region |
+| `hypersynth.unknownAfterChords` | `0xd5..0xe4` | 16 | Preserved until future fixtures map this region |
 | `external.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `external.unknownBeforeEq` | `0x37..0x4b` | 21 | Preserved until future fixtures map this region |
 | `none.bodyBeforeEq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
@@ -1458,6 +1492,10 @@ separate `NONE` parameter model.
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `HYP_MODS_B.m8i` verifies that Hypersynth uses the common modulation
   parameter layouts for `LFO` and `DRUM ENV`.
+- `HYP_TABLE.m8i` verifies that the Hypersynth instrument table starts at
+  `0xe5`, contains 16 rows, and uses the same eight-byte row layout as
+  Wavsynth, Macrosynth, Sampler, and FM Synth. In Hypersynth files, this places
+  the table after the 16-entry `chords` table and a 16-byte preserved gap.
 - `EXT_MODS_A.m8i` verifies that External uses the common modulation slot
   width, offset, packed type/destination byte, and parameter layouts for
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
@@ -1530,6 +1568,8 @@ separate `NONE` parameter model.
 | Hypersynth MODS manifest | `fixtures/6.5.x/instruments/HYP_MODS_A.yaml` |
 | Hypersynth MODS B fixture | `fixtures/6.5.x/instruments/HYP_MODS_B.m8i` |
 | Hypersynth MODS B manifest | `fixtures/6.5.x/instruments/HYP_MODS_B.yaml` |
+| Hypersynth table fixture | `fixtures/6.5.x/instruments/HYP_TABLE.m8i` |
+| Hypersynth table manifest | `fixtures/6.5.x/instruments/HYP_TABLE.yaml` |
 | External baseline fixture | `fixtures/6.5.x/instruments/EXT_DEFAULT.m8i` |
 | External params fixture | `fixtures/6.5.x/instruments/EXT_PARAMS.m8i` |
 | External params manifest | `fixtures/6.5.x/instruments/EXT_PARAMS.yaml` |
@@ -1662,6 +1702,12 @@ The `HYP_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
 the common instrument modulation block using Hypersynth as the carrier
 instrument. The manifest-driven mapper matched all 17 changed bytes exactly
 and reported zero unaccounted changed bytes.
+
+The `HYP_TABLE.m8i` fixture verifies the Hypersynth instrument table at
+`0xe5..0x164` as 16 eight-byte rows after the 16-entry `chords` table and a
+16-byte preserved gap. Each row stores `transpose`, `volume`, and three
+two-byte FX slots. The manifest-driven mapper matched all 79 changed bytes
+exactly and reported zero unaccounted changed bytes.
 
 The `EXT_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 External params, filter params, amp params, mixer params, and common EQ
