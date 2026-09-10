@@ -91,6 +91,8 @@ The verified fixtures show both full and padded values:
 | `FM_MODS_B.m8i` | `FM_MODS_B` followed by three `0x00` bytes |
 | `HYP_DEFAULT.m8i` | `HYP_DEFAULT` followed by one `0x00` byte |
 | `HYP_PARAMS.m8i` | `HYP_PARAMS` followed by two `0x00` bytes |
+| `HYP_MODS_A.m8i` | `HYP_MODS_A` followed by two `0x00` bytes |
+| `HYP_MODS_B.m8i` | `HYP_MODS_B` followed by two `0x00` bytes |
 | `EXT_DEFAULT.m8i` | `EXT_DEFAULT` followed by one `0x00` byte |
 | `EXT_PARAMS.m8i` | `EXT_PARAMS` followed by two `0x00` bytes |
 
@@ -523,8 +525,9 @@ Instrument modulation is stored as four six-byte slots at `0x4d..0x64`.
 `WAV_MODS_A.m8i` verifies the slot storage for `TRACKING`, `TRIG ENV`,
 `AHD ENV`, and `ADSR ENV`. `WAV_MODS_B.m8i` verifies the slot storage for
 `LFO` and `DRUM ENV`. `MAC_MODS_A.m8i`, `MAC_MODS_B.m8i`, `SAM_MODS_A.m8i`,
-`SAM_MODS_B.m8i`, `FM_MODS_A.m8i`, and `FM_MODS_B.m8i` verify the same
-storage layout for Macrosynth, Sampler, and FM Synth.
+`SAM_MODS_B.m8i`, `FM_MODS_A.m8i`, `FM_MODS_B.m8i`, `HYP_MODS_A.m8i`, and
+`HYP_MODS_B.m8i` verify the same storage layout for Macrosynth, Sampler, FM
+Synth, and Hypersynth.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -563,7 +566,10 @@ destinations `MOD BINV = 0x0d`, `MOD BOTH = 0x0c`, `MOD RATE = 0x0b`, and
 `MOD BINV = 0x0d` and `MOD BOTH = 0x0c`. `FM_MODS_A.m8i` verifies FM Synth
 destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
 `MOD AMT = 0x0b`. `FM_MODS_B.m8i` also verifies FM Synth destinations
-`MOD BINV = 0x0e` and `MOD BOTH = 0x0d`.
+`MOD BINV = 0x0e` and `MOD BOTH = 0x0d`. `HYP_MODS_A.m8i` verifies
+Hypersynth destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`,
+`MOD RATE = 0x0c`, and `MOD AMT = 0x0b`. `HYP_MODS_B.m8i` also verifies
+Hypersynth destinations `MOD BINV = 0x0e` and `MOD BOTH = 0x0d`.
 
 ### Modulation Parameters
 
@@ -708,11 +714,35 @@ M8 6.5.2 manual until future fixtures select those values.
 | `MOD BOTH` | `0x0d` |
 | `MOD BINV` | `0x0e` |
 
+### Hypersynth Modulation Destination
+
+Hypersynth destination values `0x0b..0x0e` are verified by `HYP_MODS_A.m8i`.
+`HYP_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
+M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `OFF` | `0x00` |
+| `VOLUME` | `0x01` |
+| `PITCH` | `0x02` |
+| `SHIFT` | `0x03` |
+| `SWARM` | `0x04` |
+| `WIDTH` | `0x05` |
+| `SUBOSC` | `0x06` |
+| `CUTOFF` | `0x07` |
+| `RES` | `0x08` |
+| `AMP` | `0x09` |
+| `PAN` | `0x0a` |
+| `MOD AMT` | `0x0b` |
+| `MOD RATE` | `0x0c` |
+| `MOD BOTH` | `0x0d` |
+| `MOD BINV` | `0x0e` |
+
 ### Modulation LFO Oscillator
 
 Oscillator value `0x13` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
-`SAM_MODS_B.m8i`, and `FM_MODS_B.m8i`. Other labels are from the M8 6.5.2
-manual until future fixtures select those values.
+`SAM_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`. Other labels are
+from the M8 6.5.2 manual until future fixtures select those values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -740,8 +770,8 @@ manual until future fixtures select those values.
 ### Modulation LFO Trigger
 
 Trigger value `0x03` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
-`SAM_MODS_B.m8i`, and `FM_MODS_B.m8i`. Other labels are from the M8 6.5.2
-manual until future fixtures select those values.
+`SAM_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`. Other labels are
+from the M8 6.5.2 manual until future fixtures select those values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1165,6 +1195,11 @@ separate `NONE` parameter model.
   `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `FM_MODS_B.m8i` verifies that FM Synth uses the common modulation parameter
   layouts for `LFO` and `DRUM ENV`.
+- `HYP_MODS_A.m8i` verifies that Hypersynth uses the common modulation slot
+  width, offset, packed type/destination byte, and parameter layouts for
+  `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
+- `HYP_MODS_B.m8i` verifies that Hypersynth uses the common modulation
+  parameter layouts for `LFO` and `DRUM ENV`.
 - Instrument files appear to include both durable instrument definitions and
   persisted UI/editor state. Hypersynth is the clearest verified example so far:
   `currentChord` is stored in the parameter region, while the persistent
@@ -1216,6 +1251,10 @@ separate `NONE` parameter model.
 | Hypersynth baseline fixture | `fixtures/6.5.x/instruments/HYP_DEFAULT.m8i` |
 | Hypersynth params fixture | `fixtures/6.5.x/instruments/HYP_PARAMS.m8i` |
 | Hypersynth params manifest | `fixtures/6.5.x/instruments/HYP_PARAMS.yaml` |
+| Hypersynth MODS fixture | `fixtures/6.5.x/instruments/HYP_MODS_A.m8i` |
+| Hypersynth MODS manifest | `fixtures/6.5.x/instruments/HYP_MODS_A.yaml` |
+| Hypersynth MODS B fixture | `fixtures/6.5.x/instruments/HYP_MODS_B.m8i` |
+| Hypersynth MODS B manifest | `fixtures/6.5.x/instruments/HYP_MODS_B.yaml` |
 | External baseline fixture | `fixtures/6.5.x/instruments/EXT_DEFAULT.m8i` |
 | External params fixture | `fixtures/6.5.x/instruments/EXT_PARAMS.m8i` |
 | External params manifest | `fixtures/6.5.x/instruments/EXT_PARAMS.yaml` |
@@ -1301,6 +1340,17 @@ Hypersynth params, filter params, amp params, mixer params, common EQ
 assignment, and the Hypersynth chord table boundary. The manifest-driven mapper
 matched all 37 changed bytes
 exactly and reported zero unaccounted changed bytes.
+
+The `HYP_MODS_A.m8i` fixture verifies the common instrument modulation block at
+`0x4d..0x64` using Hypersynth as the carrier instrument. It verifies
+`TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV` slot storage. The
+manifest-driven mapper matched all 29 changed bytes exactly and reported zero
+unaccounted changed bytes.
+
+The `HYP_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
+the common instrument modulation block using Hypersynth as the carrier
+instrument. The manifest-driven mapper matched all 17 changed bytes exactly
+and reported zero unaccounted changed bytes.
 
 The `EXT_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 External params, filter params, amp params, mixer params, and common EQ

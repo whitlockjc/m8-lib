@@ -866,6 +866,52 @@ enums:
     0x0e:
       id: mod_binv
       -label: MOD BINV
+  hypersynth_modulation_destination:
+    0x00:
+      id: off
+      -label: OFF
+    0x01:
+      id: volume
+      -label: VOLUME
+    0x02:
+      id: pitch
+      -label: PITCH
+    0x03:
+      id: shift
+      -label: SHIFT
+    0x04:
+      id: swarm
+      -label: SWARM
+    0x05:
+      id: width
+      -label: WIDTH
+    0x06:
+      id: subosc
+      -label: SUBOSC
+    0x07:
+      id: cutoff
+      -label: CUTOFF
+    0x08:
+      id: resonance
+      -label: RES
+    0x09:
+      id: amp
+      -label: AMP
+    0x0a:
+      id: pan
+      -label: PAN
+    0x0b:
+      id: mod_amount
+      -label: MOD AMT
+    0x0c:
+      id: mod_rate
+      -label: MOD RATE
+    0x0d:
+      id: mod_both
+      -label: MOD BOTH
+    0x0e:
+      id: mod_binv
+      -label: MOD BINV
   instrument_type:
     0x00:
       id: wavsynth
