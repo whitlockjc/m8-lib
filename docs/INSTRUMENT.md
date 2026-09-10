@@ -3,9 +3,8 @@
 Human-readable schema reference for M8 Instrument files.
 
 This document starts with the common instrument prefix plus the Wavsynth,
-Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument bodies.
-Other instrument types will replace currently unknown ranges as fixture evidence
-is collected.
+Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument
+bodies. Unknown ranges will be replaced as fixture evidence is collected.
 
 ## Schema
 
@@ -105,6 +104,7 @@ The verified fixtures show both full and padded values:
 | `EXT_PARAMS.m8i` | `EXT_PARAMS` followed by two `0x00` bytes |
 | `EXT_MODS_A.m8i` | `EXT_MODS_A` followed by two `0x00` bytes |
 | `EXT_MODS_B.m8i` | `EXT_MODS_B` followed by two `0x00` bytes |
+| `EXT_TABLE.m8i` | `EXT_TABLE` followed by three `0x00` bytes |
 
 ## Body Before EQ
 
@@ -476,14 +476,13 @@ Offsets are relative to the start of `mixer`.
 
 The tail layout depends on `instrumentType`. Verified editable instruments
 start with a shared 24-byte modulation block. `WAV_TABLE.m8i`,
-`MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`, and `FM_TABLE.m8i` verify
-that the Wavsynth, Macrosynth, Sampler, MIDI Out, and FM Synth instrument
-tables are stored at `0xe5..0x164`. `HYP_TABLE.m8i` verifies the same table
-location for Hypersynth, after its chord table and a 16-byte unknown gap. Other
-instrument table locations should be verified with per-instrument table
-fixtures before their unknown tail ranges are promoted to the common table
-structure. For `none`, the tail is preserved as unknown bytes because the M8 UI
-does not expose editable `NONE` instrument modulators.
+`MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`, `FM_TABLE.m8i`, and
+`EXT_TABLE.m8i` verify that the Wavsynth, Macrosynth, Sampler, MIDI Out, FM
+Synth, and External instrument tables are stored at `0xe5..0x164`.
+`HYP_TABLE.m8i` verifies the same table location for Hypersynth, after its
+chord table and a 16-byte unknown gap. For `none`, the tail is preserved as
+unknown bytes because the M8 UI does not expose editable `NONE` instrument
+modulators.
 
 ### Table Tail
 
@@ -494,15 +493,6 @@ Offsets are absolute file offsets.
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `unknownBeforeTable` | `0x65..0xe4` | 128 | unknown bytes |
 | `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
-
-### Modulated Tail
-
-Offsets are absolute file offsets.
-
-| Name | Offset / Range | Size | Type |
-| --- | --- | ---: | --- |
-| `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
-| `unknownAfterModulators` | `0x65..0x164` | 256 | unknown bytes |
 
 ### Sampler Tail
 
@@ -638,7 +628,7 @@ Offsets are relative to the start of `params`.
 
 ## Instrument Table
 
-The Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, and Hypersynth
+The Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, and External
 instrument tables are stored as 16 eight-byte rows at `0xe5..0x164`. Row
 labels are displayed as hexadecimal values `0..F` in the M8 UI.
 
@@ -661,10 +651,10 @@ Offsets are relative to the start of a table row.
 | `fx3` | `+0x06..+0x07` | 2 | [Instrument Table FX](#instrument-table-fx) |
 
 The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`,
-`FM_TABLE.m8i`, and `HYP_TABLE.m8i` fixtures verify every `transpose` and
-`volume` byte across all 16 table rows. They verify all three FX slots for rows
-`0..5` where supported, then leave the remaining FX slots at their baseline
-values.
+`FM_TABLE.m8i`, `HYP_TABLE.m8i`, and `EXT_TABLE.m8i` fixtures verify every
+`transpose` and `volume` byte across all 16 table rows. They verify all three
+FX slots for rows `0..5` where supported, then leave the remaining FX slots at
+their baseline values.
 
 ### Instrument Table FX
 
@@ -1101,6 +1091,36 @@ range.
 | `ERR` | `0xa7` |
 | `--` | `0xff` |
 
+### External Table FX Command
+
+The `EXT_TABLE.m8i` fixture verifies the following External table command
+values. `ADD` and `CHD` are non-contiguous with the surrounding verified command
+range.
+
+| Name | Stored Value |
+| --- | --- |
+| `VOL` | `0x80` |
+| `PIT` | `0x81` |
+| `MPB` | `0x82` |
+| `MPG` | `0x83` |
+| `CCA` | `0x84` |
+| `CCB` | `0x85` |
+| `CCC` | `0x86` |
+| `CCD` | `0x87` |
+| `FIL` | `0x88` |
+| `CUT` | `0x89` |
+| `RES` | `0x8a` |
+| `AMP` | `0x8b` |
+| `LIM` | `0x8c` |
+| `PAN` | `0x8d` |
+| `DRY` | `0x8e` |
+| `SMX` | `0x8f` |
+| `SDL` | `0x90` |
+| `SRV` | `0x91` |
+| `ADD` | `0xa6` |
+| `CHD` | `0xa7` |
+| `--` | `0xff` |
+
 ### Filter Type
 
 | Name | Stored Value | Scope |
@@ -1429,9 +1449,8 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `none.bodyBeforeEq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until future fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
-| `unknownBeforeTable` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, and FM Synth until future fixtures map this region |
+| `unknownBeforeTable` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, and External until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
-| `unknownAfterModulators` | `0x65..0x164` | 256 | Preserved for External until table-related regions are mapped |
 | `none.tail` | `0x4d..0x164` | 280 | Preserved for `none` because the M8 UI does not expose editable `NONE` modulators |
 
 The `NONE` instrument cannot be meaningfully edited beyond its name, so this
@@ -1529,6 +1548,9 @@ separate `NONE` parameter model.
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `EXT_MODS_B.m8i` verifies that External uses the common modulation parameter
   layouts for `LFO` and `DRUM ENV`.
+- `EXT_TABLE.m8i` verifies that the External instrument table starts at
+  `0xe5`, contains 16 rows, and uses the same eight-byte row layout as
+  Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, and Hypersynth.
 - Instrument files appear to include both durable instrument definitions and
   persisted UI/editor state. Hypersynth is the clearest verified example so far:
   `currentChord` is stored in the parameter region, while the persistent
@@ -1607,6 +1629,8 @@ separate `NONE` parameter model.
 | External MODS manifest | `fixtures/6.5.x/instruments/EXT_MODS_A.yaml` |
 | External MODS B fixture | `fixtures/6.5.x/instruments/EXT_MODS_B.m8i` |
 | External MODS B manifest | `fixtures/6.5.x/instruments/EXT_MODS_B.yaml` |
+| External table fixture | `fixtures/6.5.x/instruments/EXT_TABLE.m8i` |
+| External table manifest | `fixtures/6.5.x/instruments/EXT_TABLE.yaml` |
 | Verification command | `npm run verify` |
 | M8 manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699>, version 6.5.2, 04/21/2026 |
 | Reference material | <https://github.com/whitlockjc/m8-js> |
@@ -1759,3 +1783,8 @@ The `EXT_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
 the common instrument modulation block using External as the carrier
 instrument. The manifest-driven mapper matched all 17 changed bytes exactly
 and reported zero unaccounted changed bytes.
+
+The `EXT_TABLE.m8i` fixture verifies the External instrument table at
+`0xe5..0x164` as 16 eight-byte rows. Each row stores `transpose`, `volume`, and
+three two-byte FX slots. The manifest-driven mapper matched all 79 changed
+bytes exactly and reported zero unaccounted changed bytes.

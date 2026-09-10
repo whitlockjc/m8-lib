@@ -12,7 +12,7 @@ doc: |
   are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
   filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
-  Sampler/MIDI Out/FM Synth/Hypersynth instrument tables, sample path,
+  Sampler/MIDI Out/FM Synth/Hypersynth/External instrument tables, sample path,
   Hypersynth chord table, and common EQ assignment are mapped from params,
   MODS, and table fixtures. Unknown ranges are preserved until additional
   instrument fixtures provide evidence for their layout.
@@ -61,7 +61,7 @@ seq:
         'instrument_type::wavsynth': table_tail
         'instrument_type::macrosynth': table_tail
         'instrument_type::fm_synth': table_tail
-        'instrument_type::external': modulated_tail
+        'instrument_type::external': table_tail
         'instrument_type::none': unused_tail
     doc: Instrument-specific tail after the common EQ field.
 types:
@@ -442,12 +442,6 @@ types:
         type: u1
       - id: reverb
         type: u1
-  modulated_tail:
-    seq:
-      - id: modulators
-        type: instrument_modulators
-      - id: unknown_after_modulators
-        size-eos: true
   table_tail:
     seq:
       - id: modulators
@@ -1010,6 +1004,70 @@ enums:
     0xa7:
       id: err
       -label: ERR
+    0xff:
+      id: unset
+      -label: --
+  external_table_fx_command:
+    0x80:
+      id: volume
+      -label: VOL
+    0x81:
+      id: pitch
+      -label: PIT
+    0x82:
+      id: midi_program_bank
+      -label: MPB
+    0x83:
+      id: midi_program
+      -label: MPG
+    0x84:
+      id: cc_a
+      -label: CCA
+    0x85:
+      id: cc_b
+      -label: CCB
+    0x86:
+      id: cc_c
+      -label: CCC
+    0x87:
+      id: cc_d
+      -label: CCD
+    0x88:
+      id: filter
+      -label: FIL
+    0x89:
+      id: cutoff
+      -label: CUT
+    0x8a:
+      id: resonance
+      -label: RES
+    0x8b:
+      id: amp
+      -label: AMP
+    0x8c:
+      id: limit
+      -label: LIM
+    0x8d:
+      id: pan
+      -label: PAN
+    0x8e:
+      id: dry
+      -label: DRY
+    0x8f:
+      id: smx
+      -label: SMX
+    0x90:
+      id: send_delay
+      -label: SDL
+    0x91:
+      id: send_reverb
+      -label: SRV
+    0xa6:
+      id: add
+      -label: ADD
+    0xa7:
+      id: chord
+      -label: CHD
     0xff:
       id: unset
       -label: --

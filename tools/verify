@@ -156,6 +156,11 @@ tools/map-fixture.js \
   fixtures/6.5.x/instruments/EXT_MODS_B.yaml
 
 tools/map-fixture.js \
+  fixtures/6.5.x/instruments/EXT_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/EXT_TABLE.m8i \
+  fixtures/6.5.x/instruments/EXT_TABLE.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n \
   fixtures/6.5.x/scales/MODIFIED.m8n \
   fixtures/6.5.x/scales/MODIFIED.yaml
