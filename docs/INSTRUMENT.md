@@ -87,6 +87,8 @@ The verified fixtures show both full and padded values:
 | `MID_PARAMS.m8i` | `MID_PARAMS` followed by two `0x00` bytes |
 | `FM_DEFAULT.m8i` | `FM_DEFAULT` followed by two `0x00` bytes |
 | `FM_PARAMS.m8i` | `FM_PARAMS` followed by three `0x00` bytes |
+| `FM_MODS_A.m8i` | `FM_MODS_A` followed by three `0x00` bytes |
+| `FM_MODS_B.m8i` | `FM_MODS_B` followed by three `0x00` bytes |
 | `HYP_DEFAULT.m8i` | `HYP_DEFAULT` followed by one `0x00` byte |
 | `HYP_PARAMS.m8i` | `HYP_PARAMS` followed by two `0x00` bytes |
 | `EXT_DEFAULT.m8i` | `EXT_DEFAULT` followed by one `0x00` byte |
@@ -521,8 +523,8 @@ Instrument modulation is stored as four six-byte slots at `0x4d..0x64`.
 `WAV_MODS_A.m8i` verifies the slot storage for `TRACKING`, `TRIG ENV`,
 `AHD ENV`, and `ADSR ENV`. `WAV_MODS_B.m8i` verifies the slot storage for
 `LFO` and `DRUM ENV`. `MAC_MODS_A.m8i`, `MAC_MODS_B.m8i`, `SAM_MODS_A.m8i`,
-and `SAM_MODS_B.m8i` verify the same storage layout for Macrosynth and
-Sampler.
+`SAM_MODS_B.m8i`, `FM_MODS_A.m8i`, and `FM_MODS_B.m8i` verify the same
+storage layout for Macrosynth, Sampler, and FM Synth.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -558,7 +560,10 @@ destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
 destination values for Macrosynth. `SAM_MODS_A.m8i` verifies Sampler
 destinations `MOD BINV = 0x0d`, `MOD BOTH = 0x0c`, `MOD RATE = 0x0b`, and
 `MOD AMT = 0x0a`. `SAM_MODS_B.m8i` also verifies Sampler destinations
-`MOD BINV = 0x0d` and `MOD BOTH = 0x0c`.
+`MOD BINV = 0x0d` and `MOD BOTH = 0x0c`. `FM_MODS_A.m8i` verifies FM Synth
+destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
+`MOD AMT = 0x0b`. `FM_MODS_B.m8i` also verifies FM Synth destinations
+`MOD BINV = 0x0e` and `MOD BOTH = 0x0d`.
 
 ### Modulation Parameters
 
@@ -679,11 +684,35 @@ M8 6.5.2 manual until future fixtures select those values.
 | `MOD BOTH` | `0x0c` |
 | `MOD BINV` | `0x0d` |
 
+### FM Synth Modulation Destination
+
+FM Synth destination values `0x0b..0x0e` are verified by `FM_MODS_A.m8i`.
+`FM_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
+M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `OFF` | `0x00` |
+| `VOLUME` | `0x01` |
+| `PITCH` | `0x02` |
+| `MOD 1` | `0x03` |
+| `MOD 2` | `0x04` |
+| `MOD 3` | `0x05` |
+| `MOD 4` | `0x06` |
+| `CUTOFF` | `0x07` |
+| `RES` | `0x08` |
+| `AMP` | `0x09` |
+| `PAN` | `0x0a` |
+| `MOD AMT` | `0x0b` |
+| `MOD RATE` | `0x0c` |
+| `MOD BOTH` | `0x0d` |
+| `MOD BINV` | `0x0e` |
+
 ### Modulation LFO Oscillator
 
 Oscillator value `0x13` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
-and `SAM_MODS_B.m8i`. Other labels are from the M8 6.5.2 manual until future
-fixtures select those values.
+`SAM_MODS_B.m8i`, and `FM_MODS_B.m8i`. Other labels are from the M8 6.5.2
+manual until future fixtures select those values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -710,9 +739,9 @@ fixtures select those values.
 
 ### Modulation LFO Trigger
 
-Trigger value `0x03` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`, and
-`SAM_MODS_B.m8i`. Other labels are from the M8 6.5.2 manual until future
-fixtures select those values.
+Trigger value `0x03` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
+`SAM_MODS_B.m8i`, and `FM_MODS_B.m8i`. Other labels are from the M8 6.5.2
+manual until future fixtures select those values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1131,6 +1160,11 @@ separate `NONE` parameter model.
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `SAM_MODS_B.m8i` verifies that Sampler uses the common modulation parameter
   layouts for `LFO` and `DRUM ENV`.
+- `FM_MODS_A.m8i` verifies that FM Synth uses the common modulation slot width,
+  offset, packed type/destination byte, and parameter layouts for `TRACKING`,
+  `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
+- `FM_MODS_B.m8i` verifies that FM Synth uses the common modulation parameter
+  layouts for `LFO` and `DRUM ENV`.
 - Instrument files appear to include both durable instrument definitions and
   persisted UI/editor state. Hypersynth is the clearest verified example so far:
   `currentChord` is stored in the parameter region, while the persistent
@@ -1175,6 +1209,10 @@ separate `NONE` parameter model.
 | FM Synth baseline fixture | `fixtures/6.5.x/instruments/FM_DEFAULT.m8i` |
 | FM Synth params fixture | `fixtures/6.5.x/instruments/FM_PARAMS.m8i` |
 | FM Synth params manifest | `fixtures/6.5.x/instruments/FM_PARAMS.yaml` |
+| FM Synth MODS fixture | `fixtures/6.5.x/instruments/FM_MODS_A.m8i` |
+| FM Synth MODS manifest | `fixtures/6.5.x/instruments/FM_MODS_A.yaml` |
+| FM Synth MODS B fixture | `fixtures/6.5.x/instruments/FM_MODS_B.m8i` |
+| FM Synth MODS B manifest | `fixtures/6.5.x/instruments/FM_MODS_B.yaml` |
 | Hypersynth baseline fixture | `fixtures/6.5.x/instruments/HYP_DEFAULT.m8i` |
 | Hypersynth params fixture | `fixtures/6.5.x/instruments/HYP_PARAMS.m8i` |
 | Hypersynth params manifest | `fixtures/6.5.x/instruments/HYP_PARAMS.yaml` |
@@ -1246,6 +1284,17 @@ The `FM_PARAMS.m8i` fixture verifies common transpose/table TIC values, FM Synth
 params, filter cutoff/resonance, amp/pan values, mixer params, and common EQ
 assignment. The manifest-driven mapper matched all 50 changed bytes exactly and
 reported zero unaccounted changed bytes.
+
+The `FM_MODS_A.m8i` fixture verifies the common instrument modulation block at
+`0x4d..0x64` using FM Synth as the carrier instrument. It verifies `TRACKING`,
+`TRIG ENV`, `AHD ENV`, and `ADSR ENV` slot storage. The manifest-driven mapper
+matched all 29 changed bytes exactly and reported zero unaccounted changed
+bytes.
+
+The `FM_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
+the common instrument modulation block using FM Synth as the carrier
+instrument. The manifest-driven mapper matched all 17 changed bytes exactly
+and reported zero unaccounted changed bytes.
 
 The `HYP_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 Hypersynth params, filter params, amp params, mixer params, common EQ
