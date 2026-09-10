@@ -85,6 +85,8 @@ The verified fixtures show both full and padded values:
 | `SAMB_PARAMS.m8i` | `SAMB_PARAMS` followed by one `0x00` byte |
 | `MID_DEFAULT.m8i` | `MID_DEFAULT` followed by one `0x00` byte |
 | `MID_PARAMS.m8i` | `MID_PARAMS` followed by two `0x00` bytes |
+| `MID_MODS_A.m8i` | `MID_MODS_A` followed by two `0x00` bytes |
+| `MID_MODS_B.m8i` | `MID_MODS_B` followed by two `0x00` bytes |
 | `FM_DEFAULT.m8i` | `FM_DEFAULT` followed by two `0x00` bytes |
 | `FM_PARAMS.m8i` | `FM_PARAMS` followed by three `0x00` bytes |
 | `FM_MODS_A.m8i` | `FM_MODS_A` followed by three `0x00` bytes |
@@ -525,9 +527,9 @@ Instrument modulation is stored as four six-byte slots at `0x4d..0x64`.
 `WAV_MODS_A.m8i` verifies the slot storage for `TRACKING`, `TRIG ENV`,
 `AHD ENV`, and `ADSR ENV`. `WAV_MODS_B.m8i` verifies the slot storage for
 `LFO` and `DRUM ENV`. `MAC_MODS_A.m8i`, `MAC_MODS_B.m8i`, `SAM_MODS_A.m8i`,
-`SAM_MODS_B.m8i`, `FM_MODS_A.m8i`, `FM_MODS_B.m8i`, `HYP_MODS_A.m8i`, and
-`HYP_MODS_B.m8i` verify the same storage layout for Macrosynth, Sampler, FM
-Synth, and Hypersynth.
+`SAM_MODS_B.m8i`, `MID_MODS_A.m8i`, `MID_MODS_B.m8i`, `FM_MODS_A.m8i`,
+`FM_MODS_B.m8i`, `HYP_MODS_A.m8i`, and `HYP_MODS_B.m8i` verify the same
+storage layout for Macrosynth, Sampler, MIDI Out, FM Synth, and Hypersynth.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -563,7 +565,10 @@ destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
 destination values for Macrosynth. `SAM_MODS_A.m8i` verifies Sampler
 destinations `MOD BINV = 0x0d`, `MOD BOTH = 0x0c`, `MOD RATE = 0x0b`, and
 `MOD AMT = 0x0a`. `SAM_MODS_B.m8i` also verifies Sampler destinations
-`MOD BINV = 0x0d` and `MOD BOTH = 0x0c`. `FM_MODS_A.m8i` verifies FM Synth
+`MOD BINV = 0x0d` and `MOD BOTH = 0x0c`. `MID_MODS_A.m8i` verifies MIDI Out
+destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
+`MOD AMT = 0x0b`. `MID_MODS_B.m8i` also verifies MIDI Out destinations
+`MOD BINV = 0x0e` and `MOD BOTH = 0x0d`. `FM_MODS_A.m8i` verifies FM Synth
 destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
 `MOD AMT = 0x0b`. `FM_MODS_B.m8i` also verifies FM Synth destinations
 `MOD BINV = 0x0e` and `MOD BOTH = 0x0d`. `HYP_MODS_A.m8i` verifies
@@ -690,6 +695,30 @@ M8 6.5.2 manual until future fixtures select those values.
 | `MOD BOTH` | `0x0c` |
 | `MOD BINV` | `0x0d` |
 
+### MIDI Out Modulation Destination
+
+MIDI Out destination values `0x0b..0x0e` are verified by `MID_MODS_A.m8i`.
+`MID_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
+M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `OFF` | `0x00` |
+| `CCA` | `0x01` |
+| `CCB` | `0x02` |
+| `CCC` | `0x03` |
+| `CCD` | `0x04` |
+| `CCE` | `0x05` |
+| `CCF` | `0x06` |
+| `CCG` | `0x07` |
+| `CCH` | `0x08` |
+| `CCI` | `0x09` |
+| `CCJ` | `0x0a` |
+| `MOD AMT` | `0x0b` |
+| `MOD RATE` | `0x0c` |
+| `MOD BOTH` | `0x0d` |
+| `MOD BINV` | `0x0e` |
+
 ### FM Synth Modulation Destination
 
 FM Synth destination values `0x0b..0x0e` are verified by `FM_MODS_A.m8i`.
@@ -741,8 +770,9 @@ M8 6.5.2 manual until future fixtures select those values.
 ### Modulation LFO Oscillator
 
 Oscillator value `0x13` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
-`SAM_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`. Other labels are
-from the M8 6.5.2 manual until future fixtures select those values.
+`SAM_MODS_B.m8i`, `MID_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`.
+Other labels are from the M8 6.5.2 manual until future fixtures select those
+values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -770,8 +800,9 @@ from the M8 6.5.2 manual until future fixtures select those values.
 ### Modulation LFO Trigger
 
 Trigger value `0x03` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
-`SAM_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`. Other labels are
-from the M8 6.5.2 manual until future fixtures select those values.
+`SAM_MODS_B.m8i`, `MID_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`.
+Other labels are from the M8 6.5.2 manual until future fixtures select those
+values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1190,6 +1221,11 @@ separate `NONE` parameter model.
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `SAM_MODS_B.m8i` verifies that Sampler uses the common modulation parameter
   layouts for `LFO` and `DRUM ENV`.
+- `MID_MODS_A.m8i` verifies that MIDI Out uses the common modulation slot
+  width, offset, packed type/destination byte, and parameter layouts for
+  `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
+- `MID_MODS_B.m8i` verifies that MIDI Out uses the common modulation parameter
+  layouts for `LFO` and `DRUM ENV`.
 - `FM_MODS_A.m8i` verifies that FM Synth uses the common modulation slot width,
   offset, packed type/destination byte, and parameter layouts for `TRACKING`,
   `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
@@ -1241,6 +1277,10 @@ separate `NONE` parameter model.
 | MIDI Out baseline fixture | `fixtures/6.5.x/instruments/MID_DEFAULT.m8i` |
 | MIDI Out params fixture | `fixtures/6.5.x/instruments/MID_PARAMS.m8i` |
 | MIDI Out params manifest | `fixtures/6.5.x/instruments/MID_PARAMS.yaml` |
+| MIDI Out MODS fixture | `fixtures/6.5.x/instruments/MID_MODS_A.m8i` |
+| MIDI Out MODS manifest | `fixtures/6.5.x/instruments/MID_MODS_A.yaml` |
+| MIDI Out MODS B fixture | `fixtures/6.5.x/instruments/MID_MODS_B.m8i` |
+| MIDI Out MODS B manifest | `fixtures/6.5.x/instruments/MID_MODS_B.yaml` |
 | FM Synth baseline fixture | `fixtures/6.5.x/instruments/FM_DEFAULT.m8i` |
 | FM Synth params fixture | `fixtures/6.5.x/instruments/FM_PARAMS.m8i` |
 | FM Synth params manifest | `fixtures/6.5.x/instruments/FM_PARAMS.yaml` |
@@ -1318,6 +1358,17 @@ The `MID_PARAMS.m8i` fixture verifies common transpose/table TIC values, MIDI
 Out port, channel, bank, program change, and custom CC table storage. The
 manifest-driven mapper matched all 16 changed bytes exactly and reported zero
 unaccounted changed bytes.
+
+The `MID_MODS_A.m8i` fixture verifies the common instrument modulation block at
+`0x4d..0x64` using MIDI Out as the carrier instrument. It verifies `TRACKING`,
+`TRIG ENV`, `AHD ENV`, and `ADSR ENV` slot storage. The manifest-driven mapper
+matched all 29 changed bytes exactly and reported zero unaccounted changed
+bytes.
+
+The `MID_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
+the common instrument modulation block using MIDI Out as the carrier instrument.
+The manifest-driven mapper matched all 17 changed bytes exactly and reported
+zero unaccounted changed bytes.
 
 The `FM_PARAMS.m8i` fixture verifies common transpose/table TIC values, FM Synth
 params, filter cutoff/resonance, amp/pan values, mixer params, and common EQ

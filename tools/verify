@@ -71,6 +71,16 @@ tools/map-fixture.js \
   fixtures/6.5.x/instruments/MID_PARAMS.yaml
 
 tools/map-fixture.js \
+  fixtures/6.5.x/instruments/MID_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/MID_MODS_A.m8i \
+  fixtures/6.5.x/instruments/MID_MODS_A.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/instruments/MID_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/MID_MODS_B.m8i \
+  fixtures/6.5.x/instruments/MID_MODS_B.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/instruments/FM_DEFAULT.m8i \
   fixtures/6.5.x/instruments/FM_PARAMS.m8i \
   fixtures/6.5.x/instruments/FM_PARAMS.yaml

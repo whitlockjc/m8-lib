@@ -820,6 +820,52 @@ enums:
     0x0d:
       id: mod_binv
       -label: MOD BINV
+  midi_out_modulation_destination:
+    0x00:
+      id: off
+      -label: OFF
+    0x01:
+      id: cc_a
+      -label: CCA
+    0x02:
+      id: cc_b
+      -label: CCB
+    0x03:
+      id: cc_c
+      -label: CCC
+    0x04:
+      id: cc_d
+      -label: CCD
+    0x05:
+      id: cc_e
+      -label: CCE
+    0x06:
+      id: cc_f
+      -label: CCF
+    0x07:
+      id: cc_g
+      -label: CCG
+    0x08:
+      id: cc_h
+      -label: CCH
+    0x09:
+      id: cc_i
+      -label: CCI
+    0x0a:
+      id: cc_j
+      -label: CCJ
+    0x0b:
+      id: mod_amount
+      -label: MOD AMT
+    0x0c:
+      id: mod_rate
+      -label: MOD RATE
+    0x0d:
+      id: mod_both
+      -label: MOD BOTH
+    0x0e:
+      id: mod_binv
+      -label: MOD BINV
   fm_synth_modulation_destination:
     0x00:
       id: off
