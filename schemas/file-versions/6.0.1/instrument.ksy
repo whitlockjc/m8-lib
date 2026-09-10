@@ -11,10 +11,11 @@ doc: |
   instrument type byte, fixed-size name byte range, and common instrument prefix
   are mapped.
   Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
-  filter params, amp params, mixer params, modulators, sample path, Hypersynth
-  chord table, and common EQ assignment are mapped from params and MODS
-  fixtures. Unknown ranges are preserved until additional instrument fixtures
-  provide evidence for their layout.
+  filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth
+  instrument tables, sample path, Hypersynth chord table, and common EQ
+  assignment are mapped from params, MODS, and table fixtures. Unknown ranges
+  are preserved until additional instrument fixtures provide evidence for their
+  layout.
 seq:
   - id: instrument_type
     type: u1
@@ -57,8 +58,8 @@ seq:
         'instrument_type::sampler': sampler_tail
         'instrument_type::hypersynth': hypersynth_tail
         'instrument_type::midi_out': modulated_tail
-        'instrument_type::wavsynth': modulated_tail
-        'instrument_type::macrosynth': modulated_tail
+        'instrument_type::wavsynth': table_tail
+        'instrument_type::macrosynth': table_tail
         'instrument_type::fm_synth': modulated_tail
         'instrument_type::external': modulated_tail
         'instrument_type::none': unused_tail
@@ -447,6 +448,14 @@ types:
         type: instrument_modulators
       - id: unknown_after_modulators
         size-eos: true
+  table_tail:
+    seq:
+      - id: modulators
+        type: instrument_modulators
+      - id: unknown_before_table
+        size: 128
+      - id: table
+        type: instrument_table
   unused_tail:
     seq:
       - id: unknown
@@ -490,6 +499,35 @@ types:
         type: modulation_slot
         repeat: expr
         repeat-expr: 4
+  instrument_table:
+    seq:
+      - id: rows
+        type: instrument_table_row
+        repeat: expr
+        repeat-expr: 16
+  instrument_table_row:
+    seq:
+      - id: transpose
+        type: u1
+      - id: volume
+        type: u1
+        doc: Observed value 0xff displays as --.
+      - id: fx1
+        type: instrument_table_fx
+      - id: fx2
+        type: instrument_table_fx
+      - id: fx3
+        type: instrument_table_fx
+  instrument_table_fx:
+    seq:
+      - id: command
+        type: u1
+        doc: |
+          Instrument-specific command byte. Observed value 0xff displays as --.
+          Verified Wavsynth and Macrosynth command labels are documented in
+          instrument-specific table FX command enums.
+      - id: amount
+        type: u1
   modulation_slot:
     seq:
       - id: type_and_destination
@@ -601,6 +639,134 @@ enums:
     0x05:
       id: tracking
       -label: TRACKING
+  wavsynth_table_fx_command:
+    0x80:
+      id: volume
+      -label: VOL
+    0x81:
+      id: pitch
+      -label: PIT
+    0x82:
+      id: fine
+      -label: FIN
+    0x83:
+      id: oscillator
+      -label: OSC
+    0x84:
+      id: size
+      -label: SIZ
+    0x85:
+      id: mult
+      -label: MUL
+    0x86:
+      id: warp
+      -label: WRP
+    0x87:
+      id: scan
+      -label: SCN
+    0x88:
+      id: filter
+      -label: FIL
+    0x89:
+      id: cutoff
+      -label: CUT
+    0x8a:
+      id: resonance
+      -label: RES
+    0x8b:
+      id: amp
+      -label: AMP
+    0x8c:
+      id: limit
+      -label: LIM
+    0x8d:
+      id: pan
+      -label: PAN
+    0x8e:
+      id: dry
+      -label: DRY
+    0x8f:
+      id: smx
+      -label: SMX
+    0x90:
+      id: send_delay
+      -label: SDL
+    0x91:
+      id: send_reverb
+      -label: SRV
+    0xa6:
+      id: snc
+      -label: SNC
+    0xa7:
+      id: err
+      -label: ERR
+    0xff:
+      id: unset
+      -label: --
+  macrosynth_table_fx_command:
+    0x80:
+      id: volume
+      -label: VOL
+    0x81:
+      id: pitch
+      -label: PIT
+    0x82:
+      id: fine
+      -label: FIN
+    0x83:
+      id: oscillator
+      -label: OSC
+    0x84:
+      id: timbre
+      -label: TBR
+    0x85:
+      id: color
+      -label: COL
+    0x86:
+      id: degrade
+      -label: DEG
+    0x87:
+      id: redux
+      -label: RED
+    0x88:
+      id: filter
+      -label: FIL
+    0x89:
+      id: cutoff
+      -label: CUT
+    0x8a:
+      id: resonance
+      -label: RES
+    0x8b:
+      id: amp
+      -label: AMP
+    0x8c:
+      id: limit
+      -label: LIM
+    0x8d:
+      id: pan
+      -label: PAN
+    0x8e:
+      id: dry
+      -label: DRY
+    0x8f:
+      id: smx
+      -label: SMX
+    0x90:
+      id: send_delay
+      -label: SDL
+    0x91:
+      id: send_reverb
+      -label: SRV
+    0xa6:
+      id: trigger
+      -label: TRG
+    0xa7:
+      id: err
+      -label: ERR
+    0xff:
+      id: unset
+      -label: --
   modulation_tracking_source:
     0x00:
       id: note

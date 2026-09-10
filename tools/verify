@@ -26,6 +26,11 @@ tools/map-fixture.js \
   fixtures/6.5.x/instruments/WAV_MODS_B.yaml
 
 tools/map-fixture.js \
+  fixtures/6.5.x/instruments/WAV_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/WAV_TABLE.m8i \
+  fixtures/6.5.x/instruments/WAV_TABLE.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/instruments/MAC_DEFAULT.m8i \
   fixtures/6.5.x/instruments/MAC_PARAMS.m8i \
   fixtures/6.5.x/instruments/MAC_PARAMS.yaml
@@ -39,6 +44,11 @@ tools/map-fixture.js \
   fixtures/6.5.x/instruments/MAC_DEFAULT.m8i \
   fixtures/6.5.x/instruments/MAC_MODS_B.m8i \
   fixtures/6.5.x/instruments/MAC_MODS_B.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/instruments/MAC_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/MAC_TABLE.m8i \
+  fixtures/6.5.x/instruments/MAC_TABLE.yaml
 
 tools/map-fixture.js \
   fixtures/6.5.x/instruments/SAM_DEFAULT.m8i \
