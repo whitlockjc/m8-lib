@@ -516,8 +516,8 @@ types:
       destination:
         value: type_and_destination & 0x0f
         doc: |
-          Instrument-specific destination value. Wavsynth destination labels are
-          documented in wavsynth_modulation_destination.
+          Instrument-specific destination value. Destination labels are
+          documented in per-instrument modulation destination enums.
   modulation_ahd_env_params:
     seq:
       - id: attack
@@ -696,17 +696,17 @@ enums:
       id: pitch
       -label: PITCH
     0x03:
-      id: timbre
-      -label: TIMBRE
+      id: size
+      -label: SIZE
     0x04:
-      id: color
-      -label: COLOR
+      id: mult
+      -label: MULT
     0x05:
-      id: degrade
-      -label: DEGRADE
+      id: warp
+      -label: WARP
     0x06:
-      id: redux
-      -label: REDUX
+      id: scan
+      -label: SCAN
     0x07:
       id: cutoff
       -label: CUTOFF
@@ -742,17 +742,17 @@ enums:
       id: pitch
       -label: PITCH
     0x03:
-      id: size
-      -label: SIZE
+      id: timbre
+      -label: TIMBRE
     0x04:
-      id: mult
-      -label: MULT
+      id: color
+      -label: COLOR
     0x05:
-      id: warp
-      -label: WARP
+      id: degrade
+      -label: DEGRADE
     0x06:
-      id: scan
-      -label: SCAN
+      id: redux
+      -label: REDUX
     0x07:
       id: cutoff
       -label: CUTOFF
@@ -775,6 +775,49 @@ enums:
       id: mod_both
       -label: MOD BOTH
     0x0e:
+      id: mod_binv
+      -label: MOD BINV
+  sampler_modulation_destination:
+    0x00:
+      id: off
+      -label: OFF
+    0x01:
+      id: volume
+      -label: VOLUME
+    0x02:
+      id: pitch
+      -label: PITCH
+    0x03:
+      id: loop_start
+      -label: LOOP ST
+    0x04:
+      id: length
+      -label: LENGTH
+    0x05:
+      id: degrade
+      -label: DEGRADE
+    0x06:
+      id: cutoff
+      -label: CUTOFF
+    0x07:
+      id: resonance
+      -label: RES
+    0x08:
+      id: amp
+      -label: AMP
+    0x09:
+      id: pan
+      -label: PAN
+    0x0a:
+      id: mod_amount
+      -label: MOD AMT
+    0x0b:
+      id: mod_rate
+      -label: MOD RATE
+    0x0c:
+      id: mod_both
+      -label: MOD BOTH
+    0x0d:
       id: mod_binv
       -label: MOD BINV
   instrument_type:

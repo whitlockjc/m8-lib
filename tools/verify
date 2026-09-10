@@ -47,6 +47,16 @@ tools/map-fixture.js \
 
 tools/map-fixture.js \
   fixtures/6.5.x/instruments/SAM_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/SAM_MODS_A.m8i \
+  fixtures/6.5.x/instruments/SAM_MODS_A.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/instruments/SAM_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/SAM_MODS_B.m8i \
+  fixtures/6.5.x/instruments/SAM_MODS_B.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/instruments/SAM_DEFAULT.m8i \
   fixtures/6.5.x/instruments/SAMS_PARAMS.m8i \
   fixtures/6.5.x/instruments/SAMS_PARAMS.yaml
 
