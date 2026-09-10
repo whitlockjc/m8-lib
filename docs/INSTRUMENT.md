@@ -97,6 +97,8 @@ The verified fixtures show both full and padded values:
 | `HYP_MODS_B.m8i` | `HYP_MODS_B` followed by two `0x00` bytes |
 | `EXT_DEFAULT.m8i` | `EXT_DEFAULT` followed by one `0x00` byte |
 | `EXT_PARAMS.m8i` | `EXT_PARAMS` followed by two `0x00` bytes |
+| `EXT_MODS_A.m8i` | `EXT_MODS_A` followed by two `0x00` bytes |
+| `EXT_MODS_B.m8i` | `EXT_MODS_B` followed by two `0x00` bytes |
 
 ## Body Before EQ
 
@@ -528,8 +530,9 @@ Instrument modulation is stored as four six-byte slots at `0x4d..0x64`.
 `AHD ENV`, and `ADSR ENV`. `WAV_MODS_B.m8i` verifies the slot storage for
 `LFO` and `DRUM ENV`. `MAC_MODS_A.m8i`, `MAC_MODS_B.m8i`, `SAM_MODS_A.m8i`,
 `SAM_MODS_B.m8i`, `MID_MODS_A.m8i`, `MID_MODS_B.m8i`, `FM_MODS_A.m8i`,
-`FM_MODS_B.m8i`, `HYP_MODS_A.m8i`, and `HYP_MODS_B.m8i` verify the same
-storage layout for Macrosynth, Sampler, MIDI Out, FM Synth, and Hypersynth.
+`FM_MODS_B.m8i`, `HYP_MODS_A.m8i`, `HYP_MODS_B.m8i`, `EXT_MODS_A.m8i`, and
+`EXT_MODS_B.m8i` verify the same storage layout for Macrosynth, Sampler, MIDI
+Out, FM Synth, Hypersynth, and External.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -575,6 +578,10 @@ destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
 Hypersynth destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`,
 `MOD RATE = 0x0c`, and `MOD AMT = 0x0b`. `HYP_MODS_B.m8i` also verifies
 Hypersynth destinations `MOD BINV = 0x0e` and `MOD BOTH = 0x0d`.
+`EXT_MODS_A.m8i` verifies External destinations `MOD BINV = 0x0d`,
+`MOD BOTH = 0x0c`, `MOD RATE = 0x0b`, and `MOD AMT = 0x0a`.
+`EXT_MODS_B.m8i` also verifies External destinations `MOD BINV = 0x0d` and
+`MOD BOTH = 0x0c`.
 
 ### Modulation Parameters
 
@@ -767,12 +774,35 @@ M8 6.5.2 manual until future fixtures select those values.
 | `MOD BOTH` | `0x0d` |
 | `MOD BINV` | `0x0e` |
 
+### External Modulation Destination
+
+External destination values `0x0a..0x0d` are verified by `EXT_MODS_A.m8i`.
+`EXT_MODS_B.m8i` also verifies `0x0c` and `0x0d`. Other labels are from the
+M8 6.5.2 manual until future fixtures select those values.
+
+| Name | Stored Value |
+| --- | --- |
+| `OFF` | `0x00` |
+| `VOLUME` | `0x01` |
+| `CUTOFF` | `0x02` |
+| `RES` | `0x03` |
+| `AMP` | `0x04` |
+| `PAN` | `0x05` |
+| `CCA` | `0x06` |
+| `CCB` | `0x07` |
+| `CCC` | `0x08` |
+| `CCD` | `0x09` |
+| `MOD AMT` | `0x0a` |
+| `MOD RATE` | `0x0b` |
+| `MOD BOTH` | `0x0c` |
+| `MOD BINV` | `0x0d` |
+
 ### Modulation LFO Oscillator
 
 Oscillator value `0x13` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
 `SAM_MODS_B.m8i`, `MID_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`.
-Other labels are from the M8 6.5.2 manual until future fixtures select those
-values.
+`EXT_MODS_B.m8i` also verifies `0x13`. Other labels are from the M8 6.5.2
+manual until future fixtures select those values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -801,8 +831,8 @@ values.
 
 Trigger value `0x03` is verified by `WAV_MODS_B.m8i`, `MAC_MODS_B.m8i`,
 `SAM_MODS_B.m8i`, `MID_MODS_B.m8i`, `FM_MODS_B.m8i`, and `HYP_MODS_B.m8i`.
-Other labels are from the M8 6.5.2 manual until future fixtures select those
-values.
+`EXT_MODS_B.m8i` also verifies `0x03`. Other labels are from the M8 6.5.2
+manual until future fixtures select those values.
 
 | Name | Stored Value |
 | --- | --- |
@@ -1236,6 +1266,11 @@ separate `NONE` parameter model.
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
 - `HYP_MODS_B.m8i` verifies that Hypersynth uses the common modulation
   parameter layouts for `LFO` and `DRUM ENV`.
+- `EXT_MODS_A.m8i` verifies that External uses the common modulation slot
+  width, offset, packed type/destination byte, and parameter layouts for
+  `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
+- `EXT_MODS_B.m8i` verifies that External uses the common modulation parameter
+  layouts for `LFO` and `DRUM ENV`.
 - Instrument files appear to include both durable instrument definitions and
   persisted UI/editor state. Hypersynth is the clearest verified example so far:
   `currentChord` is stored in the parameter region, while the persistent
@@ -1298,6 +1333,10 @@ separate `NONE` parameter model.
 | External baseline fixture | `fixtures/6.5.x/instruments/EXT_DEFAULT.m8i` |
 | External params fixture | `fixtures/6.5.x/instruments/EXT_PARAMS.m8i` |
 | External params manifest | `fixtures/6.5.x/instruments/EXT_PARAMS.yaml` |
+| External MODS fixture | `fixtures/6.5.x/instruments/EXT_MODS_A.m8i` |
+| External MODS manifest | `fixtures/6.5.x/instruments/EXT_MODS_A.yaml` |
+| External MODS B fixture | `fixtures/6.5.x/instruments/EXT_MODS_B.m8i` |
+| External MODS B manifest | `fixtures/6.5.x/instruments/EXT_MODS_B.yaml` |
 | Verification command | `npm run verify` |
 | M8 manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699>, version 6.5.2, 04/21/2026 |
 | Reference material | <https://github.com/whitlockjc/m8-js> |
@@ -1407,3 +1446,14 @@ The `EXT_PARAMS.m8i` fixture verifies common transpose/table TIC values,
 External params, filter params, amp params, mixer params, and common EQ
 assignment. The manifest-driven mapper matched all 28 changed bytes exactly and
 reported zero unaccounted changed bytes.
+
+The `EXT_MODS_A.m8i` fixture verifies the common instrument modulation block at
+`0x4d..0x64` using External as the carrier instrument. It verifies `TRACKING`,
+`TRIG ENV`, `AHD ENV`, and `ADSR ENV` slot storage. The manifest-driven mapper
+matched all 29 changed bytes exactly and reported zero unaccounted changed
+bytes.
+
+The `EXT_MODS_B.m8i` fixture verifies `LFO` and `DRUM ENV` slot storage within
+the common instrument modulation block using External as the carrier
+instrument. The manifest-driven mapper matched all 17 changed bytes exactly
+and reported zero unaccounted changed bytes.

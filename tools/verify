@@ -116,6 +116,16 @@ tools/map-fixture.js \
   fixtures/6.5.x/instruments/EXT_PARAMS.yaml
 
 tools/map-fixture.js \
+  fixtures/6.5.x/instruments/EXT_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/EXT_MODS_A.m8i \
+  fixtures/6.5.x/instruments/EXT_MODS_A.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/instruments/EXT_DEFAULT.m8i \
+  fixtures/6.5.x/instruments/EXT_MODS_B.m8i \
+  fixtures/6.5.x/instruments/EXT_MODS_B.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n \
   fixtures/6.5.x/scales/MODIFIED.m8n \
   fixtures/6.5.x/scales/MODIFIED.yaml
