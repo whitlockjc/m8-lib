@@ -97,6 +97,30 @@ Needed research:
 - Revisit `0x00bd..0x00be` with additional Project fixtures to determine
   whether those bytes are Project state, derived data, or unrelated save state.
 
+## Song MIDI Settings Sync Labels
+
+Status: partially mapped
+
+Observation:
+
+- The 6.5.x `MIDI_SETTING.m8s` fixture changed Sync In from `OFF` to
+  `CLK+TRANSP+SPP` and Sync Out from `OFF` to `TRANSPORT+SPP`.
+- The Song bytes at `0x00a0..0x00a3` changed from `00 00 00 00` to
+  `01 02 00 02`.
+- The verified layout stores Sync In as clock byte plus transport byte, followed
+  by Sync Out as clock byte plus transport byte.
+
+Implication:
+
+- The Song schema can model the 4-byte sync settings block as four fields.
+- Not every UI label combination has direct fixture evidence yet.
+
+Needed research:
+
+- Create targeted Song fixtures that change only Sync In across every UI label.
+- Create targeted Song fixtures that change only Sync Out across every UI label.
+- Use those fixtures to verify every clock/transport label combination.
+
 ## Sampler Sample Path Length
 
 Status: open

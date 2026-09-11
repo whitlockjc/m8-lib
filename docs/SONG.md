@@ -2,9 +2,9 @@
 
 Human-readable schema reference for M8 Song files.
 
-This document starts with fields mapped from the Project page. Most of the Song
-body remains preserved as unknown bytes until additional Song fixtures map those
-regions.
+This document starts with fields mapped from the Project and MIDI Settings
+pages. Most of the Song body remains preserved as unknown bytes until
+additional Song fixtures map those regions.
 
 ## Schema
 
@@ -41,7 +41,7 @@ Offsets are absolute file offsets.
 | `tempo` | `0x008f..0x0092` | 4 | `f4` |
 | `liveQuantize` | `0x0093` | 1 | [Live Quantize](#live-quantize) |
 | `name` | `0x0094..0x009f` | 12 | [Fixed String](#fixed-string) |
-| `unknownBeforeScale` | `0x00a0..0x00ba` | 27 | unknown bytes |
+| `midiSettings` | `0x00a0..0x00ba` | 27 | [MIDI Settings](#midi-settings) |
 | `scale` | `0x00bb` | 1 | `u1` |
 | `groove` | `0x00bc` | 1 | `u1` |
 | `unknownTrailingState` | `0x00bd..0x00be` | 2 | unknown bytes |
@@ -67,6 +67,104 @@ The verified fixture pair shows:
 | --- | --- |
 | `DEFAULT.m8s` | `DEFAULT` followed by five `0x00` bytes |
 | `PROJECT.m8s` | `PROJECT` followed by five `0x00` bytes |
+| `MIDI_SETTING.m8s` | `MIDI_SETTING` with no padding bytes |
+
+### MIDI Settings
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `syncSettings` | `0x00a0..0x00a3` | 4 | [MIDI Sync Settings](#midi-sync-settings) |
+| `recordNoteChannel` | `0x00a4` | 1 | `u1` |
+| `recordVelocity` | `0x00a5` | 1 | [Boolean](#boolean) |
+| `recordDelayKill` | `0x00a6` | 1 | [Record Delay/Kill](#record-delaykill) |
+| `controlMapChannel` | `0x00a7` | 1 | [Control Map Channel](#control-map-channel) |
+| `songRowCueChannel` | `0x00a8` | 1 | `u1` |
+| `trackMidiInputChannels` | `0x00a9..0x00b0` | 8 | `u1[8]` |
+| `trackMidiInputInstruments` | `0x00b1..0x00b8` | 8 | `u1[8]` |
+| `programChange` | `0x00b9` | 1 | [Boolean](#boolean) |
+| `mode` | `0x00ba` | 1 | [MIDI Input Mode](#midi-input-mode) |
+
+### MIDI Sync Settings
+
+The MIDI Settings fixture changed Sync In from `OFF` to `CLK+TRANSP+SPP` and
+Sync Out from `OFF` to `TRANSPORT+SPP`. The corresponding byte block changed
+from `00 00 00 00` to `01 02 00 02`.
+
+Sync In and Sync Out are each stored as a clock-enabled byte followed by a
+transport mode byte. The M8 UI combines those two stored values into one label.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `syncInClock` | `+0x00` | 1 | [Boolean](#boolean) |
+| `syncInTransport` | `+0x01` | 1 | [MIDI Sync Transport](#midi-sync-transport) |
+| `syncOutClock` | `+0x02` | 1 | [Boolean](#boolean) |
+| `syncOutTransport` | `+0x03` | 1 | [MIDI Sync Transport](#midi-sync-transport) |
+
+Documented UI labels:
+
+| Clock | Transport | UI Label |
+| --- | --- | --- |
+| `0x00` | `0x00` | `OFF` |
+| `0x01` | `0x00` | `CLOCK` |
+| `0x00` | `0x01` | `TRANSPORT` |
+| `0x01` | `0x01` | `CLOCK+TRANSP.` |
+| `0x00` | `0x02` | `TRANSPORT+SPP` |
+| `0x01` | `0x02` | `CLK+TRANSP+SPP` |
+
+### MIDI Sync Transport
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `OFF` |
+| `0x01` | `TRANSPORT` |
+| `0x02` | `TRANSPORT+SPP` |
+
+### Boolean
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `OFF` |
+| `0x01` | `ON` |
+
+### Record Delay/Kill
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `NONE` |
+| `0x01` | `NOTE OFF` |
+| `0x02` | `DELAY` |
+| `0x03` | `BOTH` |
+
+### Control Map Channel
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `OFF` |
+| `0x01..0x10` | `01..16` |
+| `0x11` | `ALL` |
+
+### Track MIDI Input
+
+The M8 manual describes Track MIDI Input as per-track `CHAN` and `INST#`
+settings for each of the 8 tracks. The Song file stores those values in two
+adjacent 8-byte arrays.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `channels[0..7]` | `0x00a9..0x00b0` | 8 | `u1[8]` |
+| `instruments[0..7]` | `0x00b1..0x00b8` | 8 | `u1[8]` |
+
+The `instrument` value is a reference to an instrument index/number.
+
+### MIDI Input Mode
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `MONO` |
+| `0x01` | `LEGATO` |
+| `0x02` | `POLY` |
 
 ## Notes
 
@@ -76,6 +174,7 @@ The verified fixture pair shows:
 - `scale` is a stored byte value that selects one of the Scales embedded in the
   Song file. The UI label comes from the referenced embedded Scale name, which
   will be mapped later.
+- The active MIDI Settings block is verified at `0x00a0..0x00ba`.
 - `unknownBeforeProject` changed in the fixture diff, but those changes were
   not mapped to Project UI fields. This region is preserved until targeted Song
   fixtures identify whether it contains save/path state, project state, or other
@@ -89,11 +188,14 @@ The verified fixture pair shows:
 | Name | Path |
 | --- | --- |
 | Baseline fixture | `fixtures/6.5.x/songs/DEFAULT.m8s` |
-| Modified fixture | `fixtures/6.5.x/songs/PROJECT.m8s` |
-| Manifest | `fixtures/6.5.x/songs/PROJECT.yaml` |
+| Project fixture | `fixtures/6.5.x/songs/PROJECT.m8s` |
+| Project manifest | `fixtures/6.5.x/songs/PROJECT.yaml` |
+| MIDI Settings fixture | `fixtures/6.5.x/songs/MIDI_SETTING.m8s` |
+| MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
+| Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
-The manifest-driven mapper matched the Project page field changes exactly. It
-also accounts for fixture-changed bytes in explicitly ignored unknown ranges so
-the Project field mapping can be verified without assigning unsupported
-meanings to save/state bytes.
+The manifest-driven mapper matched the Project and MIDI Settings field changes
+exactly. It also accounts for fixture-changed bytes in explicitly ignored
+unknown ranges so page field mapping can be verified without assigning
+unsupported meanings to save/state bytes.

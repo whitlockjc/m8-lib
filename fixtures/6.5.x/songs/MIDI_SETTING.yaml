@@ -1,0 +1,99 @@
+fileType: song
+firmware: 6.5.2C
+screen: project.midiSettings
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving MIDI_SETTING fixture; not mapped to MIDI Settings UI fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving MIDI_SETTING fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 4d 49 44 49 5f 53 45 54 54 49 4e 47
+
+  - name: project.midiSettings.syncIn.clock
+    offset: 0x00a0
+    original: 0x00
+    new: 0x01
+    originalLabel: OFF
+    newLabel: ON
+
+  - name: project.midiSettings.syncIn.transport
+    offset: 0x00a1
+    original: 0x00
+    new: 0x02
+    originalLabel: OFF
+    newLabel: TRANSPORT+SPP
+
+  - name: project.midiSettings.syncOut.transport
+    offset: 0x00a3
+    original: 0x00
+    new: 0x02
+    originalLabel: OFF
+    newLabel: TRANSPORT+SPP
+
+  - name: project.midiSettings.recordNoteChannel
+    offset: 0x00a4
+    original: 0x09
+    new: 0x10
+    originalLabel: "09"
+    newLabel: "16"
+
+  - name: project.midiSettings.recordVelocity
+    offset: 0x00a5
+    original: 0x01
+    new: 0x00
+    originalLabel: ON
+    newLabel: OFF
+
+  - name: project.midiSettings.recordDelayKill
+    offset: 0x00a6
+    original: 0x00
+    new: 0x03
+    originalLabel: NONE
+    newLabel: BOTH
+
+  - name: project.midiSettings.controlMapChannel
+    offset: 0x00a7
+    original: 0x11
+    new: 0x00
+    originalLabel: ALL
+    newLabel: OFF
+
+  - name: project.midiSettings.songRowCueChannel
+    offset: 0x00a8
+    original: 0x0b
+    new: 0x0f
+    originalLabel: "11"
+    newLabel: "15"
+
+  - name: project.midiSettings.trackMidiInput.channels
+    offset: 0x00a9
+    originalBytes: 01 02 03 04 05 06 07 08
+    newBytes: 09 0a 0b 0c 0d 0e 0f 10
+
+  - name: project.midiSettings.trackMidiInput.instruments
+    offset: 0x00b1
+    originalBytes: 00 00 00 00 00 00 00 00
+    newBytes: 7f 7e 7d 7c 7b 7a 79 78
+
+  - name: project.midiSettings.programChange
+    offset: 0x00b9
+    original: 0x01
+    new: 0x00
+    originalLabel: ON
+    newLabel: OFF
+
+  - name: project.midiSettings.mode
+    offset: 0x00ba
+    original: 0x01
+    new: 0x02
+    originalLabel: LEGATO
+    newLabel: POLY

@@ -171,6 +171,11 @@ tools/map-fixture.js \
   fixtures/6.5.x/songs/PROJECT.yaml
 
 tools/map-fixture.js \
+  fixtures/6.5.x/songs/DEFAULT.m8s \
+  fixtures/6.5.x/songs/MIDI_SETTING.m8s \
+  fixtures/6.5.x/songs/MIDI_SETTING.yaml
+
+tools/map-fixture.js \
   fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n \
   fixtures/6.5.x/scales/MODIFIED.m8n \
   fixtures/6.5.x/scales/MODIFIED.yaml
