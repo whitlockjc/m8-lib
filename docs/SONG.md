@@ -2,8 +2,8 @@
 
 Human-readable schema reference for M8 Song files.
 
-This document starts with fields mapped from the Project and MIDI Settings
-pages. Most of the Song body remains preserved as unknown bytes until
+This document starts with fields mapped from the Project, MIDI Settings, and
+MIDI Mapping pages. Most of the Song body remains preserved as unknown bytes until
 additional Song fixtures map those regions.
 
 ## Schema
@@ -29,7 +29,9 @@ Offsets are absolute file offsets.
 | M8 File Header | `0x0000..0x000d` | 14 | [M8 File Header](FILE_HEADER.md) |
 | `unknownBeforeProject` | `0x000e..0x008d` | 128 | unknown bytes |
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
-| `unknownAfterProject` | `0x00bf..0x1b6c5` | 112135 | unknown bytes |
+| `unknownBetweenProjectAndMidiMappings` | `0x00bf..0x1a5fd` | 107839 | unknown bytes |
+| `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
+| `unknownAfterMidiMappings` | `0x1a97e..0x1b6c5` | 3400 | unknown bytes |
 
 ### Project Settings
 
@@ -68,6 +70,7 @@ The verified fixture pair shows:
 | `DEFAULT.m8s` | `DEFAULT` followed by five `0x00` bytes |
 | `PROJECT.m8s` | `PROJECT` followed by five `0x00` bytes |
 | `MIDI_SETTING.m8s` | `MIDI_SETTING` with no padding bytes |
+| `MIDI_MAPPING.m8s` | `MIDI_MAPPING` with no padding bytes |
 
 ### MIDI Settings
 
@@ -166,6 +169,70 @@ The `instrument` value is a reference to an instrument index/number.
 | `0x01` | `LEGATO` |
 | `0x02` | `POLY` |
 
+### MIDI Mappings
+
+Offsets are absolute file offsets.
+
+The M8 supports 128 MIDI Mapping records. The 6.5.x `MIDI_MAPPING.m8s`
+fixture verifies that records start at `0x1a5fe` and that each record is 7
+bytes. The table location, record count, record size, and byte order are
+considered mapped for 6.5.x.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0..127]` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mapping](#midi-mapping) |
+
+### MIDI Mapping
+
+Offsets are relative to the start of a MIDI Mapping record.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `channel` | `+0x00` | 1 | `u1` |
+| `controlNumber` | `+0x01` | 1 | [MIDI Mapping Control Number](#midi-mapping-control-number) |
+| `destinationType` | `+0x02` | 1 | [MIDI Mapping Destination Type](#midi-mapping-destination-type) |
+| `destinationIndex` | `+0x03` | 1 | `u1` |
+| `destinationParameter` | `+0x04` | 1 | `u1` |
+| `minimumValue` | `+0x05` | 1 | `u1` |
+| `maximumValue` | `+0x06` | 1 | `u1` |
+
+Verified populated records:
+
+| Index | Offset / Range | Stored Bytes | UI Label |
+| --- | --- | --- | --- |
+| `0x00` | `0x1a5fe..0x1a604` | `01 00 05 00 04 10 ff` | `I:00:SIZE` |
+| `0x01` | `0x1a605..0x1a60b` | `02 7f 0d 00 00 20 fe` | `M:00:MIX VOL` |
+| `0x02` | `0x1a60c..0x1a612` | `03 80 19 80 07 30 fd` | `Q:MX:MID Q` |
+| `0x03` | `0x1a613..0x1a619` | `04 81 0b 00 09 40 fc` | `X:09:REV SIZE` |
+
+The default Song fixture and unused records in `MIDI_MAPPING.m8s` store empty
+mapping records as seven `0x00` bytes.
+
+### MIDI Mapping Control Number
+
+Observed control-number values:
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `000` |
+| `0x7f` | `127` |
+| `0x80` | `T:X` |
+| `0x81` | `T:Y` |
+
+### MIDI Mapping Destination Type
+
+The raw destination type byte is preserved. The destination label can be
+derived from observed UI labels. Destination index and parameter labels are
+destination-specific and will be expanded when the Mixer, EQ, and Effects pages
+are mapped.
+
+| Stored Value | Label |
+| --- | --- |
+| `0x05` | `I` |
+| `0x0b` | `X` |
+| `0x0d` | `M` |
+| `0x19` | `Q` |
+
 ## Notes
 
 - `tempo` is verified as a 32-bit little-endian float. The fixture changed the
@@ -175,6 +242,17 @@ The `instrument` value is a reference to an instrument index/number.
   Song file. The UI label comes from the referenced embedded Scale name, which
   will be mapped later.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
+- The MIDI Mapping table is verified at `0x1a5fe..0x1a97d`.
+- The `MIDI_MAPPING.m8s` fixture required a chain and Wavsynth instrument so
+  the M8 UI could create an instrument-parameter mapping. Changed bytes for
+  that setup are ignored by the MIDI Mapping manifest until chain and embedded
+  instrument regions are mapped directly.
+- The refreshed `MIDI_MAPPING.m8s` fixture stores the reverb/effects mapping in
+  record `0x03` as `04 81 0b 00 09 40 fc`, verifying the `T:Y` control number,
+  range bytes, and `X:09:REV SIZE` destination.
+- MIDI Mapping destination parameter labels for Mixer, EQ, and Effects are
+  deferred until those pages are mapped. The raw seven-byte record layout is
+  verified independently of those labels.
 - `unknownBeforeProject` changed in the fixture diff, but those changes were
   not mapped to Project UI fields. This region is preserved until targeted Song
   fixtures identify whether it contains save/path state, project state, or other
@@ -192,10 +270,12 @@ The `instrument` value is a reference to an instrument index/number.
 | Project manifest | `fixtures/6.5.x/songs/PROJECT.yaml` |
 | MIDI Settings fixture | `fixtures/6.5.x/songs/MIDI_SETTING.m8s` |
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
+| MIDI Mapping fixture | `fixtures/6.5.x/songs/MIDI_MAPPING.m8s` |
+| MIDI Mapping manifest | `fixtures/6.5.x/songs/MIDI_MAPPING.yaml` |
 | Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
-The manifest-driven mapper matched the Project and MIDI Settings field changes
-exactly. It also accounts for fixture-changed bytes in explicitly ignored
-unknown ranges so page field mapping can be verified without assigning
-unsupported meanings to save/state bytes.
+The manifest-driven mapper matched the Project, MIDI Settings, and MIDI Mapping
+field changes exactly. It also accounts for fixture-changed bytes in explicitly
+ignored unknown ranges so page field mapping can be verified without assigning
+unsupported meanings to save/setup/state bytes.

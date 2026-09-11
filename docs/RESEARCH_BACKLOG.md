@@ -121,6 +121,42 @@ Needed research:
 - Create targeted Song fixtures that change only Sync Out across every UI label.
 - Use those fixtures to verify every clock/transport label combination.
 
+## Song MIDI Mapping Semantic Labels
+
+Status: raw storage mapped; semantic labels deferred
+
+Observation:
+
+- The 6.5.x `MIDI_MAPPING.m8s` fixture verifies a 128-record MIDI Mapping table
+  at `0x1a5fe..0x1a97d`, with each record stored as 7 bytes.
+- The observed populated records map to the UI labels `I:00:SIZE`,
+  `M:00:MIX VOL`, `Q:MX:MID Q`, and `X:09:REV SIZE`.
+- Historical <https://github.com/whitlockjc/m8-js> reference code reads each
+  MIDI Mapping record as channel, control number, type, instrument/index,
+  parameter, minimum value, and maximum value. Current fixture evidence
+  verifies the byte order but not every UI interpretation.
+- The refreshed fixture verifies the reverb/effects mapping as record `0x03`
+  with channel `0x04`, control `T:Y`, minimum `0x40`, and maximum `0xfc`.
+- The refreshed fixture stores the EQ mapping channel as `0x03`.
+
+Implication:
+
+- The Song schema can model MIDI Mapping as a fixed table of raw records. The
+  table location, record count, record size, and byte order are considered
+  complete for the current fixture evidence.
+- Destination type labels are partially understood, including `I`, `M`, `Q`,
+  and `X`, but destination index/parameter interpretation remains
+  destination-specific and provisional.
+- Control-number labels need more evidence beyond the verified `000`, `127`,
+  `T:X`, and `T:Y` values.
+
+Needed research:
+
+- Create fixtures that exercise additional destination types and destination
+  parameter labels after Mixer, EQ, and Effects pages are mapped.
+- Decide whether generated readers should expose the raw 7-byte mapping record
+  directly, or add destination-specific decoded views on top of it.
+
 ## Sampler Sample Path Length
 
 Status: open
