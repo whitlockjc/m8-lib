@@ -49,23 +49,53 @@ Needed research:
 - Confirm whether the M8 UI derives theme names from `.m8t` filenames.
 - Check whether any companion metadata exists outside the portable `.m8t` file.
 
-## Scale Key
+## Scale Key And Project Scale Selector
 
-Status: open
+Status: partially mapped
 
 Observation:
 
 - Scale key is displayed on the Scale Editor UI screen but is stored in the
   Song, not in the Scale file.
+- The Project page `scale` setting is stored in the Song file at `0x00bb` for
+  the 6.5.x `PROJECT.m8s` fixture.
 
 Implication:
 
 - Scale schemas should not include a `key` field.
+- Song schemas should model the Project page `scale` byte as a reference to an
+  embedded Song scale slot. The UI label comes from the embedded Scale name.
 
 Needed research:
 
-- Create Song fixtures that change only the active scale key.
-- Map the stored Song field for scale key once Song settings are researched.
+- Map the embedded Song scale table and verify how `project.scale` indexes or
+  otherwise references it.
+- Create targeted Song fixtures if the Scale Editor `key` value is separate
+  from the Project page `scale` selector.
+
+## Song Project Unknown State
+
+Status: open
+
+Observation:
+
+- The 6.5.x `PROJECT.m8s` fixture maps Project page fields at `0x008e..0x00bc`.
+- The same fixture also changes bytes at `0x001b..0x008d` and
+  `0x00bd..0x00be` that were not part of the intended Project page changes.
+
+Implication:
+
+- The Song schema preserves these regions as unknown/state bytes.
+- Fixture manifests may ignore changed bytes in these ranges so intentional
+  Project field mapping can be verified without inventing unsupported field
+  names.
+
+Needed research:
+
+- Create targeted Song fixtures that isolate save/path/device state from
+  Project page setting changes.
+- Revisit `0x00bd..0x00be` with additional Project fixtures to determine
+  whether those bytes are Project state, derived data, or unrelated save state.
 
 ## Sampler Sample Path Length
 

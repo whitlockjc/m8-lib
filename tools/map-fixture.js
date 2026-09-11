@@ -26,9 +26,9 @@ function parseScalar (value) {
 
 function parseManifest (filePath) {
   const lines = fs.readFileSync(filePath, 'utf8').split(/\r?\n/)
-  const manifest = { changes: [] }
-  let currentChange = null
-  let inChanges = false
+  const manifest = { changes: [], ignoredRanges: [] }
+  let currentItem = null
+  let currentSection = null
 
   for (const [index, line] of lines.entries()) {
     if (!line.trim() || line.trimStart().startsWith('#')) {
@@ -38,29 +38,30 @@ function parseManifest (filePath) {
     const topLevel = /^([A-Za-z][A-Za-z0-9]*):\s*(.*)$/.exec(line)
     if (topLevel && !line.startsWith(' ')) {
       const [, key, value] = topLevel
-      if (key === 'changes') {
-        inChanges = true
+      if (key === 'changes' || key === 'ignoredRanges') {
+        currentSection = key
+        currentItem = null
         continue
       }
       manifest[key] = parseScalar(value)
       continue
     }
 
-    if (!inChanges) {
+    if (!currentSection) {
       throw new Error(`${filePath}:${index + 1}: unsupported manifest line: ${line}`)
     }
 
-    const changeStart = /^  - name:\s*(.+)$/.exec(line)
-    if (changeStart) {
-      currentChange = { name: parseScalar(changeStart[1]) }
-      manifest.changes.push(currentChange)
+    const itemStart = /^  - name:\s*(.+)$/.exec(line)
+    if (itemStart) {
+      currentItem = { name: parseScalar(itemStart[1]) }
+      manifest[currentSection].push(currentItem)
       continue
     }
 
-    const changeField = /^    ([A-Za-z][A-Za-z0-9]*):\s*(.+)$/.exec(line)
-    if (changeField && currentChange) {
-      const [, key, value] = changeField
-      currentChange[key] = parseScalar(value)
+    const itemField = /^    ([A-Za-z][A-Za-z0-9]*):\s*(.+)$/.exec(line)
+    if (itemField && currentItem) {
+      const [, key, value] = itemField
+      currentItem[key] = parseScalar(value)
       continue
     }
 
@@ -168,6 +169,21 @@ function buffersEqualAt (buffer, offset, expected) {
   return true
 }
 
+function ignoredRangeBounds (range) {
+  const offset = range.offset
+  const size = range.size
+
+  if (typeof offset !== 'number') {
+    throw new Error(`${range.name}: ignored range offset must be numeric`)
+  }
+
+  if (typeof size !== 'number' || size < 1) {
+    throw new Error(`${range.name}: ignored range size must be a positive number`)
+  }
+
+  return { offset, endOffset: offset + size - 1 }
+}
+
 function main () {
   const [baselinePath, modifiedPath, manifestPath] = process.argv.slice(2)
 
@@ -187,7 +203,22 @@ function main () {
 
   const changed = new Set(changedOffsets(baseline, modified))
   const accounted = new Set()
+  const ignoredResults = []
   const results = []
+
+  for (const range of manifest.ignoredRanges) {
+    const { offset, endOffset } = ignoredRangeBounds(range)
+    const ignoredChanged = []
+
+    for (let ignoredOffset = offset; ignoredOffset <= endOffset; ignoredOffset++) {
+      if (changed.has(ignoredOffset)) {
+        accounted.add(ignoredOffset)
+        ignoredChanged.push(ignoredOffset)
+      }
+    }
+
+    ignoredResults.push({ range, offset, endOffset, ignoredChanged })
+  }
 
   for (const change of manifest.changes) {
     const originalBytes = valueBytes(change, 'original')
@@ -258,6 +289,19 @@ function main () {
       hexBytes(newBytes),
       status
     ].join('\t'))
+  }
+
+  if (ignoredResults.length > 0) {
+    console.log('')
+    console.log(['ignored_range', 'range', 'changed_bytes'].join('\t'))
+
+    for (const result of ignoredResults) {
+      console.log([
+        result.range.name,
+        hexRange(result.offset, result.endOffset - result.offset + 1),
+        result.ignoredChanged.length
+      ].join('\t'))
+    }
   }
 
   const unaccounted = [...changed].filter((offset) => !accounted.has(offset))

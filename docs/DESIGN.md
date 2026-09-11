@@ -206,6 +206,10 @@ Fixture metadata should let tools discover offsets from byte evidence by
 default. Explicit offset hints are acceptable when duplicate byte transitions
 make a field ambiguous and another fixture or schema finding already
 disambiguates the location.
+Fixture metadata may also identify ignored ranges when bytes change for reasons
+that are outside the fixture's intentional UI changes. Ignored ranges must be
+documented as preserved unknown/state bytes and tracked for later research, not
+treated as known fields.
 
 The first research objective is to map visible M8 UI fields to byte ranges.
 
