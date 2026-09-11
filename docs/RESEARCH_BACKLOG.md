@@ -157,6 +157,34 @@ Needed research:
 - Decide whether generated readers should expose the raw 7-byte mapping record
   directly, or add destination-specific decoded views on top of it.
 
+## Song Mixer DJ Filter Detail
+
+Status: partially mapped
+
+Observation:
+
+- The 6.5.x `MIXER.m8s` fixture verifies the Mixer page storage block at
+  `0x00ce..0x00ed`.
+- `mix`, `limiter`, track volumes, send levels, input levels, `djFilter`, and
+  `ott` are verified.
+- Bytes `0x00e8..0x00ec` did not change in the Mixer fixture and are preserved
+  as `unknownBeforeOtt`.
+- Historical <https://github.com/whitlockjc/m8-js> reference code treats
+  `0x00e8..0x00e9` as DJ filter resonance/type for 3.x and newer.
+
+Implication:
+
+- The Mixer storage block is mapped for byte-level preservation, but the
+  DJ-filter-adjacent bytes should remain semantically unknown until directly
+  verified.
+
+Needed research:
+
+- Create a targeted Mixer fixture that changes any available DJ filter
+  resonance/type controls, if exposed by the M8 UI.
+- Confirm whether `0x00ea..0x00ec` are unused, hidden Mixer state, or related
+  to a page that has not been mapped yet.
+
 ## Sampler Sample Path Length
 
 Status: open

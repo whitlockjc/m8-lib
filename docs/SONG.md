@@ -2,9 +2,9 @@
 
 Human-readable schema reference for M8 Song files.
 
-This document starts with fields mapped from the Project, MIDI Settings, and
-MIDI Mapping pages. Most of the Song body remains preserved as unknown bytes until
-additional Song fixtures map those regions.
+This document starts with fields mapped from the Project, MIDI Settings, Mixer,
+and MIDI Mapping pages. Most of the Song body remains preserved as unknown bytes
+until additional Song fixtures map those regions.
 
 ## Schema
 
@@ -29,7 +29,9 @@ Offsets are absolute file offsets.
 | M8 File Header | `0x0000..0x000d` | 14 | [M8 File Header](FILE_HEADER.md) |
 | `unknownBeforeProject` | `0x000e..0x008d` | 128 | unknown bytes |
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
-| `unknownBetweenProjectAndMidiMappings` | `0x00bf..0x1a5fd` | 107839 | unknown bytes |
+| `unknownBetweenProjectAndMixer` | `0x00bf..0x00cd` | 15 | unknown bytes |
+| `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
+| `unknownBetweenMixerAndMidiMappings` | `0x00ee..0x1a5fd` | 107792 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
 | `unknownAfterMidiMappings` | `0x1a97e..0x1b6c5` | 3400 | unknown bytes |
 
@@ -71,6 +73,7 @@ The verified fixture pair shows:
 | `PROJECT.m8s` | `PROJECT` followed by five `0x00` bytes |
 | `MIDI_SETTING.m8s` | `MIDI_SETTING` with no padding bytes |
 | `MIDI_MAPPING.m8s` | `MIDI_MAPPING` with no padding bytes |
+| `MIXER.m8s` | `MIXER` followed by seven `0x00` bytes |
 
 ### MIDI Settings
 
@@ -169,6 +172,44 @@ The `instrument` value is a reference to an instrument index/number.
 | `0x01` | `LEGATO` |
 | `0x02` | `POLY` |
 
+### Mixer
+
+Offsets are absolute file offsets.
+
+The Mixer page storage starts at `0x00ce`. The storage order does not match the
+visual order of the M8 Mixer page: `mix` and `limiter` are first, followed by
+track volumes, send levels, input levels, `djFilter`, preserved bytes, and
+`ott`.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `mix` | `0x00ce` | 1 | `u1` |
+| `limiter` | `0x00cf` | 1 | `u1` |
+| `tracks` | `0x00d0..0x00d7` | 8 | `u1[8]` |
+| `sends` | `0x00d8..0x00da` | 3 | [Mixer Sends](#mixer-sends) |
+| `analogInput.volume` | `0x00db` | 1 | `u1` |
+| `analogDualMonoInput.volume` | `0x00dc` | 1 | `u1` |
+| `usbInput.volume` | `0x00dd` | 1 | `u1` |
+| `analogInput.sends` | `0x00de..0x00e0` | 3 | [Mixer Sends](#mixer-sends) |
+| `analogDualMonoInput.sends` | `0x00e1..0x00e3` | 3 | [Mixer Sends](#mixer-sends) |
+| `usbInput.sends` | `0x00e4..0x00e6` | 3 | [Mixer Sends](#mixer-sends) |
+| `djFilter` | `0x00e7` | 1 | `u1` |
+| `unknownBeforeOtt` | `0x00e8..0x00ec` | 5 | unknown bytes |
+| `ott` | `0x00ed` | 1 | `u1` |
+
+The default fixture stores `0xff` for `analogDualMonoInput.volume`. The M8 UI
+displays this as unset until dual mono input is enabled.
+
+### Mixer Sends
+
+Offsets are relative to the start of a Mixer send group.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `modFx` | `+0x00` | 1 | `u1` |
+| `delay` | `+0x01` | 1 | `u1` |
+| `reverb` | `+0x02` | 1 | `u1` |
+
 ### MIDI Mappings
 
 Offsets are absolute file offsets.
@@ -242,6 +283,11 @@ are mapped.
   Song file. The UI label comes from the referenced embedded Scale name, which
   will be mapped later.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
+- The Mixer block is verified at `0x00ce..0x00ed`.
+- `unknownBeforeOtt` is preserved. Historical
+  <https://github.com/whitlockjc/m8-js> reference code treats the first two
+  bytes in this region as DJ filter resonance/type for 3.x and newer, but the
+  current Mixer fixture did not change them.
 - The MIDI Mapping table is verified at `0x1a5fe..0x1a97d`.
 - The `MIDI_MAPPING.m8s` fixture required a chain and Wavsynth instrument so
   the M8 UI could create an instrument-parameter mapping. Changed bytes for
@@ -270,12 +316,14 @@ are mapped.
 | Project manifest | `fixtures/6.5.x/songs/PROJECT.yaml` |
 | MIDI Settings fixture | `fixtures/6.5.x/songs/MIDI_SETTING.m8s` |
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
+| Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
+| Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
 | MIDI Mapping fixture | `fixtures/6.5.x/songs/MIDI_MAPPING.m8s` |
 | MIDI Mapping manifest | `fixtures/6.5.x/songs/MIDI_MAPPING.yaml` |
 | Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
-The manifest-driven mapper matched the Project, MIDI Settings, and MIDI Mapping
-field changes exactly. It also accounts for fixture-changed bytes in explicitly
-ignored unknown ranges so page field mapping can be verified without assigning
-unsupported meanings to save/setup/state bytes.
+The manifest-driven mapper matched the Project, MIDI Settings, Mixer, and MIDI
+Mapping field changes exactly. It also accounts for fixture-changed bytes in
+explicitly ignored unknown ranges so page field mapping can be verified without
+assigning unsupported meanings to save/setup/state bytes.

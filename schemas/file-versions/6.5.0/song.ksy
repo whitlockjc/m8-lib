@@ -6,10 +6,10 @@ meta:
 doc: |
   Body schema for song files with header schema version 6.5.0.
 
-  Initial schema verified against M8 6.5.2C Project, MIDI Settings, and MIDI
-  Mapping page fixtures. The Project settings and MIDI Mapping regions are
-  partially mapped. Remaining Song regions are preserved as raw bytes until
-  future fixtures provide evidence for their layout.
+  Initial schema verified against M8 6.5.2C Project, MIDI Settings, Mixer, and
+  MIDI Mapping page fixtures. The Project settings, Mixer, and MIDI Mapping
+  regions are partially mapped. Remaining Song regions are preserved as raw
+  bytes until future fixtures provide evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -19,13 +19,18 @@ seq:
       not mapped to Project UI fields yet.
   - id: project
     type: project_settings
-  - id: unknown_between_project_and_midi_mappings
-    size: 107839
+  - id: unknown_between_project_and_mixer
+    size: 15
+    doc: Preserved bytes between Project settings and Mixer settings.
+  - id: mixer
+    type: mixer_settings
+  - id: unknown_between_mixer_and_midi_mappings
+    size: 107792
     doc: |
-      Preserved bytes between the mapped Project settings region and the MIDI
-      Mapping table. The MIDI_MAPPING fixture changes bytes in this region to
-      set up a required chain and Wavsynth instrument; those changes are not
-      mapped by this Song schema yet.
+      Preserved bytes between Mixer settings and the MIDI Mapping table. The
+      MIDI_MAPPING fixture changes bytes in this region to set up a required
+      chain and Wavsynth instrument; those changes are not mapped by this Song
+      schema yet.
   - id: midi_mappings
     type: midi_mappings
   - id: unknown_after_midi_mappings
@@ -133,6 +138,55 @@ types:
       - id: sync_out_transport
         type: u1
         enum: midi_sync_transport
+  mixer_settings:
+    doc: |
+      Mixer page storage. Offsets are relative to absolute file offset 0x00ce
+      in 6.5.x fixtures.
+    seq:
+      - id: mix
+        type: u1
+      - id: limiter
+        type: u1
+      - id: track_volumes
+        type: u1
+        repeat: expr
+        repeat-expr: 8
+      - id: sends
+        type: mixer_sends
+      - id: analog_input_volume
+        type: u1
+      - id: analog_dual_mono_input_volume
+        type: u1
+        doc: |
+          Default fixture stores 0xff. The M8 UI displays this as unset until
+          dual mono input is enabled.
+      - id: usb_input_volume
+        type: u1
+      - id: analog_input_sends
+        type: mixer_sends
+      - id: analog_dual_mono_input_sends
+        type: mixer_sends
+      - id: usb_input_sends
+        type: mixer_sends
+      - id: dj_filter
+        type: u1
+      - id: unknown_before_ott
+        size: 5
+        doc: |
+          Preserved bytes between dj_filter and ott. Historical m8-js reference
+          code treats the first two bytes in this region as DJ filter
+          resonance/type for 3.x and newer, but the current Mixer fixture did
+          not change them.
+      - id: ott
+        type: u1
+  mixer_sends:
+    seq:
+      - id: mod_fx
+        type: u1
+      - id: delay
+        type: u1
+      - id: reverb
+        type: u1
   midi_mappings:
     doc: |
       MIDI Mapping page storage. Offsets are relative to absolute file offset
