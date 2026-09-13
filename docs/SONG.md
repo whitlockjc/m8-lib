@@ -3,9 +3,9 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Mixer,
-Mix & Limiter Scope, Mix EQ, and MIDI Mapping pages. Most of the Song body
-remains preserved as unknown bytes until additional Song fixtures map those
-regions.
+Effects Settings, Mix & Limiter Scope, Mix EQ, and MIDI Mapping pages. Most of
+the Song body remains preserved as unknown bytes until additional Song fixtures
+map those regions.
 
 ## Schema
 
@@ -32,9 +32,9 @@ Offsets are absolute file offsets.
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
 | `unknownBetweenProjectAndMixer` | `0x00bf..0x00cd` | 15 | unknown bytes |
 | `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
-| `unknownBetweenMixerAndMixLimiterScope` | `0x00ee..0x1a5d7` | 107754 | unknown bytes |
-| `mixLimiterScope` | `0x1a5d8..0x1a5d9` | 2 | [Mix & Limiter Scope](#mix--limiter-scope) |
-| `unknownBetweenMixLimiterScopeAndMidiMappings` | `0x1a5da..0x1a5fd` | 36 | unknown bytes |
+| `unknownBetweenMixerAndEffectsAndScope` | `0x00ee..0x1a5bd` | 107728 | unknown bytes |
+| `effectsAndScope` | `0x1a5be..0x1a5da` | 29 | [Effects & Scope Storage](#effects--scope-storage) |
+| `unknownBetweenEffectsAndScopeAndMidiMappings` | `0x1a5db..0x1a5fd` | 35 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
 | `unknownBetweenMidiMappingsAndMixEq` | `0x1a97e..0x1b65d` | 3296 | unknown bytes |
 | `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
@@ -78,6 +78,7 @@ The verified fixture pair shows:
 | `PROJECT.m8s` | `PROJECT` followed by five `0x00` bytes |
 | `MIDI_SETTING.m8s` | `MIDI_SETTING` with no padding bytes |
 | `MIDI_MAPPING.m8s` | `MIDI_MAPPING` with no padding bytes |
+| `EFFECTS.m8s` | `EFFECTS` followed by five `0x00` bytes |
 | `MIXER.m8s` | `MIXER` followed by seven `0x00` bytes |
 | `MIX_EQ.m8s` | `MIX_EQ` followed by six `0x00` bytes |
 | `MIX_SCOPE.m8s` | `MIX_SCOPE` followed by three `0x00` bytes |
@@ -238,13 +239,85 @@ remaining values as shown below.
 | `0x01` | `LOWPASS:BANDSTOP` |
 | `0x02` | `BANDPASS:HIGHPASS` |
 
+### Effects & Scope Storage
+
+Offsets are absolute file offsets.
+
+The Effects Settings and Mix & Limiter Scope detail bytes share one contiguous
+storage region. The storage order does not fully match the UI grouping:
+`modFx.type` is stored after the Mix & Limiter Scope `ottTime` and `ottColor`
+bytes.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `unknownBeforeModFx` | `0x1a5be..0x1a5c0` | 3 | unknown bytes |
+| `effects.modFx` | `0x1a5c1..0x1a5c4` | 4 | [Mod FX Settings](#mod-fx-settings) |
+| `unknownBetweenModFxAndDelay` | `0x1a5c5..0x1a5c9` | 5 | unknown bytes |
+| `effects.delay` | `0x1a5ca..0x1a5ce` | 5 | [Delay Settings](#delay-settings) |
+| `unknownBetweenDelayAndReverb` | `0x1a5cf..0x1a5d1` | 3 | unknown bytes |
+| `effects.reverb` | `0x1a5d2..0x1a5d7` | 6 | [Reverb Settings](#reverb-settings) |
+| `mixLimiterScope` | `0x1a5d8..0x1a5d9` | 2 | [Mix & Limiter Scope](#mix--limiter-scope) |
+| `effects.modFx.type` | `0x1a5da` | 1 | [Mod FX Type](#mod-fx-type) |
+
+### Effects Settings
+
+The Effects Settings fields are stored inside
+[Effects & Scope Storage](#effects--scope-storage).
+
+### Mod FX Settings
+
+Offsets are absolute file offsets. `modFx.type` is stored separately at
+`0x1a5da`.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `depth` | `0x1a5c1` | 1 | `u1` |
+| `frequency` | `0x1a5c2` | 1 | `u1` |
+| `width` | `0x1a5c3` | 1 | `u1` |
+| `reverbSend` | `0x1a5c4` | 1 | `u1` |
+
+### Mod FX Type
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `CHORUS` |
+| `0x01` | `PHASER` |
+| `0x02` | `FLANGER` |
+
+### Delay Settings
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `time.left` | `0x1a5ca` | 1 | `u1` |
+| `time.right` | `0x1a5cb` | 1 | `u1` |
+| `feedback` | `0x1a5cc` | 1 | `u1` |
+| `width` | `0x1a5cd` | 1 | `u1` |
+| `reverbSend` | `0x1a5ce` | 1 | `u1` |
+
+### Reverb Settings
+
+Offsets are absolute file offsets. The fixture verifies that `shimmer` is
+stored after `width`.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `roomSize` | `0x1a5d2` | 1 | `u1` |
+| `decay` | `0x1a5d3` | 1 | `u1` |
+| `depth` | `0x1a5d4` | 1 | `u1` |
+| `frequency` | `0x1a5d5` | 1 | `u1` |
+| `width` | `0x1a5d6` | 1 | `u1` |
+| `shimmer` | `0x1a5d7` | 1 | `u1` |
+
 ### Mix & Limiter Scope
 
 Offsets are absolute file offsets.
 
 The Mix & Limiter Scope View stores most observed controls in the Mixer block.
-The separate Mix & Limiter Scope block currently contains OTT detail controls.
-The `MIX_SCOPE.m8s` and `LIMIT_SCOPE.m8s` fixtures both verify these offsets.
+The `ottTime` and `ottColor` detail bytes are stored inside
+[Effects & Scope Storage](#effects--scope-storage). The `MIX_SCOPE.m8s` and
+`LIMIT_SCOPE.m8s` fixtures both verify these offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
@@ -394,6 +467,8 @@ are mapped.
   will be mapped later.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
 - The Mixer block is verified at `0x00ce..0x00ed`.
+- The Effects Settings fields are verified in the shared Effects & Scope
+  storage region at `0x1a5c1..0x1a5da`.
 - The Mix & Limiter Scope OTT detail block is verified at
   `0x1a5d8..0x1a5d9`.
 - The Mix EQ block is verified at `0x1b65e..0x1b66f`.
@@ -414,6 +489,11 @@ are mapped.
 - MIDI Mapping destination parameter labels for Mixer, Mix EQ, and Effects are
   not fully modeled yet. The raw seven-byte record layout is verified
   independently of those labels.
+- Effect-adjacent gaps at `0x1a5be..0x1a5c0`, `0x1a5c5..0x1a5c9`, and
+  `0x1a5cf..0x1a5d1` are preserved. Historical
+  <https://github.com/whitlockjc/m8-js> reference code suggests some of these
+  bytes may contain Delay or Reverb filter storage, but that is not
+  fixture-verified for 6.5.x yet.
 - `unknownBeforeProject` changed in the fixture diff, but those changes were
   not mapped to Project UI fields. This region is preserved until targeted Song
   fixtures identify whether it contains save/path state, project state, or other
@@ -433,6 +513,8 @@ are mapped.
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
+| Effects Settings fixture | `fixtures/6.5.x/songs/EFFECTS.m8s` |
+| Effects Settings manifest | `fixtures/6.5.x/songs/EFFECTS.yaml` |
 | Mix & Limiter Scope fixture (`MIX_SCOPE`) | `fixtures/6.5.x/songs/MIX_SCOPE.m8s` |
 | Mix & Limiter Scope manifest (`MIX_SCOPE`) | `fixtures/6.5.x/songs/MIX_SCOPE.yaml` |
 | Mix & Limiter Scope fixture (`LIMIT_SCOPE`) | `fixtures/6.5.x/songs/LIMIT_SCOPE.m8s` |
@@ -444,8 +526,8 @@ are mapped.
 | Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
-The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Mix &
-Limiter Scope, Mix EQ, and MIDI Mapping field changes exactly. It also
-accounts for fixture-changed bytes in explicitly ignored unknown ranges so page
-field mapping can be verified without assigning unsupported meanings to
+The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Effects
+Settings, Mix & Limiter Scope, Mix EQ, and MIDI Mapping field changes exactly.
+It also accounts for fixture-changed bytes in explicitly ignored unknown ranges
+so page field mapping can be verified without assigning unsupported meanings to
 save/setup/state bytes.

@@ -192,6 +192,34 @@ Needed research:
 - If future evidence shows zoom is stored in Song files, create multiple
   fixtures with distinct zoom values to identify the encoding.
 
+## Song Effects Filter Bytes
+
+Status: open
+
+Observation:
+
+- The 6.5.x `EFFECTS.m8s` fixture verifies Effects Settings fields in the
+  shared Effects & Scope storage region at `0x1a5c1..0x1a5da`.
+- The regions `0x1a5be..0x1a5c0`, `0x1a5c5..0x1a5c9`, and
+  `0x1a5cf..0x1a5d1` sit adjacent to verified Effects fields but are not
+  changed by the current fixture.
+- Historical <https://github.com/whitlockjc/m8-js> reference code suggests some
+  adjacent bytes may store Delay or Reverb filter settings.
+
+Implication:
+
+- These bytes should remain preserved unknown bytes in the raw schema until
+  fixture evidence verifies their meaning.
+- The current Effects Settings schema should not expose Delay or Reverb filter
+  fields yet.
+
+Needed research:
+
+- Create targeted Effects Settings fixtures if the 6.5.x UI exposes Delay or
+  Reverb filter controls.
+- If those controls moved, use current-version fixtures to determine whether
+  these bytes are obsolete preserved state, hidden state, or renamed controls.
+
 ## Sampler Sample Path Length
 
 Status: open

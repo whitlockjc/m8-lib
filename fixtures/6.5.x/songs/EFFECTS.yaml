@@ -1,0 +1,109 @@
+fileType: song
+firmware: 6.5.2C
+screen: mixer.effects
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving EFFECTS fixture; not mapped to Effects Settings UI fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving EFFECTS fixture; Project UI meaning is unknown
+  - name: songSetup.chainAndInstrumentState
+    offset: 0x9a5e
+    size: 0xa036
+    reason: fixture contains setup state unrelated to Effects Settings field mapping
+  - name: midiMappings.setup
+    offset: 0x1a5fe
+    size: 0x001c
+    reason: fixture contains MIDI Mapping records unrelated to Effects Settings field mapping
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 45 46 46 45 43 54 53 00 00 00 00 00
+
+  - name: effects.modFx.depth
+    offset: 0x1a5c1
+    original: 0x40
+    new: 0xff
+
+  - name: effects.modFx.frequency
+    offset: 0x1a5c2
+    original: 0x80
+    new: 0xfe
+
+  - name: effects.modFx.width
+    offset: 0x1a5c3
+    original: 0xff
+    new: 0xfd
+
+  - name: effects.modFx.reverbSend
+    offset: 0x1a5c4
+    original: 0x00
+    new: 0xfc
+
+  - name: effects.delay.time.left
+    offset: 0x1a5ca
+    original: 0x30
+    new: 0xfb
+
+  - name: effects.delay.time.right
+    offset: 0x1a5cb
+    original: 0x30
+    new: 0xfa
+
+  - name: effects.delay.feedback
+    offset: 0x1a5cc
+    original: 0x80
+    new: 0xf9
+
+  - name: effects.delay.width
+    offset: 0x1a5cd
+    original: 0xff
+    new: 0xf8
+
+  - name: effects.delay.reverbSend
+    offset: 0x1a5ce
+    original: 0x00
+    new: 0xf7
+
+  - name: effects.reverb.roomSize
+    offset: 0x1a5d2
+    original: 0xff
+    new: 0xf6
+
+  - name: effects.reverb.decay
+    offset: 0x1a5d3
+    original: 0xc0
+    new: 0xf5
+
+  - name: effects.reverb.depth
+    offset: 0x1a5d4
+    original: 0x10
+    new: 0xf3
+
+  - name: effects.reverb.frequency
+    offset: 0x1a5d5
+    original: 0xff
+    new: 0xf2
+
+  - name: effects.reverb.width
+    offset: 0x1a5d6
+    original: 0xff
+    new: 0xf1
+
+  - name: effects.reverb.shimmer
+    offset: 0x1a5d7
+    original: 0x00
+    new: 0xf4
+
+  - name: effects.modFx.type
+    offset: 0x1a5da
+    original: 0x00
+    new: 0x02
+    originalLabel: CHORUS
+    newLabel: FLANGER
