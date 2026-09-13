@@ -3,8 +3,8 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Mixer,
-Mix EQ, and MIDI Mapping pages. Most of the Song body remains preserved as
-unknown bytes until additional Song fixtures map those regions.
+Mix Scope, Mix EQ, and MIDI Mapping pages. Most of the Song body remains
+preserved as unknown bytes until additional Song fixtures map those regions.
 
 ## Schema
 
@@ -31,7 +31,9 @@ Offsets are absolute file offsets.
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
 | `unknownBetweenProjectAndMixer` | `0x00bf..0x00cd` | 15 | unknown bytes |
 | `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
-| `unknownBetweenMixerAndMidiMappings` | `0x00ee..0x1a5fd` | 107792 | unknown bytes |
+| `unknownBetweenMixerAndMixScope` | `0x00ee..0x1a5d7` | 107754 | unknown bytes |
+| `mixScope` | `0x1a5d8..0x1a5d9` | 2 | [Mix Scope](#mix-scope) |
+| `unknownBetweenMixScopeAndMidiMappings` | `0x1a5da..0x1a5fd` | 36 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
 | `unknownBetweenMidiMappingsAndMixEq` | `0x1a97e..0x1b65d` | 3296 | unknown bytes |
 | `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
@@ -77,6 +79,7 @@ The verified fixture pair shows:
 | `MIDI_MAPPING.m8s` | `MIDI_MAPPING` with no padding bytes |
 | `MIXER.m8s` | `MIXER` followed by seven `0x00` bytes |
 | `MIX_EQ.m8s` | `MIX_EQ` followed by six `0x00` bytes |
+| `MIX_SCOPE.m8s` | `MIX_SCOPE` followed by three `0x00` bytes |
 
 ### MIDI Settings
 
@@ -179,10 +182,14 @@ The `instrument` value is a reference to an instrument index/number.
 
 Offsets are absolute file offsets.
 
-The Mixer page storage starts at `0x00ce`. The storage order does not match the
+The Mixer storage starts at `0x00ce`. The storage order does not match the
 visual order of the M8 Mixer page: `mix` and `limiter` are first, followed by
-track volumes, send levels, input levels, `djFilter`, preserved bytes, and
-`ott`.
+track volumes, send levels, input levels, `djFilter`, DJ filter detail,
+limiter detail, `softClip`, and `ott`.
+
+The Limiter & Mix Scope View reuses this storage for `mix`, `limiter`,
+`djFilter`, `djFilterResonance`, `djFilterType`, `limiterAttack`,
+`limiterRelease`, `softClip`, and `ott`.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
@@ -197,7 +204,11 @@ track volumes, send levels, input levels, `djFilter`, preserved bytes, and
 | `analogDualMonoInput.sends` | `0x00e1..0x00e3` | 3 | [Mixer Sends](#mixer-sends) |
 | `usbInput.sends` | `0x00e4..0x00e6` | 3 | [Mixer Sends](#mixer-sends) |
 | `djFilter` | `0x00e7` | 1 | `u1` |
-| `unknownBeforeOtt` | `0x00e8..0x00ec` | 5 | unknown bytes |
+| `djFilterResonance` | `0x00e8` | 1 | `u1` |
+| `djFilterType` | `0x00e9` | 1 | [DJ Filter Type](#dj-filter-type) |
+| `limiterAttack` | `0x00ea` | 1 | `u1` |
+| `limiterRelease` | `0x00eb` | 1 | `u1` |
+| `softClip` | `0x00ec` | 1 | [Boolean](#boolean) |
 | `ott` | `0x00ed` | 1 | `u1` |
 
 The default fixture stores `0xff` for `analogDualMonoInput.volume`. The M8 UI
@@ -212,6 +223,30 @@ Offsets are relative to the start of a Mixer send group.
 | `modFx` | `+0x00` | 1 | `u1` |
 | `delay` | `+0x01` | 1 | `u1` |
 | `reverb` | `+0x02` | 1 | `u1` |
+
+### DJ Filter Type
+
+The Mix Scope fixture verifies `0x02` for `BANDPASS:HIGHPASS`. Historical
+<https://github.com/whitlockjc/m8-js> reference code labels the remaining
+values as shown below.
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `LOWPASS:HIGHPASS` |
+| `0x01` | `LOWPASS:BANDSTOP` |
+| `0x02` | `BANDPASS:HIGHPASS` |
+
+### Mix Scope
+
+Offsets are absolute file offsets.
+
+The Limiter & Mix Scope View stores most observed controls in the Mixer block.
+The separate Mix Scope block currently contains OTT detail controls.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `ottTime` | `0x1a5d8` | 1 | `u1` |
+| `ottColor` | `0x1a5d9` | 1 | `u1` |
 
 ### Mix EQ
 
@@ -356,11 +391,13 @@ are mapped.
   will be mapped later.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
 - The Mixer block is verified at `0x00ce..0x00ed`.
+- The Mix Scope OTT detail block is verified at `0x1a5d8..0x1a5d9`.
 - The Mix EQ block is verified at `0x1b65e..0x1b66f`.
-- `unknownBeforeOtt` is preserved. Historical
-  <https://github.com/whitlockjc/m8-js> reference code treats the first two
-  bytes in this region as DJ filter resonance/type for 3.x and newer, but the
-  current Mixer fixture did not change them.
+- The Mix Scope fixture changed `zoom` from `-30DB` to `-1DB`, but no Song
+  byte is named for it. A temporary zoom-only fixture changed
+  `project.unknownTrailingState` while leaving mapped Mixer, Mix Scope, and Mix
+  EQ bytes unchanged. The zoom setting may be stored as global UI state rather
+  than Song data.
 - The MIDI Mapping table is verified at `0x1a5fe..0x1a97d`.
 - The `MIDI_MAPPING.m8s` fixture required a chain and Wavsynth instrument so
   the M8 UI could create an instrument-parameter mapping. Changed bytes for
@@ -391,6 +428,8 @@ are mapped.
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
+| Mix Scope fixture | `fixtures/6.5.x/songs/MIX_SCOPE.m8s` |
+| Mix Scope manifest | `fixtures/6.5.x/songs/MIX_SCOPE.yaml` |
 | Mix EQ fixture | `fixtures/6.5.x/songs/MIX_EQ.m8s` |
 | Mix EQ manifest | `fixtures/6.5.x/songs/MIX_EQ.yaml` |
 | MIDI Mapping fixture | `fixtures/6.5.x/songs/MIDI_MAPPING.m8s` |
@@ -398,7 +437,8 @@ are mapped.
 | Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
-The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Mix EQ,
-and MIDI Mapping field changes exactly. It also accounts for fixture-changed
-bytes in explicitly ignored unknown ranges so page field mapping can be verified
-without assigning unsupported meanings to save/setup/state bytes.
+The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Mix
+Scope, Mix EQ, and MIDI Mapping field changes exactly. It also accounts for
+fixture-changed bytes in explicitly ignored unknown ranges so page field mapping
+can be verified without assigning unsupported meanings to save/setup/state
+bytes.

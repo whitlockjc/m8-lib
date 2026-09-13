@@ -7,10 +7,10 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Mixer, Mix
-  EQ, and MIDI Mapping page fixtures. The Project settings, Mixer, Mix EQ, and
-  MIDI Mapping regions are partially mapped. Remaining Song regions are
-  preserved as raw bytes until future fixtures provide evidence for their
-  layout.
+  Scope, Mix EQ, and MIDI Mapping page fixtures. The Project settings, Mixer,
+  Mix Scope, Mix EQ, and MIDI Mapping regions are partially mapped. Remaining
+  Song regions are preserved as raw bytes until future fixtures provide
+  evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -25,13 +25,18 @@ seq:
     doc: Preserved bytes between Project settings and Mixer settings.
   - id: mixer
     type: mixer_settings
-  - id: unknown_between_mixer_and_midi_mappings
-    size: 107792
+  - id: unknown_between_mixer_and_mix_scope
+    size: 107754
     doc: |
-      Preserved bytes between Mixer settings and the MIDI Mapping table. The
+      Preserved bytes between Mixer settings and the Mix Scope storage. The
       MIDI_MAPPING fixture changes bytes in this region to set up a required
       chain and Wavsynth instrument; those changes are not mapped by this Song
       schema yet.
+  - id: mix_scope
+    type: mix_scope_settings
+  - id: unknown_between_mix_scope_and_midi_mappings
+    size: 36
+    doc: Preserved bytes between Mix Scope storage and the MIDI Mapping table.
   - id: midi_mappings
     type: midi_mappings
   - id: unknown_between_midi_mappings_and_mix_eq
@@ -146,8 +151,8 @@ types:
         enum: midi_sync_transport
   mixer_settings:
     doc: |
-      Mixer page storage. Offsets are relative to absolute file offset 0x00ce
-      in 6.5.x fixtures.
+      Mixer and Limiter & Mix Scope storage. Offsets are relative to absolute
+      file offset 0x00ce in 6.5.x fixtures.
     seq:
       - id: mix
         type: u1
@@ -176,14 +181,30 @@ types:
         type: mixer_sends
       - id: dj_filter
         type: u1
-      - id: unknown_before_ott
-        size: 5
+      - id: dj_filter_resonance
+        type: u1
+      - id: dj_filter_type
+        type: u1
+        enum: dj_filter_type
+      - id: limiter_attack
+        type: u1
+      - id: limiter_release
+        type: u1
+      - id: soft_clip
+        type: u1
         doc: |
-          Preserved bytes between dj_filter and ott. Historical m8-js reference
-          code treats the first two bytes in this region as DJ filter
-          resonance/type for 3.x and newer, but the current Mixer fixture did
-          not change them.
+          Observed values: 0x00 means OFF, 0x01 means ON.
       - id: ott
+        type: u1
+  mix_scope_settings:
+    doc: |
+      Mix Scope storage for OTT detail controls from the Limiter & Mix Scope
+      View. Offsets are relative to absolute file offset 0x1a5d8 in 6.5.x
+      fixtures.
+    seq:
+      - id: ott_time
+        type: u1
+      - id: ott_color
         type: u1
   mixer_sends:
     seq:
@@ -267,6 +288,16 @@ types:
         value: type_and_mode >> 5
         enum: mix_eq_filter_mode
 enums:
+  dj_filter_type:
+    0x00:
+      id: lowpass_highpass
+      -label: LOWPASS:HIGHPASS
+    0x01:
+      id: lowpass_bandstop
+      -label: LOWPASS:BANDSTOP
+    0x02:
+      id: bandpass_highpass
+      -label: BANDPASS:HIGHPASS
   mix_eq_filter_type:
     0x00:
       id: lowcut

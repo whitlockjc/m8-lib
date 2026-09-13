@@ -1,0 +1,78 @@
+fileType: song
+firmware: 6.5.2C
+screen: mixer.mixScope
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving MIX_SCOPE fixture; not mapped to Mix Scope UI fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving MIX_SCOPE fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 4d 49 58 5f 53 43 4f 50 45 00 00 00
+
+  - name: mixer.mix
+    offset: 0x00ce
+    original: 0xe0
+    new: 0xff
+
+  - name: mixer.limiter
+    offset: 0x00cf
+    original: 0x00
+    new: 0xfe
+
+  - name: mixer.djFilter
+    offset: 0x00e7
+    original: 0x80
+    new: 0xfa
+
+  - name: mixer.djFilterResonance
+    offset: 0x00e8
+    original: 0x00
+    new: 0xf9
+
+  - name: mixer.djFilterType
+    offset: 0x00e9
+    original: 0x00
+    new: 0x02
+    originalLabel: LOWPASS:HIGHPASS
+    newLabel: BANDPASS:HIGHPASS
+
+  - name: mixer.limiterAttack
+    offset: 0x00ea
+    original: 0x00
+    new: 0xfc
+
+  - name: mixer.limiterRelease
+    offset: 0x00eb
+    original: 0x10
+    new: 0xfb
+
+  - name: mixer.softClip
+    offset: 0x00ec
+    original: 0x00
+    new: 0x01
+    originalLabel: OFF
+    newLabel: ON
+
+  - name: mixer.ott
+    offset: 0x00ed
+    original: 0x00
+    new: 0xf8
+
+  - name: mixScope.ottTime
+    offset: 0x1a5d8
+    original: 0x80
+    new: 0xf7
+
+  - name: mixScope.ottColor
+    offset: 0x1a5d9
+    original: 0x80
+    new: 0xf6

@@ -157,33 +157,36 @@ Needed research:
 - Decide whether generated readers should expose the raw 7-byte mapping record
   directly, or add destination-specific decoded views on top of it.
 
-## Song Mixer DJ Filter Detail
+## Song Mix Scope Zoom
 
-Status: partially mapped
+Status: open
 
 Observation:
 
-- The 6.5.x `MIXER.m8s` fixture verifies the Mixer page storage block at
-  `0x00ce..0x00ed`.
-- `mix`, `limiter`, track volumes, send levels, input levels, `djFilter`, and
-  `ott` are verified.
-- Bytes `0x00e8..0x00ec` did not change in the Mixer fixture and are preserved
-  as `unknownBeforeOtt`.
-- Historical <https://github.com/whitlockjc/m8-js> reference code treats
-  `0x00e8..0x00e9` as DJ filter resonance/type for 3.x and newer.
+- The 6.5.x `MIX_SCOPE.m8s` fixture changed Mix Scope zoom from `-30DB` to
+  `-1DB`.
+- The same fixture verifies `mix`, `limiter`, `djFilter`,
+  `djFilterResonance`, `djFilterType`, `limiterAttack`, `limiterRelease`,
+  `softClip`, `ott`, `ottTime`, and `ottColor`.
+- The fixture also changes save/state bytes before Project settings and one
+  byte in `project.unknownTrailingState`.
+- A temporary `MS_ZOOM.m8s` fixture changed only zoom from `-30DB` to `-47DB`
+  while keeping Mix Scope controls at defaults. It changed the Project name,
+  save/state bytes, and `project.unknownTrailingState`, but left the mapped
+  Mixer, Mix Scope, and Mix EQ regions identical to `DEFAULT.m8s`.
 
 Implication:
 
-- The Mixer storage block is mapped for byte-level preservation, but the
-  DJ-filter-adjacent bytes should remain semantically unknown until directly
-  verified.
+- The schema should not name a `zoom` field yet. Current evidence suggests
+  zoom may be global UI state rather than Song data, or otherwise stored in an
+  unrelated state region that has not been identified.
 
 Needed research:
 
-- Create a targeted Mixer fixture that changes any available DJ filter
-  resonance/type controls, if exposed by the M8 UI.
-- Confirm whether `0x00ea..0x00ec` are unused, hidden Mixer state, or related
-  to a page that has not been mapped yet.
+- Check whether Mix Scope zoom persists through files outside the Song format,
+  such as System state files.
+- If future evidence shows zoom is stored in Song files, create multiple
+  fixtures with distinct zoom values to identify the encoding.
 
 ## Sampler Sample Path Length
 
