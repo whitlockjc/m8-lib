@@ -7,11 +7,11 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Mixer,
-  Effects Settings, Mix & Limiter Scope, Mix EQ, and MIDI Mapping page
+  Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, and MIDI Mapping page
   fixtures. The Project settings, Mixer, Effects Settings, Mix & Limiter
-  Scope, Mix EQ, and MIDI Mapping regions are partially mapped. Remaining Song
-  regions are preserved as raw bytes until future fixtures provide evidence for
-  their layout.
+  Scope, Mix EQ, ModFX EQ, and MIDI Mapping regions are partially mapped.
+  Remaining Song regions are preserved as raw bytes until future fixtures
+  provide evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -46,8 +46,10 @@ seq:
     size: 3296
     doc: Preserved bytes between the MIDI Mapping table and Mix EQ settings.
   - id: mix_eq
-    type: mix_eq_settings
-  - id: unknown_after_mix_eq
+    type: eq_settings
+  - id: mod_fx_eq
+    type: eq_settings
+  - id: unknown_after_mod_fx_eq
     size-eos: true
 types:
   project_settings:
@@ -333,23 +335,23 @@ types:
         type: u1
       - id: maximum_value
         type: u1
-  mix_eq_settings:
+  eq_settings:
     doc: |
-      Mix EQ storage for the master EQ navigated to from the Mixer page.
-      Offsets are relative to absolute file offset 0x1b65e in 6.5.x fixtures.
+      Three-band EQ storage. Each known EQ uses three adjacent 6-byte band
+      records.
     seq:
       - id: low_band
-        type: mix_eq_band
+        type: eq_band
       - id: mid_band
-        type: mix_eq_band
+        type: eq_band
       - id: high_band
-        type: mix_eq_band
-  mix_eq_band:
+        type: eq_band
+  eq_band:
     doc: |
-      Six-byte Mix EQ band record. The type and mode are packed into one byte:
-      bits 0..4 hold the filter type and bits 5..7 hold the filter mode.
-      Frequency is stored as an unsigned little-endian integer. Gain is stored
-      as signed hundredths, so 10.50 is stored as 1050.
+      Six-byte EQ band record. The type and mode are packed into one byte: bits
+      0..4 hold the filter type and bits 5..7 hold the filter mode. Frequency
+      is stored as an unsigned little-endian integer. Gain is stored as signed
+      hundredths, so 10.50 is stored as 1050.
     seq:
       - id: type_and_mode
         type: u1
@@ -362,10 +364,10 @@ types:
     instances:
       filter_type:
         value: type_and_mode & 0x1f
-        enum: mix_eq_filter_type
+        enum: eq_filter_type
       filter_mode:
         value: type_and_mode >> 5
-        enum: mix_eq_filter_mode
+        enum: eq_filter_mode
 enums:
   mod_fx_type:
     0x00:
@@ -387,7 +389,7 @@ enums:
     0x02:
       id: bandpass_highpass
       -label: BANDPASS:HIGHPASS
-  mix_eq_filter_type:
+  eq_filter_type:
     0x00:
       id: lowcut
       -label: LOWCUT
@@ -409,7 +411,7 @@ enums:
     0x06:
       id: allpass
       -label: ALLPASS
-  mix_eq_filter_mode:
+  eq_filter_mode:
     0x00:
       id: stereo
       -label: STEREO
