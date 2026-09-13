@@ -3,8 +3,9 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Mixer,
-Mix Scope, Mix EQ, and MIDI Mapping pages. Most of the Song body remains
-preserved as unknown bytes until additional Song fixtures map those regions.
+Mix & Limiter Scope, Mix EQ, and MIDI Mapping pages. Most of the Song body
+remains preserved as unknown bytes until additional Song fixtures map those
+regions.
 
 ## Schema
 
@@ -31,9 +32,9 @@ Offsets are absolute file offsets.
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
 | `unknownBetweenProjectAndMixer` | `0x00bf..0x00cd` | 15 | unknown bytes |
 | `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
-| `unknownBetweenMixerAndMixScope` | `0x00ee..0x1a5d7` | 107754 | unknown bytes |
-| `mixScope` | `0x1a5d8..0x1a5d9` | 2 | [Mix Scope](#mix-scope) |
-| `unknownBetweenMixScopeAndMidiMappings` | `0x1a5da..0x1a5fd` | 36 | unknown bytes |
+| `unknownBetweenMixerAndMixLimiterScope` | `0x00ee..0x1a5d7` | 107754 | unknown bytes |
+| `mixLimiterScope` | `0x1a5d8..0x1a5d9` | 2 | [Mix & Limiter Scope](#mix--limiter-scope) |
+| `unknownBetweenMixLimiterScopeAndMidiMappings` | `0x1a5da..0x1a5fd` | 36 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
 | `unknownBetweenMidiMappingsAndMixEq` | `0x1a97e..0x1b65d` | 3296 | unknown bytes |
 | `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
@@ -80,6 +81,7 @@ The verified fixture pair shows:
 | `MIXER.m8s` | `MIXER` followed by seven `0x00` bytes |
 | `MIX_EQ.m8s` | `MIX_EQ` followed by six `0x00` bytes |
 | `MIX_SCOPE.m8s` | `MIX_SCOPE` followed by three `0x00` bytes |
+| `LIMIT_SCOPE.m8s` | `LIMIT_SCOPE` followed by one `0x00` byte |
 
 ### MIDI Settings
 
@@ -187,7 +189,7 @@ visual order of the M8 Mixer page: `mix` and `limiter` are first, followed by
 track volumes, send levels, input levels, `djFilter`, DJ filter detail,
 limiter detail, `softClip`, and `ott`.
 
-The Limiter & Mix Scope View reuses this storage for `mix`, `limiter`,
+The Mix & Limiter Scope View reuses this storage for `mix`, `limiter`,
 `djFilter`, `djFilterResonance`, `djFilterType`, `limiterAttack`,
 `limiterRelease`, `softClip`, and `ott`.
 
@@ -226,9 +228,9 @@ Offsets are relative to the start of a Mixer send group.
 
 ### DJ Filter Type
 
-The Mix Scope fixture verifies `0x02` for `BANDPASS:HIGHPASS`. Historical
-<https://github.com/whitlockjc/m8-js> reference code labels the remaining
-values as shown below.
+The Mix & Limiter Scope fixtures verify `0x02` for `BANDPASS:HIGHPASS`.
+Historical <https://github.com/whitlockjc/m8-js> reference code labels the
+remaining values as shown below.
 
 | Stored Value | Label |
 | --- | --- |
@@ -236,12 +238,13 @@ values as shown below.
 | `0x01` | `LOWPASS:BANDSTOP` |
 | `0x02` | `BANDPASS:HIGHPASS` |
 
-### Mix Scope
+### Mix & Limiter Scope
 
 Offsets are absolute file offsets.
 
-The Limiter & Mix Scope View stores most observed controls in the Mixer block.
-The separate Mix Scope block currently contains OTT detail controls.
+The Mix & Limiter Scope View stores most observed controls in the Mixer block.
+The separate Mix & Limiter Scope block currently contains OTT detail controls.
+The `MIX_SCOPE.m8s` and `LIMIT_SCOPE.m8s` fixtures both verify these offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
@@ -391,13 +394,15 @@ are mapped.
   will be mapped later.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
 - The Mixer block is verified at `0x00ce..0x00ed`.
-- The Mix Scope OTT detail block is verified at `0x1a5d8..0x1a5d9`.
+- The Mix & Limiter Scope OTT detail block is verified at
+  `0x1a5d8..0x1a5d9`.
 - The Mix EQ block is verified at `0x1b65e..0x1b66f`.
-- The Mix Scope fixture changed `zoom` from `-30DB` to `-1DB`, but no Song
+- The `MIX_SCOPE.m8s` fixture changed `zoom` from `-30DB` to `-1DB`, but no Song
   byte is named for it. A temporary zoom-only fixture changed
-  `project.unknownTrailingState` while leaving mapped Mixer, Mix Scope, and Mix
-  EQ bytes unchanged. The zoom setting may be stored as global UI state rather
-  than Song data.
+  `project.unknownTrailingState` while leaving mapped Mixer, Mix & Limiter
+  Scope, and Mix EQ bytes unchanged. The `LIMIT_SCOPE.m8s` fixture left zoom at
+  its `-30DB` default and still changed `project.unknownTrailingState`. The
+  zoom setting may be stored as global UI state rather than Song data.
 - The MIDI Mapping table is verified at `0x1a5fe..0x1a97d`.
 - The `MIDI_MAPPING.m8s` fixture required a chain and Wavsynth instrument so
   the M8 UI could create an instrument-parameter mapping. Changed bytes for
@@ -428,8 +433,10 @@ are mapped.
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
-| Mix Scope fixture | `fixtures/6.5.x/songs/MIX_SCOPE.m8s` |
-| Mix Scope manifest | `fixtures/6.5.x/songs/MIX_SCOPE.yaml` |
+| Mix & Limiter Scope fixture (`MIX_SCOPE`) | `fixtures/6.5.x/songs/MIX_SCOPE.m8s` |
+| Mix & Limiter Scope manifest (`MIX_SCOPE`) | `fixtures/6.5.x/songs/MIX_SCOPE.yaml` |
+| Mix & Limiter Scope fixture (`LIMIT_SCOPE`) | `fixtures/6.5.x/songs/LIMIT_SCOPE.m8s` |
+| Mix & Limiter Scope manifest (`LIMIT_SCOPE`) | `fixtures/6.5.x/songs/LIMIT_SCOPE.yaml` |
 | Mix EQ fixture | `fixtures/6.5.x/songs/MIX_EQ.m8s` |
 | Mix EQ manifest | `fixtures/6.5.x/songs/MIX_EQ.yaml` |
 | MIDI Mapping fixture | `fixtures/6.5.x/songs/MIDI_MAPPING.m8s` |
@@ -437,8 +444,8 @@ are mapped.
 | Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
-The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Mix
-Scope, Mix EQ, and MIDI Mapping field changes exactly. It also accounts for
-fixture-changed bytes in explicitly ignored unknown ranges so page field mapping
-can be verified without assigning unsupported meanings to save/setup/state
-bytes.
+The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Mix &
+Limiter Scope, Mix EQ, and MIDI Mapping field changes exactly. It also
+accounts for fixture-changed bytes in explicitly ignored unknown ranges so page
+field mapping can be verified without assigning unsupported meanings to
+save/setup/state bytes.

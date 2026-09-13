@@ -157,23 +157,27 @@ Needed research:
 - Decide whether generated readers should expose the raw 7-byte mapping record
   directly, or add destination-specific decoded views on top of it.
 
-## Song Mix Scope Zoom
+## Song Mix & Limiter Scope Zoom
 
 Status: open
 
 Observation:
 
-- The 6.5.x `MIX_SCOPE.m8s` fixture changed Mix Scope zoom from `-30DB` to
-  `-1DB`.
+- The 6.5.x `MIX_SCOPE.m8s` fixture changed Mix & Limiter Scope zoom from
+  `-30DB` to `-1DB`.
 - The same fixture verifies `mix`, `limiter`, `djFilter`,
   `djFilterResonance`, `djFilterType`, `limiterAttack`, `limiterRelease`,
   `softClip`, `ott`, `ottTime`, and `ottColor`.
 - The fixture also changes save/state bytes before Project settings and one
   byte in `project.unknownTrailingState`.
+- The 6.5.x `LIMIT_SCOPE.m8s` fixture left zoom at its default `-30DB` value
+  while changing the same Mix & Limiter Scope values. It still changed
+  `project.unknownTrailingState`.
 - A temporary `MS_ZOOM.m8s` fixture changed only zoom from `-30DB` to `-47DB`
-  while keeping Mix Scope controls at defaults. It changed the Project name,
-  save/state bytes, and `project.unknownTrailingState`, but left the mapped
-  Mixer, Mix Scope, and Mix EQ regions identical to `DEFAULT.m8s`.
+  while keeping Mix & Limiter Scope controls at defaults. It changed the
+  Project name, save/state bytes, and `project.unknownTrailingState`, but left
+  the mapped Mixer, Mix & Limiter Scope, and Mix EQ regions identical to
+  `DEFAULT.m8s`.
 
 Implication:
 
@@ -183,8 +187,8 @@ Implication:
 
 Needed research:
 
-- Check whether Mix Scope zoom persists through files outside the Song format,
-  such as System state files.
+- Check whether Mix & Limiter Scope zoom persists through files outside the Song
+  format, such as System state files.
 - If future evidence shows zoom is stored in Song files, create multiple
   fixtures with distinct zoom values to identify the encoding.
 
