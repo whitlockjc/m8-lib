@@ -3,8 +3,8 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Mixer,
-and MIDI Mapping pages. Most of the Song body remains preserved as unknown bytes
-until additional Song fixtures map those regions.
+Mix EQ, and MIDI Mapping pages. Most of the Song body remains preserved as
+unknown bytes until additional Song fixtures map those regions.
 
 ## Schema
 
@@ -33,7 +33,9 @@ Offsets are absolute file offsets.
 | `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
 | `unknownBetweenMixerAndMidiMappings` | `0x00ee..0x1a5fd` | 107792 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
-| `unknownAfterMidiMappings` | `0x1a97e..0x1b6c5` | 3400 | unknown bytes |
+| `unknownBetweenMidiMappingsAndMixEq` | `0x1a97e..0x1b65d` | 3296 | unknown bytes |
+| `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
+| `unknownAfterMixEq` | `0x1b670..0x1b6c5` | 86 | unknown bytes |
 
 ### Project Settings
 
@@ -74,6 +76,7 @@ The verified fixture pair shows:
 | `MIDI_SETTING.m8s` | `MIDI_SETTING` with no padding bytes |
 | `MIDI_MAPPING.m8s` | `MIDI_MAPPING` with no padding bytes |
 | `MIXER.m8s` | `MIXER` followed by seven `0x00` bytes |
+| `MIX_EQ.m8s` | `MIX_EQ` followed by six `0x00` bytes |
 
 ### MIDI Settings
 
@@ -210,6 +213,75 @@ Offsets are relative to the start of a Mixer send group.
 | `delay` | `+0x01` | 1 | `u1` |
 | `reverb` | `+0x02` | 1 | `u1` |
 
+### Mix EQ
+
+Offsets are absolute file offsets.
+
+The Mix EQ page is the master EQ navigated to from the Mixer page. It stores
+three adjacent 6-byte band records.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `lowBand` | `0x1b65e..0x1b663` | 6 | [Mix EQ Band](#mix-eq-band) |
+| `midBand` | `0x1b664..0x1b669` | 6 | [Mix EQ Band](#mix-eq-band) |
+| `highBand` | `0x1b66a..0x1b66f` | 6 | [Mix EQ Band](#mix-eq-band) |
+
+### Mix EQ Band
+
+Offsets are relative to the start of a Mix EQ band.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `typeAndMode` | `+0x00` | 1 | [Mix EQ Type/Mode](#mix-eq-typemode) |
+| `frequency` | `+0x01..+0x02` | 2 | `u2le` |
+| `gain` | `+0x03..+0x04` | 2 | `i2le` |
+| `q` | `+0x05` | 1 | `u1` |
+
+`gain` is stored as signed hundredths. For example, `-40.00` is stored as
+`-4000`, `10.50` is stored as `1050`, and `40.00` is stored as `4000`.
+
+### Mix EQ Type/Mode
+
+The band filter type and mode are packed into one byte:
+
+| Bits | Meaning |
+| --- | --- |
+| `0..4` | [Mix EQ Filter Type](#mix-eq-filter-type) |
+| `5..7` | [Mix EQ Filter Mode](#mix-eq-filter-mode) |
+
+Verified packed values:
+
+| Band | Stored Value | Type | Mode |
+| --- | --- | --- | --- |
+| `lowBand` default | `0x01` | `LOWSHELF` | `STEREO` |
+| `lowBand` modified | `0x20` | `LOWCUT` | `MID` |
+| `midBand` default | `0x02` | `BELL` | `STEREO` |
+| `midBand` modified | `0x63` | `BANDPASS` | `LEFT` |
+| `highBand` default | `0x04` | `HI.SHELF` | `STEREO` |
+| `highBand` modified | `0x86` | `ALLPASS` | `RIGHT` |
+
+### Mix EQ Filter Type
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `LOWCUT` |
+| `0x01` | `LOWSHELF` |
+| `0x02` | `BELL` |
+| `0x03` | `BANDPASS` |
+| `0x04` | `HI.SHELF` |
+| `0x05` | `HI.CUT` |
+| `0x06` | `ALLPASS` |
+
+### Mix EQ Filter Mode
+
+| Stored Value | Label |
+| --- | --- |
+| `0x00` | `STEREO` |
+| `0x01` | `MID` |
+| `0x02` | `SIDE` |
+| `0x03` | `LEFT` |
+| `0x04` | `RIGHT` |
+
 ### MIDI Mappings
 
 Offsets are absolute file offsets.
@@ -284,6 +356,7 @@ are mapped.
   will be mapped later.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
 - The Mixer block is verified at `0x00ce..0x00ed`.
+- The Mix EQ block is verified at `0x1b65e..0x1b66f`.
 - `unknownBeforeOtt` is preserved. Historical
   <https://github.com/whitlockjc/m8-js> reference code treats the first two
   bytes in this region as DJ filter resonance/type for 3.x and newer, but the
@@ -296,9 +369,9 @@ are mapped.
 - The refreshed `MIDI_MAPPING.m8s` fixture stores the reverb/effects mapping in
   record `0x03` as `04 81 0b 00 09 40 fc`, verifying the `T:Y` control number,
   range bytes, and `X:09:REV SIZE` destination.
-- MIDI Mapping destination parameter labels for Mixer, EQ, and Effects are
-  deferred until those pages are mapped. The raw seven-byte record layout is
-  verified independently of those labels.
+- MIDI Mapping destination parameter labels for Mixer, Mix EQ, and Effects are
+  not fully modeled yet. The raw seven-byte record layout is verified
+  independently of those labels.
 - `unknownBeforeProject` changed in the fixture diff, but those changes were
   not mapped to Project UI fields. This region is preserved until targeted Song
   fixtures identify whether it contains save/path state, project state, or other
@@ -318,12 +391,14 @@ are mapped.
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
+| Mix EQ fixture | `fixtures/6.5.x/songs/MIX_EQ.m8s` |
+| Mix EQ manifest | `fixtures/6.5.x/songs/MIX_EQ.yaml` |
 | MIDI Mapping fixture | `fixtures/6.5.x/songs/MIDI_MAPPING.m8s` |
 | MIDI Mapping manifest | `fixtures/6.5.x/songs/MIDI_MAPPING.yaml` |
 | Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
-The manifest-driven mapper matched the Project, MIDI Settings, Mixer, and MIDI
-Mapping field changes exactly. It also accounts for fixture-changed bytes in
-explicitly ignored unknown ranges so page field mapping can be verified without
-assigning unsupported meanings to save/setup/state bytes.
+The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Mix EQ,
+and MIDI Mapping field changes exactly. It also accounts for fixture-changed
+bytes in explicitly ignored unknown ranges so page field mapping can be verified
+without assigning unsupported meanings to save/setup/state bytes.

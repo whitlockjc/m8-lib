@@ -6,10 +6,11 @@ meta:
 doc: |
   Body schema for song files with header schema version 6.5.0.
 
-  Initial schema verified against M8 6.5.2C Project, MIDI Settings, Mixer, and
-  MIDI Mapping page fixtures. The Project settings, Mixer, and MIDI Mapping
-  regions are partially mapped. Remaining Song regions are preserved as raw
-  bytes until future fixtures provide evidence for their layout.
+  Initial schema verified against M8 6.5.2C Project, MIDI Settings, Mixer, Mix
+  EQ, and MIDI Mapping page fixtures. The Project settings, Mixer, Mix EQ, and
+  MIDI Mapping regions are partially mapped. Remaining Song regions are
+  preserved as raw bytes until future fixtures provide evidence for their
+  layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -33,7 +34,12 @@ seq:
       schema yet.
   - id: midi_mappings
     type: midi_mappings
-  - id: unknown_after_midi_mappings
+  - id: unknown_between_midi_mappings_and_mix_eq
+    size: 3296
+    doc: Preserved bytes between the MIDI Mapping table and Mix EQ settings.
+  - id: mix_eq
+    type: mix_eq_settings
+  - id: unknown_after_mix_eq
     size-eos: true
 types:
   project_settings:
@@ -227,7 +233,78 @@ types:
         type: u1
       - id: maximum_value
         type: u1
+  mix_eq_settings:
+    doc: |
+      Mix EQ storage for the master EQ navigated to from the Mixer page.
+      Offsets are relative to absolute file offset 0x1b65e in 6.5.x fixtures.
+    seq:
+      - id: low_band
+        type: mix_eq_band
+      - id: mid_band
+        type: mix_eq_band
+      - id: high_band
+        type: mix_eq_band
+  mix_eq_band:
+    doc: |
+      Six-byte Mix EQ band record. The type and mode are packed into one byte:
+      bits 0..4 hold the filter type and bits 5..7 hold the filter mode.
+      Frequency is stored as an unsigned little-endian integer. Gain is stored
+      as signed hundredths, so 10.50 is stored as 1050.
+    seq:
+      - id: type_and_mode
+        type: u1
+      - id: frequency
+        type: u2
+      - id: gain
+        type: s2
+      - id: q
+        type: u1
+    instances:
+      filter_type:
+        value: type_and_mode & 0x1f
+        enum: mix_eq_filter_type
+      filter_mode:
+        value: type_and_mode >> 5
+        enum: mix_eq_filter_mode
 enums:
+  mix_eq_filter_type:
+    0x00:
+      id: lowcut
+      -label: LOWCUT
+    0x01:
+      id: lowshelf
+      -label: LOWSHELF
+    0x02:
+      id: bell
+      -label: BELL
+    0x03:
+      id: bandpass
+      -label: BANDPASS
+    0x04:
+      id: hi_shelf
+      -label: HI.SHELF
+    0x05:
+      id: hi_cut
+      -label: HI.CUT
+    0x06:
+      id: allpass
+      -label: ALLPASS
+  mix_eq_filter_mode:
+    0x00:
+      id: stereo
+      -label: STEREO
+    0x01:
+      id: mid
+      -label: MID
+    0x02:
+      id: side
+      -label: SIDE
+    0x03:
+      id: left
+      -label: LEFT
+    0x04:
+      id: right
+      -label: RIGHT
   midi_mapping_destination_type:
     0x05:
       id: instrument
