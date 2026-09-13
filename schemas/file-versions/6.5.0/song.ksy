@@ -7,11 +7,12 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Mixer,
-  Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, and MIDI
-  Mapping page fixtures. The Project settings, Mixer, Effects Settings, Mix &
-  Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, and MIDI Mapping regions are
-  partially mapped. Remaining Song regions are preserved as raw bytes until
-  future fixtures provide evidence for their layout.
+  Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ,
+  and MIDI Mapping page fixtures. The Project settings, Mixer, Effects
+  Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and
+  MIDI Mapping regions are partially mapped. Remaining Song regions are
+  preserved as raw bytes until future fixtures provide evidence for their
+  layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -51,7 +52,9 @@ seq:
     type: eq_settings
   - id: delay_eq
     type: eq_settings
-  - id: unknown_after_delay_eq
+  - id: reverb_eq
+    type: eq_settings
+  - id: unknown_after_reverb_eq
     size-eos: true
 types:
   project_settings:

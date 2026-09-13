@@ -1,0 +1,94 @@
+fileType: song
+firmware: 6.5.2C
+screen: mixer.effects.reverbEq
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving REVERB_EQ fixture; not mapped to Reverb EQ UI fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving REVERB_EQ fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 52 45 56 45 52 42 5f 45 51 00 00 00
+
+  - name: reverbEq.lowBand.typeAndMode
+    offset: 0x1b694
+    original: 0x00
+    new: 0x22
+    originalLabel: LOWCUT/STEREO
+    newLabel: BELL/MID
+
+  - name: reverbEq.lowBand.frequency
+    offset: 0x1b695
+    type: u2le
+    original: 200
+    new: 346
+
+  - name: reverbEq.lowBand.gain
+    offset: 0x1b697
+    type: i2le
+    original: 0
+    new: 500
+    scale: hundredths
+
+  - name: reverbEq.lowBand.q
+    offset: 0x1b699
+    original: 0x32
+    new: 0x2d
+
+  - name: reverbEq.midBand.typeAndMode
+    offset: 0x1b69a
+    original: 0x02
+    new: 0x44
+    originalLabel: BELL/STEREO
+    newLabel: HI.SHELF/SIDE
+
+  - name: reverbEq.midBand.frequency
+    offset: 0x1b69b
+    type: u2le
+    original: 1000
+    new: 1758
+
+  - name: reverbEq.midBand.gain
+    offset: 0x1b69d
+    type: i2le
+    original: 0
+    new: 1000
+    scale: hundredths
+
+  - name: reverbEq.midBand.q
+    offset: 0x1b69f
+    original: 0x32
+    new: 0x3c
+
+  - name: reverbEq.highBand.typeAndMode
+    offset: 0x1b6a0
+    original: 0x05
+    new: 0x66
+    originalLabel: HI.CUT/STEREO
+    newLabel: ALLPASS/LEFT
+
+  - name: reverbEq.highBand.frequency
+    offset: 0x1b6a1
+    type: u2le
+    original: 8800
+    new: 9263
+
+  - name: reverbEq.highBand.gain
+    offset: 0x1b6a3
+    type: i2le
+    original: 0
+    new: -500
+    scale: hundredths
+
+  - name: reverbEq.highBand.q
+    offset: 0x1b6a5
+    original: 0x32
+    new: 0x37

@@ -3,9 +3,9 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Mixer,
-Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, and MIDI
-Mapping pages. Most of the Song body remains preserved as unknown bytes until
-additional Song fixtures map those regions.
+Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ,
+and MIDI Mapping pages. Most of the Song body remains preserved as unknown
+bytes until additional Song fixtures map those regions.
 
 ## Schema
 
@@ -40,7 +40,8 @@ Offsets are absolute file offsets.
 | `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
 | `modFxEq` | `0x1b670..0x1b681` | 18 | [ModFX EQ](#modfx-eq) |
 | `delayEq` | `0x1b682..0x1b693` | 18 | [Delay EQ](#delay-eq) |
-| `unknownAfterDelayEq` | `0x1b694..0x1b6c5` | 50 | unknown bytes |
+| `reverbEq` | `0x1b694..0x1b6a5` | 18 | [Reverb EQ](#reverb-eq) |
+| `unknownAfterReverbEq` | `0x1b6a6..0x1b6c5` | 32 | unknown bytes |
 
 ### Project Settings
 
@@ -83,6 +84,7 @@ The verified fixture pair shows:
 | `EFFECTS.m8s` | `EFFECTS` followed by five `0x00` bytes |
 | `MODFX_EQ.m8s` | `MODFX_EQ` followed by four `0x00` bytes |
 | `DELAY_EQ.m8s` | `DELAY_EQ` followed by four `0x00` bytes |
+| `REVERB_EQ.m8s` | `REVERB_EQ` followed by three `0x00` bytes |
 | `MIXER.m8s` | `MIXER` followed by seven `0x00` bytes |
 | `MIX_EQ.m8s` | `MIX_EQ` followed by six `0x00` bytes |
 | `MIX_SCOPE.m8s` | `MIX_SCOPE` followed by three `0x00` bytes |
@@ -368,6 +370,19 @@ The Delay EQ page stores three adjacent 6-byte band records using the common
 | `midBand` | `0x1b688..0x1b68d` | 6 | [EQ Band](#eq-band) |
 | `highBand` | `0x1b68e..0x1b693` | 6 | [EQ Band](#eq-band) |
 
+### Reverb EQ
+
+Offsets are absolute file offsets.
+
+The Reverb EQ page stores three adjacent 6-byte band records using the common
+[EQ Band](#eq-band) layout.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `lowBand` | `0x1b694..0x1b699` | 6 | [EQ Band](#eq-band) |
+| `midBand` | `0x1b69a..0x1b69f` | 6 | [EQ Band](#eq-band) |
+| `highBand` | `0x1b6a0..0x1b6a5` | 6 | [EQ Band](#eq-band) |
+
 ### EQ Band
 
 Offsets are relative to the start of an EQ band.
@@ -413,6 +428,12 @@ Verified packed values:
 | `delayEq.midBand` modified | `0x61` | `LOWSHELF` | `LEFT` |
 | `delayEq.highBand` default | `0x05` | `HI.CUT` | `STEREO` |
 | `delayEq.highBand` modified | `0x24` | `HI.SHELF` | `MID` |
+| `reverbEq.lowBand` default | `0x00` | `LOWCUT` | `STEREO` |
+| `reverbEq.lowBand` modified | `0x22` | `BELL` | `MID` |
+| `reverbEq.midBand` default | `0x02` | `BELL` | `STEREO` |
+| `reverbEq.midBand` modified | `0x44` | `HI.SHELF` | `SIDE` |
+| `reverbEq.highBand` default | `0x05` | `HI.CUT` | `STEREO` |
+| `reverbEq.highBand` modified | `0x66` | `ALLPASS` | `LEFT` |
 
 ### EQ Filter Type
 
@@ -522,6 +543,7 @@ are mapped.
 - The Delay EQ block is verified at `0x1b682..0x1b693`.
 - The `DELAY_EQ.m8s` fixture verifies `delayEq.highBand.typeAndMode` as
   `0x05 -> 0x24`, which maps to `HI.CUT/STEREO -> HI.SHELF/MID`.
+- The Reverb EQ block is verified at `0x1b694..0x1b6a5`.
 - The `MIX_SCOPE.m8s` fixture changed `zoom` from `-30DB` to `-1DB`, but no Song
   byte is named for it. A temporary zoom-only fixture changed
   `project.unknownTrailingState` while leaving mapped Mixer, Mix & Limiter
@@ -575,13 +597,15 @@ are mapped.
 | ModFX EQ manifest | `fixtures/6.5.x/songs/MODFX_EQ.yaml` |
 | Delay EQ fixture | `fixtures/6.5.x/songs/DELAY_EQ.m8s` |
 | Delay EQ manifest | `fixtures/6.5.x/songs/DELAY_EQ.yaml` |
+| Reverb EQ fixture | `fixtures/6.5.x/songs/REVERB_EQ.m8s` |
+| Reverb EQ manifest | `fixtures/6.5.x/songs/REVERB_EQ.yaml` |
 | MIDI Mapping fixture | `fixtures/6.5.x/songs/MIDI_MAPPING.m8s` |
 | MIDI Mapping manifest | `fixtures/6.5.x/songs/MIDI_MAPPING.yaml` |
 | Manual | <https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699> |
 | Verification command | `npm run verify` |
 
 The manifest-driven mapper matched the Project, MIDI Settings, Mixer, Effects
-Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, and MIDI Mapping
-field changes exactly. It also accounts for fixture-changed bytes in explicitly
-ignored unknown ranges so page field mapping can be verified without assigning
-unsupported meanings to save/setup/state bytes.
+Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI
+Mapping field changes exactly. It also accounts for fixture-changed bytes in
+explicitly ignored unknown ranges so page field mapping can be verified without
+assigning unsupported meanings to save/setup/state bytes.
