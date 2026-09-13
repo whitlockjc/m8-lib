@@ -1,0 +1,94 @@
+fileType: song
+firmware: 6.5.2C
+screen: mixer.effects.delayEq
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving DELAY_EQ fixture; not mapped to Delay EQ UI fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving DELAY_EQ fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 44 45 4c 41 59 5f 45 51 00 00 00 00
+
+  - name: delayEq.lowBand.typeAndMode
+    offset: 0x1b682
+    original: 0x00
+    new: 0x22
+    originalLabel: LOWCUT/STEREO
+    newLabel: BELL/MID
+
+  - name: delayEq.lowBand.frequency
+    offset: 0x1b683
+    type: u2le
+    original: 500
+    new: 533
+
+  - name: delayEq.lowBand.gain
+    offset: 0x1b685
+    type: i2le
+    original: 0
+    new: 575
+    scale: hundredths
+
+  - name: delayEq.lowBand.q
+    offset: 0x1b687
+    original: 0x32
+    new: 0x37
+
+  - name: delayEq.midBand.typeAndMode
+    offset: 0x1b688
+    original: 0x02
+    new: 0x61
+    originalLabel: BELL/STEREO
+    newLabel: LOWSHELF/LEFT
+
+  - name: delayEq.midBand.frequency
+    offset: 0x1b689
+    type: u2le
+    original: 1000
+    new: 837
+
+  - name: delayEq.midBand.gain
+    offset: 0x1b68b
+    type: i2le
+    original: 0
+    new: -325
+    scale: hundredths
+
+  - name: delayEq.midBand.q
+    offset: 0x1b68d
+    original: 0x32
+    new: 0x1d
+
+  - name: delayEq.highBand.typeAndMode
+    offset: 0x1b68e
+    original: 0x05
+    new: 0x24
+    originalLabel: HI.CUT/STEREO
+    newLabel: HI.SHELF/MID
+
+  - name: delayEq.highBand.frequency
+    offset: 0x1b68f
+    type: u2le
+    original: 10000
+    new: 8165
+
+  - name: delayEq.highBand.gain
+    offset: 0x1b691
+    type: i2le
+    original: 0
+    new: 600
+    scale: hundredths
+
+  - name: delayEq.highBand.q
+    offset: 0x1b693
+    original: 0x32
+    new: 0x3f

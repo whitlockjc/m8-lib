@@ -207,6 +207,11 @@ tools/map-fixture.js \
 
 tools/map-fixture.js \
   fixtures/6.5.x/songs/DEFAULT.m8s \
+  fixtures/6.5.x/songs/DELAY_EQ.m8s \
+  fixtures/6.5.x/songs/DELAY_EQ.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/songs/DEFAULT.m8s \
   fixtures/6.5.x/songs/MIDI_MAPPING.m8s \
   fixtures/6.5.x/songs/MIDI_MAPPING.yaml
 
