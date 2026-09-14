@@ -1,0 +1,99 @@
+fileType: song
+firmware: 6.5.2C
+screen: song
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving SONG_ROWS fixture; not mapped to Song View UI fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving SONG_ROWS fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 53 4f 4e 47 5f 52 4f 57 53 00 00 00
+
+  - name: rows[0].track1
+    offset: 0x02ee
+    original: 0xff
+    new: 0x01
+
+  - name: rows[0].track2
+    offset: 0x02ef
+    original: 0xff
+    new: 0x02
+
+  - name: rows[0].track3
+    offset: 0x02f0
+    original: 0xff
+    new: 0x03
+
+  - name: rows[0].track4
+    offset: 0x02f1
+    original: 0xff
+    new: 0x04
+
+  - name: rows[0].track5
+    offset: 0x02f2
+    original: 0xff
+    new: 0x05
+
+  - name: rows[0].track6
+    offset: 0x02f3
+    original: 0xff
+    new: 0x06
+
+  - name: rows[0].track7
+    offset: 0x02f4
+    original: 0xff
+    new: 0x07
+
+  - name: rows[0].track8
+    offset: 0x02f5
+    original: 0xff
+    new: 0x08
+
+  - name: rows[255].track1
+    offset: 0x0ae6
+    original: 0xff
+    new: 0xf7
+
+  - name: rows[255].track2
+    offset: 0x0ae7
+    original: 0xff
+    new: 0xf8
+
+  - name: rows[255].track3
+    offset: 0x0ae8
+    original: 0xff
+    new: 0xf9
+
+  - name: rows[255].track4
+    offset: 0x0ae9
+    original: 0xff
+    new: 0xfa
+
+  - name: rows[255].track5
+    offset: 0x0aea
+    original: 0xff
+    new: 0xfb
+
+  - name: rows[255].track6
+    offset: 0x0aeb
+    original: 0xff
+    new: 0xfc
+
+  - name: rows[255].track7
+    offset: 0x0aec
+    original: 0xff
+    new: 0xfd
+
+  - name: rows[255].track8
+    offset: 0x0aed
+    original: 0xff
+    new: 0xfe

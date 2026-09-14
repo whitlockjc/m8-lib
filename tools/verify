@@ -177,6 +177,11 @@ tools/map-fixture.js \
 
 tools/map-fixture.js \
   fixtures/6.5.x/songs/DEFAULT.m8s \
+  fixtures/6.5.x/songs/SONG_ROWS.m8s \
+  fixtures/6.5.x/songs/SONG_ROWS.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/songs/DEFAULT.m8s \
   fixtures/6.5.x/songs/MIXER.m8s \
   fixtures/6.5.x/songs/MIXER.yaml
 

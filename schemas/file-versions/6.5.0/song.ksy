@@ -6,13 +6,13 @@ meta:
 doc: |
   Body schema for song files with header schema version 6.5.0.
 
-  Initial schema verified against M8 6.5.2C Project, MIDI Settings, Mixer,
-  Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ,
-  and MIDI Mapping page fixtures. The Project settings, Mixer, Effects
-  Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and
-  MIDI Mapping regions are partially mapped. Remaining Song regions are
-  preserved as raw bytes until future fixtures provide evidence for their
-  layout.
+  Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
+  Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ,
+  Reverb EQ, and MIDI Mapping page fixtures. The Project settings, MIDI
+  Settings, Song rows, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ,
+  ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping regions are partially mapped.
+  Remaining Song regions are preserved as raw bytes until future fixtures
+  provide evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -27,13 +27,18 @@ seq:
     doc: Preserved bytes between Project settings and Mixer settings.
   - id: mixer
     type: mixer_settings
-  - id: unknown_between_mixer_and_effects_and_scope
-    size: 107728
+  - id: unknown_between_mixer_and_rows
+    size: 512
+    doc: Preserved bytes between Mixer settings and Song rows.
+  - id: rows
+    type: song_rows
+  - id: unknown_between_rows_and_effects_and_scope
+    size: 105168
     doc: |
-      Preserved bytes between Mixer settings and the Effects/Mix & Limiter
-      Scope storage. The MIDI_MAPPING fixture changes bytes in this region to
-      set up a required chain and Wavsynth instrument; those changes are not
-      mapped by this Song schema yet.
+      Preserved bytes between Song rows and the Effects/Mix & Limiter Scope
+      storage. The MIDI_MAPPING fixture changes bytes in this region to set up
+      a required chain and Wavsynth instrument; those changes are not mapped by
+      this Song schema yet.
   - id: effects_and_scope
     type: effects_and_scope_settings
   - id: unknown_between_effects_and_scope_and_midi_mappings
@@ -57,6 +62,37 @@ seq:
   - id: unknown_after_reverb_eq
     size-eos: true
 types:
+  song_rows:
+    doc: |
+      Song View row storage. Offsets are relative to absolute file offset
+      0x02ee in 6.5.x fixtures. The M8 stores 256 rows, and each row stores one
+      chain index per track.
+    seq:
+      - id: entries
+        type: song_row
+        repeat: expr
+        repeat-expr: 256
+  song_row:
+    doc: |
+      Eight-byte Song View row. Each byte stores the chain index assigned to a
+      specific track. 0xff is observed as unset.
+    seq:
+      - id: track_1
+        type: u1
+      - id: track_2
+        type: u1
+      - id: track_3
+        type: u1
+      - id: track_4
+        type: u1
+      - id: track_5
+        type: u1
+      - id: track_6
+        type: u1
+      - id: track_7
+        type: u1
+      - id: track_8
+        type: u1
   project_settings:
     doc: |
       Project page settings. Offsets are relative to absolute file offset
