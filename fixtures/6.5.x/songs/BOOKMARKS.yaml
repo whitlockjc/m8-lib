@@ -1,0 +1,123 @@
+fileType: song
+firmware: 6.5.2C
+screen: song.bookmarks
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving BOOKMARKS fixture; not mapped to Song View bookmark fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving BOOKMARKS fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 42 4f 4f 4b 4d 41 52 4b 53 00 00 00
+
+  - name: rows[0].track1
+    offset: 0x02ee
+    original: 0xff
+    new: 0x01
+
+  - name: rows[0].track2
+    offset: 0x02ef
+    original: 0xff
+    new: 0x02
+
+  - name: rows[0].track3
+    offset: 0x02f0
+    original: 0xff
+    new: 0x03
+
+  - name: rows[0].track4
+    offset: 0x02f1
+    original: 0xff
+    new: 0x04
+
+  - name: rows[0].track5
+    offset: 0x02f2
+    original: 0xff
+    new: 0x05
+
+  - name: rows[0].track6
+    offset: 0x02f3
+    original: 0xff
+    new: 0x06
+
+  - name: rows[0].track7
+    offset: 0x02f4
+    original: 0xff
+    new: 0x07
+
+  - name: rows[0].track8
+    offset: 0x02f5
+    original: 0xff
+    new: 0x08
+
+  - name: rows[255].track1
+    offset: 0x0ae6
+    original: 0xff
+    new: 0x08
+
+  - name: rows[255].track2
+    offset: 0x0ae7
+    original: 0xff
+    new: 0x07
+
+  - name: rows[255].track3
+    offset: 0x0ae8
+    original: 0xff
+    new: 0x06
+
+  - name: rows[255].track4
+    offset: 0x0ae9
+    original: 0xff
+    new: 0x05
+
+  - name: rows[255].track5
+    offset: 0x0aea
+    original: 0xff
+    new: 0x04
+
+  - name: rows[255].track6
+    offset: 0x0aeb
+    original: 0xff
+    new: 0x03
+
+  - name: rows[255].track7
+    offset: 0x0aec
+    original: 0xff
+    new: 0x02
+
+  - name: rows[255].track8
+    offset: 0x0aed
+    original: 0xff
+    new: 0x01
+
+  - name: bookmarks[0].trackMask
+    offset: 0x1a97e
+    original: 0x00
+    new: 0xaa
+    newLabel: tracks 2,4,6,8
+
+  - name: bookmarks[1].trackMask
+    offset: 0x1a97f
+    original: 0x00
+    new: 0x55
+    newLabel: tracks 1,3,5,7
+
+  - name: bookmarks[254].trackMask
+    offset: 0x1aa7c
+    original: 0x00
+    new: 0x55
+    newLabel: tracks 1,3,5,7
+
+  - name: bookmarks[255].trackMask
+    offset: 0x1aa7d
+    original: 0x00
+    new: 0xaa
+    newLabel: tracks 2,4,6,8

@@ -7,12 +7,12 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
-  Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ,
-  Reverb EQ, and MIDI Mapping page fixtures. The Project settings, MIDI
-  Settings, Song rows, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ,
-  ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping regions are partially mapped.
-  Remaining Song regions are preserved as raw bytes until future fixtures
-  provide evidence for their layout.
+  Bookmarks, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ,
+  Delay EQ, Reverb EQ, and MIDI Mapping page fixtures. The Project settings,
+  MIDI Settings, Song rows, Bookmarks, Mixer, Effects Settings, Mix & Limiter
+  Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping regions are
+  partially mapped. Remaining Song regions are preserved as raw bytes until
+  future fixtures provide evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -48,9 +48,11 @@ seq:
       Mapping table.
   - id: midi_mappings
     type: midi_mappings
-  - id: unknown_between_midi_mappings_and_mix_eq
-    size: 3296
-    doc: Preserved bytes between the MIDI Mapping table and Mix EQ settings.
+  - id: bookmarks
+    type: bookmarks
+  - id: unknown_between_bookmarks_and_mix_eq
+    size: 3040
+    doc: Preserved bytes between the Bookmarks table and Mix EQ settings.
   - id: mix_eq
     type: eq_settings
   - id: mod_fx_eq
@@ -345,6 +347,37 @@ types:
         type: midi_mapping
         repeat: expr
         repeat-expr: 128
+  bookmarks:
+    doc: |
+      Song View bookmark storage. Offsets are relative to absolute file offset
+      0x1a97e in 6.5.x fixtures. The M8 stores one bitmask byte per Song row.
+    seq:
+      - id: entries
+        type: bookmark_row
+        repeat: expr
+        repeat-expr: 256
+  bookmark_row:
+    doc: Bookmark state for one Song row. Bits 0..7 correspond to tracks 1..8.
+    seq:
+      - id: track_mask
+        type: u1
+    instances:
+      track_1:
+        value: (track_mask & 0x01) != 0
+      track_2:
+        value: (track_mask & 0x02) != 0
+      track_3:
+        value: (track_mask & 0x04) != 0
+      track_4:
+        value: (track_mask & 0x08) != 0
+      track_5:
+        value: (track_mask & 0x10) != 0
+      track_6:
+        value: (track_mask & 0x20) != 0
+      track_7:
+        value: (track_mask & 0x40) != 0
+      track_8:
+        value: (track_mask & 0x80) != 0
   midi_mapping:
     doc: |
       Seven-byte MIDI Mapping record. Historical m8-js reference code reads

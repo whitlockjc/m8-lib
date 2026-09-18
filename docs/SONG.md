@@ -3,9 +3,9 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Song
-View, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ,
-Reverb EQ, and MIDI Mapping pages. Most of the Song body remains preserved as
-unknown bytes until additional Song fixtures map those regions.
+View, Bookmarks, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX
+EQ, Delay EQ, Reverb EQ, and MIDI Mapping pages. Most of the Song body remains
+preserved as unknown bytes until additional Song fixtures map those regions.
 
 ## Schema
 
@@ -38,7 +38,8 @@ Offsets are absolute file offsets.
 | `effectsAndScope` | `0x1a5be..0x1a5da` | 29 | [Effects & Scope Storage](#effects--scope-storage) |
 | `unknownBetweenEffectsAndScopeAndMidiMappings` | `0x1a5db..0x1a5fd` | 35 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
-| `unknownBetweenMidiMappingsAndMixEq` | `0x1a97e..0x1b65d` | 3296 | unknown bytes |
+| `bookmarks` | `0x1a97e..0x1aa7d` | 256 | [Bookmarks](#bookmarks) |
+| `unknownBetweenBookmarksAndMixEq` | `0x1aa7e..0x1b65d` | 3040 | unknown bytes |
 | `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
 | `modFxEq` | `0x1b670..0x1b681` | 18 | [ModFX EQ](#modfx-eq) |
 | `delayEq` | `0x1b682..0x1b693` | 18 | [Delay EQ](#delay-eq) |
@@ -83,6 +84,7 @@ The verified fixture pair shows:
 | `PROJECT.m8s` | `PROJECT` followed by five `0x00` bytes |
 | `MIDI_SETTING.m8s` | `MIDI_SETTING` with no padding bytes |
 | `MIDI_MAPPING.m8s` | `MIDI_MAPPING` with no padding bytes |
+| `BOOKMARKS.m8s` | `BOOKMARKS` followed by three `0x00` bytes |
 | `EFFECTS.m8s` | `EFFECTS` followed by five `0x00` bytes |
 | `MODFX_EQ.m8s` | `MODFX_EQ` followed by four `0x00` bytes |
 | `DELAY_EQ.m8s` | `DELAY_EQ` followed by four `0x00` bytes |
@@ -122,6 +124,45 @@ Offsets are relative to the start of a Song row.
 
 The default row value for each track is `0xff`, which the M8 UI displays as
 unset. Other observed values are chain indexes.
+
+### Bookmarks
+
+The Song View stores one bookmark bitmask byte for each of the 256 Song rows.
+Bits `0..7` correspond to tracks `1..8`.
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0..255]` | `0x1a97e..0x1aa7d` | 256 | [Bookmark Row](#bookmark-row) |
+
+### Bookmark Row
+
+Offsets are relative to the start of a Bookmark row.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `trackMask` | `+0x00` | 1 | `u1` |
+
+| Bit | Field | Track |
+| ---: | --- | --- |
+| `0` | `track1` | `1` |
+| `1` | `track2` | `2` |
+| `2` | `track3` | `3` |
+| `3` | `track4` | `4` |
+| `4` | `track5` | `5` |
+| `5` | `track6` | `6` |
+| `6` | `track7` | `7` |
+| `7` | `track8` | `8` |
+
+The `BOOKMARKS.m8s` fixture verifies:
+
+| Row | Stored Value | Bookmarked Tracks |
+| --- | --- | --- |
+| `0x00` | `0xaa` | `2,4,6,8` |
+| `0x01` | `0x55` | `1,3,5,7` |
+| `0xfe` | `0x55` | `1,3,5,7` |
+| `0xff` | `0xaa` | `2,4,6,8` |
 
 ### MIDI Settings
 
@@ -566,6 +607,9 @@ are mapped.
 - The Song rows table is verified at `0x02ee..0x0aed`. The fixture modifies row
   `0x00` and row `0xff`, which verifies the table boundaries as 256 eight-byte
   rows.
+- The Bookmarks table is verified at `0x1a97e..0x1aa7d`. The fixture modifies
+  rows `0x00`, `0x01`, `0xfe`, and `0xff`, which verifies the table boundaries
+  as 256 one-byte row bitmasks.
 - The Mixer block is verified at `0x00ce..0x00ed`.
 - The Effects Settings fields are verified in the shared Effects & Scope
   storage region at `0x1a5c1..0x1a5da`.
@@ -621,6 +665,8 @@ are mapped.
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
 | Song Rows fixture | `fixtures/6.5.x/songs/SONG_ROWS.m8s` |
 | Song Rows manifest | `fixtures/6.5.x/songs/SONG_ROWS.yaml` |
+| Bookmarks fixture | `fixtures/6.5.x/songs/BOOKMARKS.m8s` |
+| Bookmarks manifest | `fixtures/6.5.x/songs/BOOKMARKS.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
 | Effects Settings fixture | `fixtures/6.5.x/songs/EFFECTS.m8s` |
@@ -643,8 +689,8 @@ are mapped.
 | Verification command | `npm run verify` |
 
 The manifest-driven mapper matched the Project, MIDI Settings, Song View,
-Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ,
-Reverb EQ, and MIDI Mapping field changes exactly. It also accounts for
-fixture-changed bytes in explicitly ignored unknown ranges so page field mapping
-can be verified without assigning unsupported meanings to save/setup/state
-bytes.
+Bookmarks, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ,
+Delay EQ, Reverb EQ, and MIDI Mapping field changes exactly. It also accounts
+for fixture-changed bytes in explicitly ignored unknown ranges so page field
+mapping can be verified without assigning unsupported meanings to
+save/setup/state bytes.
