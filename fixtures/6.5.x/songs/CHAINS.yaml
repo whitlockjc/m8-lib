@@ -1,0 +1,189 @@
+fileType: song
+firmware: 6.5.2C
+screen: chain
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving CHAINS fixture; not mapped to Chain View fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving CHAINS fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 43 48 41 49 4e 53 00 00 00 00 00 00
+
+  - name: rows[0].track1
+    offset: 0x02ee
+    original: 0xff
+    new: 0x00
+
+  - name: rows[0].track2
+    offset: 0x02ef
+    original: 0xff
+    new: 0xfe
+
+  - name: chains[0].rows[0]
+    offset: 0x9a5e
+    originalBytes: ff 00
+    newBytes: 00 ff
+
+  - name: chains[0].rows[1]
+    offset: 0x9a60
+    originalBytes: ff 00
+    newBytes: 01 fe
+
+  - name: chains[0].rows[2]
+    offset: 0x9a62
+    originalBytes: ff 00
+    newBytes: 02 fd
+
+  - name: chains[0].rows[3]
+    offset: 0x9a64
+    originalBytes: ff 00
+    newBytes: 03 fc
+
+  - name: chains[0].rows[4]
+    offset: 0x9a66
+    originalBytes: ff 00
+    newBytes: 04 fb
+
+  - name: chains[0].rows[5]
+    offset: 0x9a68
+    originalBytes: ff 00
+    newBytes: 05 fa
+
+  - name: chains[0].rows[6]
+    offset: 0x9a6a
+    originalBytes: ff 00
+    newBytes: 06 f9
+
+  - name: chains[0].rows[7]
+    offset: 0x9a6c
+    originalBytes: ff 00
+    newBytes: 07 f8
+
+  - name: chains[0].rows[8]
+    offset: 0x9a6e
+    originalBytes: ff 00
+    newBytes: 08 f7
+
+  - name: chains[0].rows[9]
+    offset: 0x9a70
+    originalBytes: ff 00
+    newBytes: 09 f6
+
+  - name: chains[0].rows[10]
+    offset: 0x9a72
+    originalBytes: ff 00
+    newBytes: 0a f5
+
+  - name: chains[0].rows[11]
+    offset: 0x9a74
+    originalBytes: ff 00
+    newBytes: 0b f4
+
+  - name: chains[0].rows[12]
+    offset: 0x9a76
+    originalBytes: ff 00
+    newBytes: 0c f3
+
+  - name: chains[0].rows[13]
+    offset: 0x9a78
+    originalBytes: ff 00
+    newBytes: 0d f2
+
+  - name: chains[0].rows[14]
+    offset: 0x9a7a
+    originalBytes: ff 00
+    newBytes: 0e f1
+
+  - name: chains[0].rows[15]
+    offset: 0x9a7c
+    originalBytes: ff 00
+    newBytes: 0f f0
+
+  - name: chains[254].rows[0]
+    offset: 0xba1e
+    originalBytes: ff 00
+    newBytes: fe 01
+
+  - name: chains[254].rows[1]
+    offset: 0xba20
+    originalBytes: ff 00
+    newBytes: fd 02
+
+  - name: chains[254].rows[2]
+    offset: 0xba22
+    originalBytes: ff 00
+    newBytes: fc 03
+
+  - name: chains[254].rows[3]
+    offset: 0xba24
+    originalBytes: ff 00
+    newBytes: fb 04
+
+  - name: chains[254].rows[4]
+    offset: 0xba26
+    originalBytes: ff 00
+    newBytes: fa 05
+
+  - name: chains[254].rows[5]
+    offset: 0xba28
+    originalBytes: ff 00
+    newBytes: f9 06
+
+  - name: chains[254].rows[6]
+    offset: 0xba2a
+    originalBytes: ff 00
+    newBytes: f8 07
+
+  - name: chains[254].rows[7]
+    offset: 0xba2c
+    originalBytes: ff 00
+    newBytes: f7 08
+
+  - name: chains[254].rows[8]
+    offset: 0xba2e
+    originalBytes: ff 00
+    newBytes: f6 09
+
+  - name: chains[254].rows[9]
+    offset: 0xba30
+    originalBytes: ff 00
+    newBytes: f5 0a
+
+  - name: chains[254].rows[10]
+    offset: 0xba32
+    originalBytes: ff 00
+    newBytes: f4 0b
+
+  - name: chains[254].rows[11]
+    offset: 0xba34
+    originalBytes: ff 00
+    newBytes: f3 0c
+
+  - name: chains[254].rows[12]
+    offset: 0xba36
+    originalBytes: ff 00
+    newBytes: f2 0d
+
+  - name: chains[254].rows[13]
+    offset: 0xba38
+    originalBytes: ff 00
+    newBytes: f1 0e
+
+  - name: chains[254].rows[14]
+    offset: 0xba3a
+    originalBytes: ff 00
+    newBytes: f0 0f
+
+  - name: chains[254].rows[15]
+    offset: 0xba3c
+    originalBytes: ff 00
+    newBytes: ef 10

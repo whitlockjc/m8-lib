@@ -7,12 +7,12 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
-  Bookmarks, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ,
-  Delay EQ, Reverb EQ, and MIDI Mapping page fixtures. The Project settings,
-  MIDI Settings, Song rows, Bookmarks, Mixer, Effects Settings, Mix & Limiter
-  Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping regions are
-  partially mapped. Remaining Song regions are preserved as raw bytes until
-  future fixtures provide evidence for their layout.
+  Bookmarks, Chain View, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ,
+  ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping page fixtures. The Project
+  settings, MIDI Settings, Song rows, Bookmarks, Chains, Mixer, Effects
+  Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI
+  Mapping regions are partially mapped. Remaining Song regions are preserved as
+  raw bytes until future fixtures provide evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -32,13 +32,18 @@ seq:
     doc: Preserved bytes between Mixer settings and Song rows.
   - id: rows
     type: song_rows
-  - id: unknown_between_rows_and_effects_and_scope
-    size: 105168
+  - id: unknown_between_rows_and_chains
+    size: 36720
+    doc: Preserved bytes between Song rows and Chains.
+  - id: chains
+    type: chains
+  - id: unknown_between_chains_and_effects_and_scope
+    size: 60256
     doc: |
-      Preserved bytes between Song rows and the Effects/Mix & Limiter Scope
+      Preserved bytes between Chains and the Effects/Mix & Limiter Scope
       storage. The MIDI_MAPPING fixture changes bytes in this region to set up
-      a required chain and Wavsynth instrument; those changes are not mapped by
-      this Song schema yet.
+      a required Wavsynth instrument; those changes are not mapped by this Song
+      schema yet.
   - id: effects_and_scope
     type: effects_and_scope_settings
   - id: unknown_between_effects_and_scope_and_midi_mappings
@@ -94,6 +99,32 @@ types:
       - id: track_7
         type: u1
       - id: track_8
+        type: u1
+  chains:
+    doc: |
+      Chain View storage. Offsets are relative to absolute file offset 0x9a5e
+      in 6.5.x fixtures. The M8 stores 256 chains, and each chain stores 16
+      rows.
+    seq:
+      - id: entries
+        type: chain
+        repeat: expr
+        repeat-expr: 256
+  chain:
+    doc: Thirty-two-byte Chain View record containing 16 two-byte rows.
+    seq:
+      - id: rows
+        type: chain_row
+        repeat: expr
+        repeat-expr: 16
+  chain_row:
+    doc: |
+      Chain row storage. The phrase byte stores the referenced phrase index;
+      0xff is observed as unset.
+    seq:
+      - id: phrase
+        type: u1
+      - id: transpose
         type: u1
   project_settings:
     doc: |
