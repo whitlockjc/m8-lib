@@ -4,9 +4,9 @@ Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Song
 View, Bookmarks, Chain View, Mixer, Effects Settings, Mix & Limiter Scope, Mix
-EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping pages. Most of the Song
-body remains preserved as unknown bytes until additional Song fixtures map those
-regions.
+EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI Mapping, and Scales pages. Most of the
+Song body remains preserved as unknown bytes until additional Song fixtures map
+those regions.
 
 ## Schema
 
@@ -42,7 +42,8 @@ Offsets are absolute file offsets.
 | `unknownBetweenEffectsAndScopeAndMidiMappings` | `0x1a5db..0x1a5fd` | 35 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
 | `bookmarks` | `0x1a97e..0x1aa7d` | 256 | [Bookmarks](#bookmarks) |
-| `unknownBetweenBookmarksAndMixEq` | `0x1aa7e..0x1b65d` | 3040 | unknown bytes |
+| `scales` | `0x1aa7e..0x1ad5d` | 736 | [Embedded Scales](#embedded-scales) |
+| `unknownBetweenScalesAndMixEq` | `0x1ad5e..0x1b65d` | 2304 | unknown bytes |
 | `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
 | `modFxEq` | `0x1b670..0x1b681` | 18 | [ModFX EQ](#modfx-eq) |
 | `delayEq` | `0x1b682..0x1b693` | 18 | [Delay EQ](#delay-eq) |
@@ -60,7 +61,7 @@ Offsets are absolute file offsets.
 | `liveQuantize` | `0x0093` | 1 | [Live Quantize](#live-quantize) |
 | `name` | `0x0094..0x009f` | 12 | [Fixed String](#fixed-string) |
 | `midiSettings` | `0x00a0..0x00ba` | 27 | [MIDI Settings](#midi-settings) |
-| `scale` | `0x00bb` | 1 | `u1` |
+| `scale` | `0x00bb` | 1 | [Scale Selector / Key Byte](#scale-selector--key-byte) |
 | `groove` | `0x00bc` | 1 | `u1` |
 | `unknownTrailingState` | `0x00bd..0x00be` | 2 | unknown bytes |
 
@@ -73,6 +74,19 @@ The Project page displays `CHAIN LEN` for `0x00`. Values from `0x01` through
 | --- | --- |
 | `0x00` | `CHAIN LEN` |
 | `0x01..0xff` | `STEPS` |
+
+### Scale Selector / Key Byte
+
+The byte at `0x00bb` is shared by two observed Scale-related UI changes:
+
+| Fixture | UI Change | Stored Change |
+| --- | --- | --- |
+| `PROJECT.m8s` | Project page Scale selector changed from `00` to `FE` | `0x00 -> 0xfe` |
+| `SCALES.m8s` | Scale View key changed from `C` to `E` | `0x00 -> 0x40` |
+
+The exact packing or contextual interpretation is not yet mapped. Preserve the
+raw byte until targeted fixtures isolate Project Scale selection from Scale View
+key changes.
 
 ### Fixed String
 
@@ -89,6 +103,7 @@ The verified fixture pair shows:
 | `MIDI_MAPPING.m8s` | `MIDI_MAPPING` with no padding bytes |
 | `BOOKMARKS.m8s` | `BOOKMARKS` followed by three `0x00` bytes |
 | `CHAINS.m8s` | `CHAINS` followed by six `0x00` bytes |
+| `SCALES.m8s` | `SCALES` followed by six `0x00` bytes |
 | `EFFECTS.m8s` | `EFFECTS` followed by five `0x00` bytes |
 | `MODFX_EQ.m8s` | `MODFX_EQ` followed by four `0x00` bytes |
 | `DELAY_EQ.m8s` | `DELAY_EQ` followed by four `0x00` bytes |
@@ -209,6 +224,51 @@ The `CHAINS.m8s` fixture verifies:
 The observed distance between chain `0x00` and chain `0xfe` is `0x1fc0` bytes,
 which verifies a `0x20` byte chain stride. The full `0x9a5e..0xba5d` table range
 follows from 256 chains at 32 bytes per chain.
+
+### Embedded Scales
+
+The Song stores 16 embedded Scale body records. These records match the
+standalone Scale file body layout and do not include the 14-byte M8 file header.
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0..15]` | `0x1aa7e..0x1ad5d` | 736 | [Embedded Scale](#embedded-scale) |
+
+The `SCALES.m8s` fixture verifies:
+
+| Scale | Offset / Range | Name Change | Tuning Change |
+| --- | --- | --- | --- |
+| `0x00` | `0x1aa7e..0x1aaab` | `CHROMATIC -> CHROMATIC_MOD` | `440.00 -> 459.99` |
+| `0x0f` | `0x1ad30..0x1ad5d` | `IWATO -> IWATO_MOD` | `440.00 -> 420.01` |
+
+Although the test note originally named Scale `0x04`, byte evidence from the
+fixture stores `IWATO` in slot `0x0f`.
+
+### Embedded Scale
+
+Offsets are relative to the start of an embedded Scale record.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `enabledNotes` | `+0x00..+0x01` | 2 | `u2le` |
+| `intervals[0..11]` | `+0x02..+0x19` | 24 | [Embedded Scale Interval](#embedded-scale-interval) |
+| `name` | `+0x1a..+0x29` | 16 | [Fixed String](#fixed-string) |
+| `tuningOffset` | `+0x2a..+0x2d` | 4 | `f4` |
+
+`tuningOffset` has the same meaning as standalone Scale files: a 32-bit
+little-endian float offset from `440.00` Hz.
+
+### Embedded Scale Interval
+
+Offsets are relative to the start of each embedded Scale interval.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `offset` | `+0x00..+0x01` | 2 | `i2le` |
+
+`offset` is stored as hundredths of a semitone.
 
 ### MIDI Settings
 
@@ -647,8 +707,9 @@ are mapped.
   UI value from `120.00` to `121.99`; the stored float changed from `120.0` to
   approximately `121.98999786376953`.
 - `scale` is a stored byte value that selects one of the Scales embedded in the
-  Song file. The UI label comes from the referenced embedded Scale name, which
-  will be mapped later.
+  Song file in the Project page, but the same byte also changes for Scale View
+  key changes. The raw storage is preserved until targeted fixtures isolate the
+  exact interpretation.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
 - The Song rows table is verified at `0x02ee..0x0aed`. The fixture modifies row
   `0x00` and row `0xff`, which verifies the table boundaries as 256 eight-byte
@@ -660,6 +721,11 @@ are mapped.
   `0x00`, chain `0xfe`, and the `0x20` byte chain stride. The final table range
   is inferred from the M8's 256-chain structure and the verified row/entry
   sizes.
+- The embedded Scales table is verified at `0x1aa7e..0x1ad5d`. The table stores
+  16 records of 46 bytes each. Each record matches the standalone Scale file
+  body layout, excluding the standalone M8 file header.
+- The `SCALES.m8s` fixture verifies `CHROMATIC_MOD` in Scale slot `0x00` and
+  `IWATO_MOD` in Scale slot `0x0f`.
 - The Mixer block is verified at `0x00ce..0x00ed`.
 - The Effects Settings fields are verified in the shared Effects & Scope
   storage region at `0x1a5c1..0x1a5da`.
@@ -719,6 +785,8 @@ are mapped.
 | Bookmarks manifest | `fixtures/6.5.x/songs/BOOKMARKS.yaml` |
 | Chains fixture | `fixtures/6.5.x/songs/CHAINS.m8s` |
 | Chains manifest | `fixtures/6.5.x/songs/CHAINS.yaml` |
+| Scales fixture | `fixtures/6.5.x/songs/SCALES.m8s` |
+| Scales manifest | `fixtures/6.5.x/songs/SCALES.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
 | Effects Settings fixture | `fixtures/6.5.x/songs/EFFECTS.m8s` |
@@ -741,8 +809,8 @@ are mapped.
 | Verification command | `npm run verify` |
 
 The manifest-driven mapper matched the Project, MIDI Settings, Song View,
-Bookmarks, Chain View, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ,
-ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping field changes exactly. It also
-accounts for fixture-changed bytes in explicitly ignored unknown ranges so page
-field mapping can be verified without assigning unsupported meanings to
-save/setup/state bytes.
+Bookmarks, Chain View, Scales View, Mixer, Effects Settings, Mix & Limiter
+Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping field changes
+exactly. It also accounts for fixture-changed bytes in explicitly ignored
+unknown ranges so page field mapping can be verified without assigning
+unsupported meanings to save/setup/state bytes.

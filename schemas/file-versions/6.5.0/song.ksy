@@ -7,12 +7,13 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
-  Bookmarks, Chain View, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ,
-  ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping page fixtures. The Project
-  settings, MIDI Settings, Song rows, Bookmarks, Chains, Mixer, Effects
-  Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI
-  Mapping regions are partially mapped. Remaining Song regions are preserved as
-  raw bytes until future fixtures provide evidence for their layout.
+  Bookmarks, Chain View, Scales View, Mixer, Effects Settings, Mix & Limiter
+  Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping page fixtures.
+  The Project settings, MIDI Settings, Song rows, Bookmarks, Chains, embedded
+  Scales, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay
+  EQ, Reverb EQ, and MIDI Mapping regions are partially mapped. Remaining Song
+  regions are preserved as raw bytes until future fixtures provide evidence for
+  their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -55,9 +56,11 @@ seq:
     type: midi_mappings
   - id: bookmarks
     type: bookmarks
-  - id: unknown_between_bookmarks_and_mix_eq
-    size: 3040
-    doc: Preserved bytes between the Bookmarks table and Mix EQ settings.
+  - id: scales
+    type: embedded_scales
+  - id: unknown_between_scales_and_mix_eq
+    size: 2304
+    doc: Preserved bytes between the embedded Scales table and Mix EQ settings.
   - id: mix_eq
     type: eq_settings
   - id: mod_fx_eq
@@ -153,8 +156,11 @@ types:
       - id: scale
         type: u1
         doc: |
-          Selects one of the Scales embedded in the Song file. The UI label
-          comes from the referenced embedded Scale name.
+          Project page Scale selector and Scale View key storage. The PROJECT
+          fixture changed this byte from 0x00 to 0xfe while changing the Project
+          page Scale value. The SCALES fixture changed the Scale View key from C
+          to E and changed this byte from 0x00 to 0x40. The exact packing or
+          contextual interpretation needs more fixture evidence.
       - id: groove
         type: u1
       - id: unknown_trailing_state
@@ -409,6 +415,36 @@ types:
         value: (track_mask & 0x40) != 0
       track_8:
         value: (track_mask & 0x80) != 0
+  embedded_scales:
+    doc: |
+      Embedded Scale storage. Offsets are relative to absolute file offset
+      0x1aa7e in 6.5.x fixtures. The M8 stores 16 Scale body records without
+      standalone Scale file headers.
+    seq:
+      - id: entries
+        type: embedded_scale
+        repeat: expr
+        repeat-expr: 16
+  embedded_scale:
+    doc: |
+      Embedded Scale body. This matches the standalone Scale file body layout:
+      enabled notes, 12 intervals, a fixed-size name, and tuning offset.
+    seq:
+      - id: enabled_notes
+        type: u2
+      - id: intervals
+        type: scale_interval
+        repeat: expr
+        repeat-expr: 12
+      - id: name
+        size: 16
+      - id: tuning_offset
+        type: f4
+  scale_interval:
+    doc: Signed interval offset stored as hundredths of a semitone.
+    seq:
+      - id: offset
+        type: s2
   midi_mapping:
     doc: |
       Seven-byte MIDI Mapping record. Historical m8-js reference code reads
