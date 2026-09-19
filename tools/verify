@@ -207,6 +207,11 @@ tools/map-fixture.js \
 
 tools/map-fixture.js \
   fixtures/6.5.x/songs/DEFAULT.m8s \
+  fixtures/6.5.x/songs/GROOVES.m8s \
+  fixtures/6.5.x/songs/GROOVES.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/songs/DEFAULT.m8s \
   fixtures/6.5.x/songs/EFFECTS.m8s \
   fixtures/6.5.x/songs/EFFECTS.yaml
 

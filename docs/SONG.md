@@ -3,10 +3,10 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Song
-View, Bookmarks, Chain View, Mixer, Effects Settings, Mix & Limiter Scope, Mix
-EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI Mapping, and Scales pages. Most of the
-Song body remains preserved as unknown bytes until additional Song fixtures map
-those regions.
+View, Bookmarks, Chain View, Mixer, Grooves, Effects Settings, Mix & Limiter
+Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI Mapping, and Scales pages.
+Most of the Song body remains preserved as unknown bytes until additional Song
+fixtures map those regions.
 
 ## Schema
 
@@ -33,7 +33,7 @@ Offsets are absolute file offsets.
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
 | `unknownBetweenProjectAndMixer` | `0x00bf..0x00cd` | 15 | unknown bytes |
 | `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
-| `unknownBetweenMixerAndRows` | `0x00ee..0x02ed` | 512 | unknown bytes |
+| `grooves` | `0x00ee..0x02ed` | 512 | [Grooves](#grooves) |
 | `rows` | `0x02ee..0x0aed` | 2048 | [Song Rows](#song-rows) |
 | `unknownBetweenRowsAndChains` | `0x0aee..0x9a5d` | 36720 | unknown bytes |
 | `chains` | `0x9a5e..0xba5d` | 8192 | [Chains](#chains) |
@@ -160,6 +160,30 @@ The verified fixture pair shows:
 | `MIX_EQ.m8s` | `MIX_EQ` followed by six `0x00` bytes |
 | `MIX_SCOPE.m8s` | `MIX_SCOPE` followed by three `0x00` bytes |
 | `LIMIT_SCOPE.m8s` | `LIMIT_SCOPE` followed by one `0x00` byte |
+| `GROOVES.m8s` | `GROOVES` followed by five `0x00` bytes |
+
+### Grooves
+
+The Grooves View stores 32 grooves. Each groove stores 16 one-byte step values.
+The `GROOVES.m8s` fixture verifies the first and last grooves of the
+contiguous groove table.
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0..31]` | `0x00ee..0x02ed` | 512 | [Groove](#groove) |
+
+### Groove
+
+Offsets are relative to the start of a Groove.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `steps[0..15]` | `+0x00..+0x0f` | 16 | `u1[16]` |
+
+Default groove records store `06 06 ff ff ff ff ff ff ff ff ff ff ff ff ff
+ff`. In observed fixtures, `0xff` represents an unset step value.
 
 ### Song Rows
 
@@ -777,6 +801,9 @@ are mapped.
   `0x00bb`. Its value is a `0x00..0x0f` index into the embedded Song scale
   table.
 - The Mixer block is verified at `0x00ce..0x00ed`.
+- The Grooves table is verified at `0x00ee..0x02ed`. The fixture modifies
+  groove `0x00` and groove `0x1f`, which verifies the table boundaries as 32
+  sixteen-byte Groove records.
 - The Effects Settings fields are verified in the shared Effects & Scope
   storage region at `0x1a5c1..0x1a5da`.
 - The Mix & Limiter Scope OTT detail block is verified at
@@ -841,6 +868,8 @@ are mapped.
 | Key-only manifest | `fixtures/6.5.x/songs/KEY_ONLY.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
+| Grooves fixture | `fixtures/6.5.x/songs/GROOVES.m8s` |
+| Grooves manifest | `fixtures/6.5.x/songs/GROOVES.yaml` |
 | Effects Settings fixture | `fixtures/6.5.x/songs/EFFECTS.m8s` |
 | Effects Settings manifest | `fixtures/6.5.x/songs/EFFECTS.yaml` |
 | Mix & Limiter Scope fixture (`MIX_SCOPE`) | `fixtures/6.5.x/songs/MIX_SCOPE.m8s` |

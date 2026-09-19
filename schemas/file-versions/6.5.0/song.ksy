@@ -7,13 +7,13 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
-  Bookmarks, Chain View, Scales View, Mixer, Effects Settings, Mix & Limiter
-  Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping page fixtures.
-  The Project settings, MIDI Settings, Song rows, Bookmarks, Chains, embedded
-  Scales, Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay
-  EQ, Reverb EQ, and MIDI Mapping regions are partially mapped. Remaining Song
-  regions are preserved as raw bytes until future fixtures provide evidence for
-  their layout.
+  Bookmarks, Chain View, Scales View, Mixer, Grooves, Effects Settings, Mix &
+  Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping page
+  fixtures. The Project settings, MIDI Settings, Song rows, Bookmarks, Chains,
+  embedded Scales, Mixer, Grooves, Effects Settings, Mix & Limiter Scope, Mix
+  EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping regions are partially
+  mapped. Remaining Song regions are preserved as raw bytes until future
+  fixtures provide evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -28,9 +28,8 @@ seq:
     doc: Preserved bytes between Project settings and Mixer settings.
   - id: mixer
     type: mixer_settings
-  - id: unknown_between_mixer_and_rows
-    size: 512
-    doc: Preserved bytes between Mixer settings and Song rows.
+  - id: grooves
+    type: grooves
   - id: rows
     type: song_rows
   - id: unknown_between_rows_and_chains
@@ -72,6 +71,23 @@ seq:
   - id: unknown_after_reverb_eq
     size-eos: true
 types:
+  grooves:
+    doc: |
+      Groove storage. Offsets are relative to absolute file offset 0x00ee in
+      6.5.x fixtures. The M8 stores 32 grooves, and each groove stores 16 one
+      byte step values.
+    seq:
+      - id: entries
+        type: groove
+        repeat: expr
+        repeat-expr: 32
+  groove:
+    doc: Sixteen-byte Groove record containing one byte per step.
+    seq:
+      - id: steps
+        type: u1
+        repeat: expr
+        repeat-expr: 16
   song_rows:
     doc: |
       Song View row storage. Offsets are relative to absolute file offset
