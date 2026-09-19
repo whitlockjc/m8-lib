@@ -51,27 +51,27 @@ Needed research:
 
 ## Scale Key And Project Scale Selector
 
-Status: partially mapped
+Status: mapped
 
 Observation:
 
-- Scale key is displayed on the Scale Editor UI screen but is stored in the
-  Song, not in the Scale file.
-- The Project page `scale` setting is stored in the Song file at `0x00bb` for
-  the 6.5.x `PROJECT.m8s` fixture.
+- The Project page Scale selector and Scale View key are represented by the
+  Song byte at `0x00bb`.
+- The high nibble stores the key index. Current fixtures verify `C -> E`
+  as `0x00 -> 0x40` and `C -> G` as `0x00 -> 0x70`.
+- The low nibble stores the Project Scale selector index. The selector value is
+  a `0x00..0x0f` index into the 16 embedded Song scales.
+- The M8 UI presents key and scale together, but schema work should treat their
+  meanings as distinct values: key index, scale index, and embedded Scale
+  definition.
 
 Implication:
 
 - Scale schemas should not include a `key` field.
-- Song schemas should model the Project page `scale` byte as a reference to an
-  embedded Song scale slot. The UI label comes from the embedded Scale name.
-
-Needed research:
-
-- Map the embedded Song scale table and verify how `project.scale` indexes or
-  otherwise references it.
-- Create targeted Song fixtures if the Scale Editor `key` value is separate
-  from the Project page `scale` selector.
+- Song schemas should model the raw Project Scale/key byte and document the
+  derived key index and scale index separately.
+- Project Scale selector values should be represented as indexes into the
+  embedded Song scale table.
 
 ## Song Project Unknown State
 

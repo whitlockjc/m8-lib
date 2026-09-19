@@ -156,11 +156,15 @@ types:
       - id: scale
         type: u1
         doc: |
-          Project page Scale selector and Scale View key storage. The PROJECT
-          fixture changed this byte from 0x00 to 0xfe while changing the Project
-          page Scale value. The SCALES fixture changed the Scale View key from C
-          to E and changed this byte from 0x00 to 0x40. The exact packing or
-          contextual interpretation needs more fixture evidence.
+          Project page Scale selector and Scale View key storage. The high
+          nibble stores the key index; the low nibble stores the embedded Scale
+          index. The PROJECT fixture changed this byte from 0x00 to 0xfe while
+          changing the Project page Scale value. The SCALES fixture changed the
+          key from C to E and changed this byte from 0x00 to 0x40. The KEY_ONLY
+          fixture changed the key from C to G and changed this byte from 0x00
+          to 0x70. The UI presents key and scale together, but the schema model
+          has distinct values: key index, scale index, and Scale definition
+          record.
       - id: groove
         type: u1
       - id: unknown_trailing_state

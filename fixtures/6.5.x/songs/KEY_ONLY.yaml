@@ -1,0 +1,26 @@
+fileType: song
+firmware: 6.5.2C
+screen: project.scales
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving KEY_ONLY fixture; not mapped to Scale View fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving KEY_ONLY fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 4b 45 59 5f 4f 4e 4c 59 00 00 00 00
+
+  - name: project.scale
+    offset: 0x00bb
+    original: 0x00
+    new: 0x70
+    originalLabel: C
+    newLabel: G

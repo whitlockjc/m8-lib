@@ -18,7 +18,7 @@ changes:
     originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
     newBytes: 53 43 41 4c 45 53 00 00 00 00 00 00
 
-  - name: project.scaleKey
+  - name: project.scale
     offset: 0x00bb
     original: 0x00
     new: 0x40

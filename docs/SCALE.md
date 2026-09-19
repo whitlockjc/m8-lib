@@ -84,10 +84,50 @@ Processing observations from the M8 UI:
 The stored value appears to be an offset from `440.00` Hz, the standard A440
 tuning reference, not the absolute tuning value.
 
+### Scale Key
+
+The Scale Editor key is displayed on the Scale Editor UI screen, but it is not
+stored in standalone Scale files. In Song files, the Project Scale selector and
+Scale View key are represented by the Project settings byte at `0x00bb`. The
+high nibble stores the key index, and the low nibble stores the embedded Scale
+index.
+
+The `SCALES.m8s` fixture changed the key from `C` to `E` and changed that byte
+from `0x00` to `0x40`. The `KEY_ONLY.m8s` fixture changed only the key from
+`C` to `G` and changed that byte from `0x00` to `0x70`.
+
+The key labels are:
+
+| Key Value | Label |
+| --- | --- |
+| `0x0` | `C` |
+| `0x1` | `C#` |
+| `0x2` | `D` |
+| `0x3` | `D#` |
+| `0x4` | `E` |
+| `0x5` | `F` |
+| `0x6` | `F#` |
+| `0x7` | `G` |
+| `0x8` | `G#` |
+| `0x9` | `A` |
+| `0xa` | `A#` |
+| `0xb` | `B` |
+
+The key is stored in the high nibble of the Song byte in the observed fixtures.
+`E` stores key value `0x4`, and `G` stores key value `0x7`, matching chromatic
+label order. Project page Scale selection is represented by the low nibble of
+the same Song byte and is not stored in standalone Scale files.
+
+The M8 UI presents key and scale together, but they are separate stored
+concepts: key is a key index, Project Scale selection is a scale index into the
+Song's embedded scales, and each embedded scale is a Scale schema body record.
+
 ## Notes
 
 - Scale key is displayed on the Scale Editor UI screen but is stored in the
-  Song, not in the Scale file.
+  Song, not in the Scale file. See [Scale Key](#scale-key).
+- Project Scale selection is also shown alongside Scale editing, but it is a
+  separate Song value: an index into the Song's embedded Scale records.
 - Scale tuning is displayed on the Scale Editor UI screen and stored in the
   Scale file as `tuningOffset`.
 - Scale strings use fixed-size storage. Padding bytes are part of the stored

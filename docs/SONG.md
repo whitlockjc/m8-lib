@@ -77,16 +77,63 @@ The Project page displays `CHAIN LEN` for `0x00`. Values from `0x01` through
 
 ### Scale Selector / Key Byte
 
-The byte at `0x00bb` is shared by two observed Scale-related UI changes:
+The Project page Scale selector and Scale View key are represented by the Song
+byte at `0x00bb`.
 
 | Fixture | UI Change | Stored Change |
 | --- | --- | --- |
 | `PROJECT.m8s` | Project page Scale selector changed from `00` to `FE` | `0x00 -> 0xfe` |
 | `SCALES.m8s` | Scale View key changed from `C` to `E` | `0x00 -> 0x40` |
+| `KEY_ONLY.m8s` | Scale View key changed from `C` to `G` | `0x00 -> 0x70` |
 
-The exact packing or contextual interpretation is not yet mapped. Preserve the
-raw byte until targeted fixtures isolate Project Scale selection from Scale View
-key changes.
+The stored byte contains two distinct semantic values:
+
+| Derived Value | Bits | Meaning |
+| --- | --- | --- |
+| `keyIndex` | high nibble | key index |
+| `scaleIndex` | low nibble | embedded Scale index, `0x00..0x0f` |
+
+The `keyIndex` uses chromatic label order:
+
+| Key Value | Label |
+| --- | --- |
+| `0x0` | `C` |
+| `0x1` | `C#` |
+| `0x2` | `D` |
+| `0x3` | `D#` |
+| `0x4` | `E` |
+| `0x5` | `F` |
+| `0x6` | `F#` |
+| `0x7` | `G` |
+| `0x8` | `G#` |
+| `0x9` | `A` |
+| `0xa` | `A#` |
+| `0xb` | `B` |
+
+The key is stored in the high nibble of `0x00bb` in the observed fixtures.
+`E` stores key value `0x4`, and `G` stores key value `0x7`, matching chromatic
+label order.
+
+### Project Scale Selector
+
+The Project page `scale` setting selects one of the 16 embedded Song scales.
+Its `scaleIndex` value is the low nibble of `0x00bb` and is an index from
+`0x00` through `0x0f` into
+[`scales.entries[0..15]`](#embedded-scales). For example, Project `scale =
+0x0f` means the Song uses `scales.entries[15]`.
+
+The M8 UI presents key and scale together in the Scale View, but the storage
+model should treat them as distinct values:
+
+| UI Concept | Stored Meaning | Status |
+| --- | --- | --- |
+| Key | `keyIndex`, using chromatic labels `C..B` | verified in high nibble of `0x00bb` |
+| Scale selector | `scaleIndex`, `0x00..0x0f` | verified in low nibble of `0x00bb` |
+| Scale definition | Embedded Scale body record | verified in `scales.entries[0..15]` |
+
+The selector chooses which embedded scale definition is active. The key is a
+separate index that determines the root key for scale interpretation. The scale
+definition is the 46-byte embedded Scale schema itself.
 
 ### Fixed String
 
@@ -706,10 +753,8 @@ are mapped.
 - `tempo` is verified as a 32-bit little-endian float. The fixture changed the
   UI value from `120.00` to `121.99`; the stored float changed from `120.0` to
   approximately `121.98999786376953`.
-- `scale` is a stored byte value that selects one of the Scales embedded in the
-  Song file in the Project page, but the same byte also changes for Scale View
-  key changes. The raw storage is preserved until targeted fixtures isolate the
-  exact interpretation.
+- The Scale View `key` is stored at `0x00bb`. Project page Scale selection is
+  a separate setting: a `0x00..0x0f` index into the embedded Song scale table.
 - The active MIDI Settings block is verified at `0x00a0..0x00ba`.
 - The Song rows table is verified at `0x02ee..0x0aed`. The fixture modifies row
   `0x00` and row `0xff`, which verifies the table boundaries as 256 eight-byte
@@ -726,6 +771,11 @@ are mapped.
   body layout, excluding the standalone M8 file header.
 - The `SCALES.m8s` fixture verifies `CHROMATIC_MOD` in Scale slot `0x00` and
   `IWATO_MOD` in Scale slot `0x0f`.
+- The `KEY_ONLY.m8s` fixture verifies that changing only the Scale View key
+  from `C` to `G` changes `0x00bb` from `0x00` to `0x70`.
+- The Project page Scale selector is the low nibble of the `scale` byte at
+  `0x00bb`. Its value is a `0x00..0x0f` index into the embedded Song scale
+  table.
 - The Mixer block is verified at `0x00ce..0x00ed`.
 - The Effects Settings fields are verified in the shared Effects & Scope
   storage region at `0x1a5c1..0x1a5da`.
@@ -787,6 +837,8 @@ are mapped.
 | Chains manifest | `fixtures/6.5.x/songs/CHAINS.yaml` |
 | Scales fixture | `fixtures/6.5.x/songs/SCALES.m8s` |
 | Scales manifest | `fixtures/6.5.x/songs/SCALES.yaml` |
+| Key-only fixture | `fixtures/6.5.x/songs/KEY_ONLY.m8s` |
+| Key-only manifest | `fixtures/6.5.x/songs/KEY_ONLY.yaml` |
 | Mixer fixture | `fixtures/6.5.x/songs/MIXER.m8s` |
 | Mixer manifest | `fixtures/6.5.x/songs/MIXER.yaml` |
 | Effects Settings fixture | `fixtures/6.5.x/songs/EFFECTS.m8s` |
