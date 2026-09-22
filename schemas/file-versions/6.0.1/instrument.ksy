@@ -17,54 +17,63 @@ doc: |
   MODS, and table fixtures. Unknown ranges are preserved until additional
   instrument fixtures provide evidence for their layout.
 seq:
-  - id: instrument_type
-    type: u1
-    enum: instrument_type
-  - id: name
-    size: 12
-    doc: |
-      Fixed-size byte range for the instrument name. Padding bytes are preserved
-      as stored.
-  - id: transpose
-    type: u1
-    doc: |
-      Common instrument transpose setting. Observed values: 0x01 means ON,
-      0x00 means OFF.
-  - id: table_tic
-    type: u1
-    doc: Common instrument table TIC setting.
-  - id: body_before_eq
-    type:
-      switch-on: instrument_type
-      cases:
-        'instrument_type::wavsynth': wavsynth_body_before_eq
-        'instrument_type::macrosynth': macrosynth_body_before_eq
-        'instrument_type::sampler': sampler_body_before_eq
-        'instrument_type::midi_out': midi_out_body_before_eq
-        'instrument_type::fm_synth': fm_synth_body_before_eq
-        'instrument_type::hypersynth': hypersynth_body_before_eq
-        'instrument_type::external': external_body_before_eq
-        'instrument_type::none': unused_body_before_eq
-    doc: Instrument-specific body before the common EQ field.
-  - id: eq
-    type: u1
-    doc: |
-      Common instrument EQ assignment. Observed values: 0x80 displays as --,
-      0x7f displays as 7F.
-  - id: tail
-    type:
-      switch-on: instrument_type
-      cases:
-        'instrument_type::sampler': sampler_tail
-        'instrument_type::hypersynth': hypersynth_tail
-        'instrument_type::midi_out': table_tail
-        'instrument_type::wavsynth': table_tail
-        'instrument_type::macrosynth': table_tail
-        'instrument_type::fm_synth': table_tail
-        'instrument_type::external': table_tail
-        'instrument_type::none': none_tail
-    doc: Instrument-specific tail after the common EQ field.
+  - id: instrument
+    type: instrument_data
+  - id: table
+    type: instrument_table
 types:
+  instrument_data:
+    doc: |
+      Fixed 215-byte instrument record. This record is stored directly in Song
+      files; standalone Instrument files append one 128-byte instrument table.
+    seq:
+      - id: instrument_type
+        type: u1
+        enum: instrument_type
+      - id: name
+        size: 12
+        doc: |
+          Fixed-size byte range for the instrument name. Padding bytes are
+          preserved as stored.
+      - id: transpose
+        type: u1
+        doc: |
+          Common instrument transpose setting. Observed values: 0x01 means ON,
+          0x00 means OFF.
+      - id: table_tic
+        type: u1
+        doc: Common instrument table TIC setting.
+      - id: body_before_eq
+        type:
+          switch-on: instrument_type
+          cases:
+            'instrument_type::wavsynth': wavsynth_body_before_eq
+            'instrument_type::macrosynth': macrosynth_body_before_eq
+            'instrument_type::sampler': sampler_body_before_eq
+            'instrument_type::midi_out': midi_out_body_before_eq
+            'instrument_type::fm_synth': fm_synth_body_before_eq
+            'instrument_type::hypersynth': hypersynth_body_before_eq
+            'instrument_type::external': external_body_before_eq
+            'instrument_type::none': unused_body_before_eq
+        doc: Instrument-specific body before the common EQ field.
+      - id: eq
+        type: u1
+        doc: |
+          Common instrument EQ assignment. Observed values: 0x80 displays as
+          --, 0x7f displays as 7F.
+      - id: tail
+        type:
+          switch-on: instrument_type
+          cases:
+            'instrument_type::sampler': sampler_data_tail
+            'instrument_type::hypersynth': hypersynth_data_tail
+            'instrument_type::midi_out': standard_data_tail
+            'instrument_type::wavsynth': standard_data_tail
+            'instrument_type::macrosynth': standard_data_tail
+            'instrument_type::fm_synth': standard_data_tail
+            'instrument_type::external': standard_data_tail
+            'instrument_type::none': none_data_tail
+        doc: Instrument-specific tail after the common EQ field.
   unused_body_before_eq:
     doc: |
       Preserved bytes between the common instrument prefix and common EQ field
@@ -442,21 +451,17 @@ types:
         type: u1
       - id: reverb
         type: u1
-  table_tail:
+  standard_data_tail:
     seq:
       - id: modulators
         type: instrument_modulators
-      - id: unknown_before_table
+      - id: unknown_after_modulators
         size: 128
-      - id: table
-        type: instrument_table
-  none_tail:
+  none_data_tail:
     seq:
-      - id: unknown_before_table
+      - id: unknown
         size: 152
-      - id: table
-        type: instrument_table
-  sampler_tail:
+  sampler_data_tail:
     seq:
       - id: modulators
         type: instrument_modulators
@@ -467,9 +472,7 @@ types:
           are verified by Sampler fixtures; full maximum length is inferred from
           the surrounding fixed instrument layout and should be refined if future
           evidence contradicts it.
-      - id: table
-        type: instrument_table
-  hypersynth_tail:
+  hypersynth_data_tail:
     seq:
       - id: modulators
         type: instrument_modulators
@@ -479,8 +482,6 @@ types:
         repeat-expr: 16
       - id: unknown_after_chords
         size: 16
-      - id: table
-        type: instrument_table
   hypersynth_chord:
     seq:
       - id: enabled_notes

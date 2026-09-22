@@ -197,6 +197,13 @@ tools/map-fixture.js \
 
 tools/map-fixture.js \
   fixtures/6.5.x/songs/DEFAULT.m8s \
+  fixtures/6.5.x/songs/INSTRUMENTS.m8s \
+  fixtures/6.5.x/songs/INSTRUMENTS.yaml
+
+node tools/verify-embedded-instruments.js
+
+tools/map-fixture.js \
+  fixtures/6.5.x/songs/DEFAULT.m8s \
   fixtures/6.5.x/songs/SCALES.m8s \
   fixtures/6.5.x/songs/SCALES.yaml
 

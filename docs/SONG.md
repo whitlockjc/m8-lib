@@ -3,10 +3,10 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Song
-View, Phrase View, Bookmarks, Chain View, Mixer, Grooves, Effects Settings, Mix
-& Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI Mapping, and
-Scales pages. Most of the Song body remains preserved as unknown bytes until
-additional Song fixtures map those regions.
+View, Phrase View, Bookmarks, Chain View, Instruments, Mixer, Grooves, Effects
+Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI
+Mapping, and Scales pages. Remaining unknown Song bytes are preserved until
+additional fixtures map those regions.
 
 ## Schema
 
@@ -36,8 +36,9 @@ Offsets are absolute file offsets.
 | `grooves` | `0x00ee..0x02ed` | 512 | [Grooves](#grooves) |
 | `rows` | `0x02ee..0x0aed` | 2048 | [Song Rows](#song-rows) |
 | `phrases` | `0x0aee..0x9a5d` | 36720 | [Phrases](#phrases) |
-| `chains` | `0x9a5e..0xba5d` | 8192 | [Chains](#chains) |
-| `unknownBetweenChainsAndEffectsAndScope` | `0xba5e..0x1a5bd` | 60256 | unknown bytes |
+| `chains` | `0x9a5e..0xba3d` | 8160 | [Chains](#chains) |
+| `tables` | `0xba3e..0x13a3d` | 32768 | [Tables](#tables) |
+| `instruments` | `0x13a3e..0x1a5bd` | 27520 | [Instruments](#instruments) |
 | `effectsAndScope` | `0x1a5be..0x1a5da` | 29 | [Effects & Scope Storage](#effects--scope-storage) |
 | `unknownBetweenEffectsAndScopeAndMidiMappings` | `0x1a5db..0x1a5fd` | 35 | unknown bytes |
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
@@ -308,14 +309,15 @@ The `BOOKMARKS.m8s` fixture verifies:
 
 ### Chains
 
-The Chain View stores 256 chains. Each chain stores 16 rows. Each row stores a
-phrase index and a transpose byte.
+The Chain View stores chain indexes `0x00` through `0xfe`. The value `0xff` is
+an unset chain reference rather than a stored Chain record. Each Chain stores
+16 rows, and each row stores a phrase index and a transpose byte.
 
 Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `entries[0..255]` | `0x9a5e..0xba5d` | 8192 | [Chain](#chain) |
+| `entries[0..254]` | `0x9a5e..0xba3d` | 8160 | [Chain](#chain) |
 
 ### Chain
 
@@ -345,8 +347,48 @@ The `CHAINS.m8s` fixture verifies:
 | `0xfe` | `0xba1e..0xba3d` | phrase `0xfe..0xef`, transpose `0x01..0x10` |
 
 The observed distance between chain `0x00` and chain `0xfe` is `0x1fc0` bytes,
-which verifies a `0x20` byte chain stride. The full `0x9a5e..0xba5d` table range
-follows from 256 chains at 32 bytes per chain.
+which verifies a `0x20` byte chain stride. `INSTRUMENTS.m8s` establishes that
+the following Table region begins at `0xba3e`, completing the evidence for 255
+stored Chain records.
+
+### Tables
+
+The Song stores 256 adjacent 128-byte Table records. Each record uses the same
+layout as the Table appended to a standalone Instrument file.
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0..255]` | `0xba3e..0x13a3d` | 32768 | [Instrument Table](INSTRUMENT.md#instrument-table) |
+
+Every Table in `INSTRUMENTS.m8s` has the standalone default Table bytes. This
+verifies the record shape and region boundaries. The M8's documented indexing
+rule associates the first 128 Tables directly with the 128 Instruments:
+`tables[n]` belongs to `instruments[n]` for indexes `0x00..0x7f`. The role of
+Tables `0x80..0xff` is not yet documented here.
+
+### Instruments
+
+The Song stores 128 adjacent 215-byte Instrument records. Each record matches
+the `instrumentData` portion of a standalone Instrument file. Standalone files
+add a 14-byte M8 file header before the record and one 128-byte Table after it.
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0..127]` | `0x13a3e..0x1a5bd` | 27520 | [Instrument Data](INSTRUMENT.md#common-layout) |
+
+The `INSTRUMENTS.m8s` fixture verifies both boundaries:
+
+| Instrument | Offset / Range | Type | Standalone Comparison |
+| --- | --- | --- | --- |
+| `0x00` | `0x13a3e..0x13b14` | `WAVSYNTH` | Matches `WAV_DEFAULT.m8i` instrument data except name |
+| `0x7f` | `0x1a4e7..0x1a5bd` | `HYPERSYN` | Matches `HYP_DEFAULT.m8i` instrument data except name |
+
+For both records, the embedded 12-byte `name` range is all `0xff`; every other
+byte matches the corresponding standalone default Instrument record exactly.
 
 ### Embedded Scales
 
@@ -844,10 +886,15 @@ are mapped.
 - The Bookmarks table is verified at `0x1a97e..0x1aa7d`. The fixture modifies
   rows `0x00`, `0x01`, `0xfe`, and `0xff`, which verifies the table boundaries
   as 256 one-byte row bitmasks.
-- The Chains table is modeled at `0x9a5e..0xba5d`. The fixture verifies chain
-  `0x00`, chain `0xfe`, and the `0x20` byte chain stride. The final table range
-  is inferred from the M8's 256-chain structure and the verified row/entry
-  sizes.
+- The Chains table is verified at `0x9a5e..0xba3d`. `CHAINS.m8s` verifies chain
+  `0x00`, chain `0xfe`, and the `0x20` byte stride; `INSTRUMENTS.m8s` verifies
+  the next region starts at `0xba3e`. Chain reference `0xff` is unset.
+- The Tables region occupies `0xba3e..0x13a3d` as 256 records of 128 bytes.
+  Its boundaries and record shape are fixture-verified. Tables `0x00..0x7f`
+  are associated by matching index with Instruments `0x00..0x7f`.
+- The Instruments region is verified at `0x13a3e..0x1a5bd` as 128 records of
+  215 bytes. Boundary records `0x00` and `0x7f` match standalone Wavsynth and
+  Hypersynth instrument data except for their unset embedded names.
 - The embedded Scales table is verified at `0x1aa7e..0x1ad5d`. The table stores
   16 records of 46 bytes each. Each record matches the standalone Scale file
   body layout, excluding the standalone M8 file header.
@@ -884,8 +931,9 @@ are mapped.
 - The MIDI Mapping table is verified at `0x1a5fe..0x1a97d`.
 - The `MIDI_MAPPING.m8s` fixture required a chain and Wavsynth instrument so
   the M8 UI could create an instrument-parameter mapping. Changed bytes for
-  that setup are ignored by the MIDI Mapping manifest until chain and embedded
-  instrument regions are mapped directly.
+  that setup remain ignored by its page-focused manifest; the Chain and
+  embedded Instrument regions are now mapped independently by their dedicated
+  fixtures.
 - The refreshed `MIDI_MAPPING.m8s` fixture stores the reverb/effects mapping in
   record `0x03` as `04 81 0b 00 09 40 fc`, verifying the `T:Y` control number,
   range bytes, and `X:09:REV SIZE` destination.
@@ -922,6 +970,8 @@ are mapped.
 | Bookmarks manifest | `fixtures/6.5.x/songs/BOOKMARKS.yaml` |
 | Chains fixture | `fixtures/6.5.x/songs/CHAINS.m8s` |
 | Chains manifest | `fixtures/6.5.x/songs/CHAINS.yaml` |
+| Instruments fixture | `fixtures/6.5.x/songs/INSTRUMENTS.m8s` |
+| Instruments manifest | `fixtures/6.5.x/songs/INSTRUMENTS.yaml` |
 | Scales fixture | `fixtures/6.5.x/songs/SCALES.m8s` |
 | Scales manifest | `fixtures/6.5.x/songs/SCALES.yaml` |
 | Key-only fixture | `fixtures/6.5.x/songs/KEY_ONLY.m8s` |

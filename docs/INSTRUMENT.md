@@ -44,9 +44,7 @@ Remaining work is semantic rather than container-structural:
 - finish FX command-family labels, byte values, availability, and amount
   semantics in [FX Commands](FX_COMMANDS.md),
 - classify preserved bytes as `field`, `state`, `cache`, `reserved`,
-  `padding`, or `unknown` when targeted fixtures provide evidence,
-- compare standalone Instrument files with embedded Song instruments after the
-  Song schema is mapped.
+  `padding`, or `unknown` when targeted fixtures provide evidence.
 
 ## Common Layout
 
@@ -55,17 +53,25 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | M8 File Header | `0x00..0x0d` | 14 | [M8 File Header](FILE_HEADER.md) |
+| `instrumentData` | `0x0e..0xe4` | 215 | instrument record |
 | `instrumentType` | `0x0e` | 1 | [Instrument Type](#instrument-type) |
 | `name` | `0x0f..0x1a` | 12 | [Fixed String](#fixed-strings) |
 | `transpose` | `0x1b` | 1 | `u1` |
 | `tableTic` | `0x1c` | 1 | `u1` |
 | `bodyBeforeEq` | `0x1d..0x4b` | 47 | [Body Before EQ](#body-before-eq) |
 | `eq` | `0x4c` | 1 | `u1` |
-| `tail` | `0x4d..0x164` | 280 | [Tail](#tail) |
+| `tail` | `0x4d..0xe4` | 152 | [Tail](#tail) |
+| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
 
 The `bodyBeforeEq` layout depends on `instrumentType`. For `none`, this range
 is preserved but not documented as meaningful fields, because the M8 UI does
 not expose editable `NONE` instrument parameters.
+
+`INSTRUMENTS.m8s` verifies that Song files reuse `instrumentData` exactly. Its
+embedded Wavsynth and Hypersynth records match the first 215 body bytes of
+`WAV_DEFAULT.m8i` and `HYP_DEFAULT.m8i`, respectively, except that the embedded
+12-byte names are unset (`0xff`). Song Tables are stored separately from the
+128 embedded Instrument records.
 
 ### Instrument Type
 
@@ -503,25 +509,20 @@ Offsets are relative to the start of `mixer`.
 
 ## Tail
 
-The tail layout depends on `instrumentType`. Verified editable instruments
-start with a shared 24-byte modulation block. `WAV_TABLE.m8i`,
-`MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`, `FM_TABLE.m8i`, and
-`EXT_TABLE.m8i` verify that the Wavsynth, Macrosynth, Sampler, MIDI Out, FM
-Synth, and External instrument tables are stored at `0xe5..0x164`.
-`HYP_TABLE.m8i` verifies the same table location for Hypersynth, after its
-chord table and a 16-byte unknown gap. `NONE_TABLE.m8i` verifies the same table
-location for `none`, after a larger preserved pre-table region because the M8 UI
-does not expose editable `NONE` instrument modulators.
+The 152-byte tail is the final portion of `instrumentData`, and its layout
+depends on `instrumentType`. Verified editable instruments start with a shared
+24-byte modulation block. The standalone Instrument Table follows the tail at
+`0xe5`; Song files store the same 215-byte `instrumentData` records and keep
+their Tables in a separate region.
 
-### Table Tail
+### Standard Tail
 
 Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
-| `unknownBeforeTable` | `0x65..0xe4` | 128 | unknown bytes |
-| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
+| `unknownAfterModulators` | `0x65..0xe4` | 128 | unknown bytes |
 
 ### NONE Tail
 
@@ -529,8 +530,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `unknownBeforeTable` | `0x4d..0xe4` | 152 | unknown bytes |
-| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
+| `unknown` | `0x4d..0xe4` | 152 | unknown bytes |
 
 ### Sampler Tail
 
@@ -540,7 +540,6 @@ Offsets are absolute file offsets.
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `samplePath` | `0x65..0xe4` | 128 | [Fixed String](#fixed-strings) |
-| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
 
 The Sampler fixtures verify that the selected sample path `/Samples/Kick.wav`
 starts at `0x65`. The full 128-byte `samplePath` range is provisional until a
@@ -555,7 +554,6 @@ Offsets are absolute file offsets.
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `chords` | `0x65..0xd4` | 112 | [Hypersynth Chord](#hypersynth-chord) |
 | `unknownAfterChords` | `0xd5..0xe4` | 16 | unknown bytes |
-| `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
 
 The `HYP_PARAMS.m8i` fixture verifies chord `0` begins at `0x65` and chord
 `15` begins at `0xce`. This implies 16 chord entries of 7 bytes each.
@@ -1509,9 +1507,9 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `none.bodyBeforeEq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until future fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
-| `unknownBeforeTable` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, and External until future fixtures map this region |
+| `unknownAfterModulators` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, and External until future fixtures map this region |
 | `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
-| `none.unknownBeforeTable` | `0x4d..0xe4` | 152 | Preserved for `none` until future fixtures map this region |
+| `none.unknown` | `0x4d..0xe4` | 152 | Preserved for `none` until future fixtures map this region |
 
 The `NONE` instrument does not expose editable instrument parameters or
 modulators, but it can store an editable table. `NONE_DEFAULT.m8i` verifies the
@@ -1520,9 +1518,10 @@ unused body bytes. `NONE_TABLE.m8i` verifies the table location and row layout.
 
 ## Notes
 
-- Standalone Instrument files and instruments embedded in Song files are
-  expected to share the same in-memory representation. This should be verified
-  when Song instrument regions are mapped.
+- `INSTRUMENTS.m8s` verifies that standalone Instrument files and instruments
+  embedded in Song files share the same 215-byte `instrumentData`
+  representation. Standalone files append one 128-byte Table, while Songs
+  store Tables in a separate region.
 - Enumerated values should document both stored representation and UI label.
   Verified instrument type values are `wavsynth = 0x00`,
   `macrosynth = 0x01`, `sampler = 0x02`, `midiOut = 0x03`,

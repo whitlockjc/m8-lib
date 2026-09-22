@@ -1,0 +1,114 @@
+fileType: song
+firmware: 6.5.2C
+screen: instrument
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving INSTRUMENTS fixture; not mapped to Instrument fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving INSTRUMENTS fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 49 4e 53 54 52 55 4d 45 4e 54 53 00
+
+  - name: chains[0].rows[0].phrase
+    offset: 0x9a5e
+    original: 0xff
+    new: 0x00
+
+  - name: instruments[0].type
+    offset: 0x13a3e
+    original: 0xff
+    new: 0x00
+  - name: instruments[0].bodyBeforeEq
+    offset: 0x13a4d
+    originalBytes: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+    newBytes: 00 00 80 00 20 00 00 00 00 ff 00 00 00 80 c0 00 00 00 00 00
+  - name: instruments[0].modulators
+    offset: 0x13a7d
+    originalBytes: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+    newBytes: 00 ff 00 00 80 ff 00 ff 00 00 80 ff 30 ff 00 00 10 ff 30 ff 00 00 10
+
+  - name: instruments[127].type
+    offset: 0x1a4e7
+    original: 0xff
+    new: 0x05
+  - name: instruments[127].bodyBeforeEq
+    offset: 0x1a4f6
+    originalBytes: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+    newBytes: 00 00 80 00 00 00 00 00 00 00 00 80 00 00 80 00 ff 00 00 00 80 c0 00 00 00 00 00 00
+  - name: instruments[127].modulators
+    offset: 0x1a526
+    originalBytes: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+    newBytes: 00 ff 00 00 80 ff 00 ff 00 00 80 ff 30 ff 00 00 10 ff 30 ff 00 00 10
+  - name: instruments[127].chords[0].enabledNotes
+    offset: 0x1a53e
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[1].enabledNotes
+    offset: 0x1a545
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[2].enabledNotes
+    offset: 0x1a54c
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[3].enabledNotes
+    offset: 0x1a553
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[4].enabledNotes
+    offset: 0x1a55a
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[5].enabledNotes
+    offset: 0x1a561
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[6].enabledNotes
+    offset: 0x1a568
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[7].enabledNotes
+    offset: 0x1a56f
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[8].enabledNotes
+    offset: 0x1a576
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[9].enabledNotes
+    offset: 0x1a57d
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[10].enabledNotes
+    offset: 0x1a584
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[11].enabledNotes
+    offset: 0x1a58b
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[12].enabledNotes
+    offset: 0x1a592
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[13].enabledNotes
+    offset: 0x1a599
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[14].enabledNotes
+    offset: 0x1a5a0
+    original: 0x00
+    new: 0xff
+  - name: instruments[127].chords[15].enabledNotes
+    offset: 0x1a5a7
+    original: 0x00
+    new: 0xff

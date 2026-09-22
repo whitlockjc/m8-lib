@@ -3,17 +3,20 @@ meta:
   endian: le
   license: Apache-2.0
   ks-version: 0.11
+  imports:
+    - ../6.0.1/instrument
 doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
   Phrase View, Bookmarks, Chain View, Scales View, Mixer, Grooves, Effects
   Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and
-  MIDI Mapping page fixtures. The Project settings, MIDI Settings, Song rows,
-  Phrases, Bookmarks, Chains, embedded Scales, Mixer, Grooves, Effects Settings,
-  Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping
-  regions are partially mapped. Remaining Song regions are preserved as raw
-  bytes until future fixtures provide evidence for their layout.
+  MIDI Mapping, and Instrument fixtures. The Project settings, MIDI Settings,
+  Song rows, Phrases, Bookmarks, Chains, Tables, Instruments, embedded Scales,
+  Mixer, Grooves, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay
+  EQ, Reverb EQ, and MIDI Mapping regions are partially mapped. Remaining Song
+  regions are preserved as raw bytes until future fixtures provide evidence for
+  their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -36,13 +39,14 @@ seq:
     type: phrases
   - id: chains
     type: chains
-  - id: unknown_between_chains_and_effects_and_scope
-    size: 60256
+  - id: tables
+    type: tables
     doc: |
-      Preserved bytes between Chains and the Effects/Mix & Limiter Scope
-      storage. The MIDI_MAPPING fixture changes bytes in this region to set up
-      a required Wavsynth instrument; those changes are not mapped by this Song
-      schema yet.
+      Song table storage. Record boundaries and default bytes are verified by
+      INSTRUMENTS.m8s. Tables 0x00 through 0x7f are associated by matching index
+      with Instruments 0x00 through 0x7f.
+  - id: instruments
+    type: instruments
   - id: effects_and_scope
     type: effects_and_scope_settings
   - id: unknown_between_effects_and_scope_and_midi_mappings
@@ -164,13 +168,13 @@ types:
   chains:
     doc: |
       Chain View storage. Offsets are relative to absolute file offset 0x9a5e
-      in 6.5.x fixtures. The M8 stores 256 chains, and each chain stores 16
-      rows.
+      in 6.5.x fixtures. The M8 stores chain indexes 0x00 through 0xfe; 0xff is
+      the unset reference sentinel. Each chain stores 16 rows.
     seq:
       - id: entries
         type: chain
         repeat: expr
-        repeat-expr: 256
+        repeat-expr: 255
   chain:
     doc: Thirty-two-byte Chain View record containing 16 two-byte rows.
     seq:
@@ -187,6 +191,28 @@ types:
         type: u1
       - id: transpose
         type: u1
+  tables:
+    doc: |
+      Song table storage at absolute offsets 0xba3e..0x13a3d. The region contains
+      256 fixed 128-byte tables using the same table structure appended to a
+      standalone Instrument file. Tables 0x00 through 0x7f are associated with
+      Instruments 0x00 through 0x7f by matching index. The purpose of Tables
+      0x80 through 0xff is not yet documented by this schema.
+    seq:
+      - id: entries
+        type: instrument_6_0_1::instrument_table
+        repeat: expr
+        repeat-expr: 256
+  instruments:
+    doc: |
+      Song instrument storage at absolute offsets 0x13a3e..0x1a5bd. The region
+      contains 128 fixed 215-byte instrument records using the same structure as
+      the instrument portion of a standalone Instrument file.
+    seq:
+      - id: entries
+        type: instrument_6_0_1::instrument_data
+        repeat: expr
+        repeat-expr: 128
   project_settings:
     doc: |
       Project page settings. Offsets are relative to absolute file offset

@@ -157,6 +157,37 @@ Needed research:
 - Decide whether generated readers should expose the raw 7-byte mapping record
   directly, or add destination-specific decoded views on top of it.
 
+## Song Table Association
+
+Status: structure mapped; first 128 associations documented
+
+Observation:
+
+- The 6.5.x `INSTRUMENTS.m8s` fixture establishes a 32768-byte region at
+  `0xba3e..0x13a3d`, immediately before the embedded Instrument records.
+- The region contains 256 adjacent 128-byte records, each matching the Table
+  structure appended to standalone Instrument files.
+- All 256 records contain default Table bytes in the current fixture, so no
+  individual Song Table index is distinguished by changed data.
+- The Song stores 128 Instrument records but 256 Table records.
+- M8 documentation establishes that Tables `0x00..0x7f` are associated by
+  matching index with Instruments `0x00..0x7f`.
+
+Implication:
+
+- The Song schema can represent this region as 256 raw Instrument Table
+  records without leaving an unknown gap.
+- Schemas and user-facing APIs may expose the direct relationship between the
+  first 128 Tables and the 128 Instruments.
+- The purpose of Tables `0x80..0xff` should remain unspecified until documented
+  evidence or targeted fixtures establish their semantics.
+
+Needed research:
+
+- Create a Song fixture with a deliberately modified Table to confirm the
+  documented matching-index storage for Tables `0x00..0x7f`.
+- Determine how Tables `0x80..0xff` are addressed and what role they serve.
+
 ## Song Mix & Limiter Scope Zoom
 
 Status: open
@@ -266,8 +297,14 @@ Needed research:
 
 - Revisit preserved Instrument bytes only when targeted fixtures or Song
   embedding evidence can prove their meaning.
-- Compare standalone Instrument files with embedded Song instruments after the
-  Song schema is mapped.
+
+Resolved comparison:
+
+- `INSTRUMENTS.m8s` verifies that embedded Wavsynth and Hypersynth records use
+  the same 215-byte `instrumentData` structure as standalone Instrument files.
+  Their only differences from the corresponding standalone defaults are the
+  unset embedded names. This comparison does not assign new semantics to the
+  remaining preserved bytes.
 
 ## FM Synth Common Enum Slots
 
