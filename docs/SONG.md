@@ -53,16 +53,18 @@ Offsets are absolute file offsets.
 
 ### Directory Region
 
-The 128-byte region begins with a null-terminated directory path. Its remaining
-bytes are preserved raw because they vary between fixtures and are not known to
-be padding. The path is `/Songs/6_5_X/` in all 21 current 6.5.x Song fixtures,
-with a terminator at `0x001b`. The `PROJECT.m8s` fixture was refreshed to
-remove an extra trailing slash that appeared in its earlier version.
+The directory occupies a fixed 128-byte field. The path is null-terminated;
+the remaining bytes are reserved directory-field capacity, not a separate
+unmapped Song region. Preserve those bytes verbatim: they vary between saves
+and are not verified to be zero-filled padding. The path is `/Songs/6_5_X/`
+in current 6.5.x Song fixtures, with a terminator at `0x001b`. The
+`PROJECT.m8s` fixture was refreshed to remove an extra trailing slash that
+appeared in its earlier version.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `path` | Starts at `0x000e` | Variable, including terminator | Null-terminated ASCII string |
-| `trailing` | After the terminator through `0x008d` | Remaining bytes | Preserved unknown bytes |
+| `trailing` | After the terminator through `0x008d` | Remaining bytes | Reserved directory-field capacity; preserve raw |
 
 ### Project Settings
 
@@ -993,9 +995,9 @@ are mapped.
   <https://github.com/whitlockjc/m8-js> reference code suggests some of these
   bytes may contain Delay or Reverb filter storage, but that is not
   fixture-verified for 6.5.x yet.
-- The directory path in `directoryRegion` is mapped, but bytes after its null
-  terminator still change between fixture saves. Those trailing bytes remain
-  preserved until targeted fixtures identify their meaning.
+- The full 128-byte `directoryRegion` is accounted for as a fixed-width
+  directory field. Its post-terminator bytes vary between fixture saves and
+  must remain byte-preserved; they are not treated as zero-filled padding.
 - `unknownTrailingState` changed in the fixture diff but does not yet have a
   Project UI meaning. It is preserved and should be revisited with additional
   Project or Song fixtures.

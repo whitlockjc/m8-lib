@@ -22,9 +22,10 @@ seq:
     type: directory_region
     size: 128
     doc: |
-      Null-terminated directory path followed by preserved bytes. The path is
-      /Songs/6_5_X/ in all current 6.5.x Song fixtures. The post-terminator
-      bytes vary between fixtures and must not be treated as string padding.
+      Fixed 128-byte directory field. The null-terminated path is followed by
+      the remaining reserved bytes in this field. The path is /Songs/6_5_X/
+      in current 6.5.x Song fixtures. Post-terminator bytes vary between saves
+      and must be preserved verbatim, not assumed to be zero-filled padding.
   - id: project
     type: project_settings
   - id: unknown_between_project_and_mixer
@@ -75,14 +76,14 @@ seq:
     size-eos: true
 types:
   directory_region:
-    doc: Fixed 128-byte region containing the Song directory and trailing bytes.
+    doc: Fixed 128-byte Song directory field, including reserved post-terminator space.
     seq:
       - id: path
         type: strz
         encoding: ASCII
       - id: trailing
         size: _io.size - _io.pos
-        doc: Preserved bytes after the path terminator; meaning unknown.
+        doc: Reserved directory-field capacity after the path terminator; preserve stored bytes.
   grooves:
     doc: |
       Groove storage. Offsets are relative to absolute file offset 0x00ee in

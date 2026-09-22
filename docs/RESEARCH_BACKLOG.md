@@ -72,17 +72,19 @@ Status: open
 Observation:
 
 - The 6.5.x `PROJECT.m8s` fixture maps Project page fields at `0x008e..0x00bc`.
-- Song fixtures verify a null-terminated directory path beginning at `0x000e`.
-- The same fixture also changes bytes after the directory terminator through
-  `0x008d` and `0x00bd..0x00be` that were not part of the intended Project
-  page changes.
+- Song fixtures verify a fixed 128-byte directory field beginning at `0x000e`.
+  The null-terminated path occupies only part of that field; the remaining
+  reserved bytes vary between saves and are preserved raw.
+- The same fixture also changes `0x00bd..0x00be`, which was not part of the
+  intended Project page changes.
 
 Implication:
 
-- The Song schema preserves these regions as unknown/state bytes.
-- Fixture manifests may ignore changed bytes in these ranges so intentional
-  Project field mapping can be verified without inventing unsupported field
-  names.
+- The directory field is fully accounted for by its fixed 128-byte size;
+  variable post-terminator bytes are not an additional unmapped Song region.
+- The Song schema still preserves `0x00bd..0x00be` as unknown/state bytes.
+- Fixture manifests may ignore incidental save-state changes while verifying
+  intentional Project field changes.
 
 Needed research:
 
