@@ -249,6 +249,11 @@ tools/map-fixture.js \
 
 tools/map-fixture.js \
   fixtures/6.5.x/songs/DEFAULT.m8s \
+  fixtures/6.5.x/songs/EQS.m8s \
+  fixtures/6.5.x/songs/EQS.yaml
+
+tools/map-fixture.js \
+  fixtures/6.5.x/songs/DEFAULT.m8s \
   fixtures/6.5.x/songs/MODFX_EQ.m8s \
   fixtures/6.5.x/songs/MODFX_EQ.yaml
 

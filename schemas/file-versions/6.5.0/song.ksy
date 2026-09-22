@@ -10,10 +10,10 @@ doc: |
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
   Phrase View, Bookmarks, Chain View, Scales View, Mixer, Grooves, Effects
-  Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and
+  Settings, Mix & Limiter Scope, Instrument EQs, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and
   MIDI Mapping, Instrument, and Table fixtures. The Project settings, MIDI Settings,
   Song rows, Phrases, Bookmarks, Chains, Tables, Instruments, embedded Scales,
-  Mixer, Grooves, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay
+  Mixer, Grooves, Effects Settings, Mix & Limiter Scope, Instrument EQs, Mix EQ, ModFX EQ, Delay
   EQ, Reverb EQ, and MIDI Mapping regions are partially mapped. Remaining Song
   regions are preserved as raw bytes until future fixtures provide evidence for
   their layout.
@@ -61,9 +61,8 @@ seq:
     type: bookmarks
   - id: scales
     type: embedded_scales
-  - id: unknown_between_scales_and_mix_eq
-    size: 2304
-    doc: Preserved bytes between the embedded Scales table and Mix EQ settings.
+  - id: instrument_eqs
+    type: instrument_eqs
   - id: mix_eq
     type: eq_settings
   - id: mod_fx_eq
@@ -586,6 +585,13 @@ types:
         type: eq_band
       - id: high_band
         type: eq_band
+  instrument_eqs:
+    doc: 128 assignable Instrument EQ banks, each with the standard 18-byte EQ layout.
+    seq:
+      - id: entries
+        type: eq_settings
+        repeat: expr
+        repeat-expr: 128
   eq_band:
     doc: |
       Six-byte EQ band record. The type and mode are packed into one byte: bits

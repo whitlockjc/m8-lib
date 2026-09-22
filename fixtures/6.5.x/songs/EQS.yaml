@@ -1,0 +1,155 @@
+fileType: song
+firmware: 6.5.2C
+screen: instrument.eq
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving EQS fixture; not mapped to Instrument EQ fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving EQS fixture; Project UI meaning is unknown
+  - name: songSetup.chain
+    offset: 0x9a5e
+    size: 0x0001
+    reason: chain created to reach Instrument EQ editor
+  - name: songSetup.instrument
+    offset: 0x13a3e
+    size: 0x00d7
+    reason: Instrument created to reach EQ editor; instrument layout verified separately
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 45 51 53 00 00 00 00 00 00 00 00 00
+
+  - name: instrumentEqs.0.lowBand.typeAndMode
+    offset: 0x1ad5e
+    original: 0x01
+    new: 0x20
+    originalLabel: LOWSHELF/STEREO
+    newLabel: LOWCUT/MID
+  - name: instrumentEqs.0.lowBand.frequency
+    offset: 0x1ad5f
+    type: u2le
+    original: 100
+    new: 20
+  - name: instrumentEqs.0.lowBand.gain
+    offset: 0x1ad61
+    type: i2le
+    original: 0
+    new: -4000
+    scale: hundredths
+  - name: instrumentEqs.0.lowBand.q
+    offset: 0x1ad63
+    original: 50
+    new: 1
+  - name: instrumentEqs.0.midBand.typeAndMode
+    offset: 0x1ad64
+    original: 0x02
+    new: 0x43
+    originalLabel: BELL/STEREO
+    newLabel: BANDPASS/SIDE
+  - name: instrumentEqs.0.midBand.frequency
+    offset: 0x1ad65
+    type: u2le
+    original: 1000
+    new: 1870
+  - name: instrumentEqs.0.midBand.gain
+    offset: 0x1ad67
+    type: i2le
+    original: 0
+    new: 125
+    scale: hundredths
+  - name: instrumentEqs.0.midBand.q
+    offset: 0x1ad69
+    original: 50
+    new: 63
+  - name: instrumentEqs.0.highBand.typeAndMode
+    offset: 0x1ad6a
+    original: 0x04
+    new: 0x86
+    originalLabel: HI.SHELF/STEREO
+    newLabel: ALLPASS/RIGHT
+  - name: instrumentEqs.0.highBand.frequency
+    offset: 0x1ad6b
+    type: u2le
+    original: 5000
+    new: 7257
+  - name: instrumentEqs.0.highBand.gain
+    offset: 0x1ad6d
+    type: i2le
+    original: 0
+    new: 4000
+    scale: hundredths
+  - name: instrumentEqs.0.highBand.q
+    offset: 0x1ad6f
+    original: 50
+    new: 99
+
+  - name: instrumentEqs.127.lowBand.typeAndMode
+    offset: 0x1b64c
+    original: 0x01
+    new: 0x60
+    originalLabel: LOWSHELF/STEREO
+    newLabel: LOWCUT/LEFT
+  - name: instrumentEqs.127.lowBand.frequency
+    offset: 0x1b64d
+    type: u2le
+    original: 100
+    new: 55
+  - name: instrumentEqs.127.lowBand.gain
+    offset: 0x1b64f
+    type: i2le
+    original: 0
+    new: -575
+    scale: hundredths
+  - name: instrumentEqs.127.lowBand.q
+    offset: 0x1b651
+    original: 50
+    new: 43
+  - name: instrumentEqs.127.midBand.typeAndMode
+    offset: 0x1b652
+    original: 0x02
+    new: 0x21
+    originalLabel: BELL/STEREO
+    newLabel: LOWSHELF/MID
+  - name: instrumentEqs.127.midBand.frequency
+    offset: 0x1b653
+    type: u2le
+    original: 1000
+    new: 1757
+  - name: instrumentEqs.127.midBand.gain
+    offset: 0x1b655
+    type: i2le
+    original: 0
+    new: 575
+    scale: hundredths
+  - name: instrumentEqs.127.midBand.q
+    offset: 0x1b657
+    original: 50
+    new: 59
+  - name: instrumentEqs.127.highBand.typeAndMode
+    offset: 0x1b658
+    original: 0x04
+    new: 0x65
+    originalLabel: HI.SHELF/STEREO
+    newLabel: HI.CUT/LEFT
+  - name: instrumentEqs.127.highBand.frequency
+    offset: 0x1b659
+    type: u2le
+    original: 5000
+    new: 13909
+  - name: instrumentEqs.127.highBand.gain
+    offset: 0x1b65b
+    type: i2le
+    original: 0
+    new: 3925
+    scale: hundredths
+  - name: instrumentEqs.127.highBand.q
+    offset: 0x1b65d
+    original: 50
+    new: 91

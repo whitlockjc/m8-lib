@@ -44,7 +44,7 @@ Offsets are absolute file offsets.
 | `midiMappings` | `0x1a5fe..0x1a97d` | 896 | [MIDI Mappings](#midi-mappings) |
 | `bookmarks` | `0x1a97e..0x1aa7d` | 256 | [Bookmarks](#bookmarks) |
 | `scales` | `0x1aa7e..0x1ad5d` | 736 | [Embedded Scales](#embedded-scales) |
-| `unknownBetweenScalesAndMixEq` | `0x1ad5e..0x1b65d` | 2304 | unknown bytes |
+| `instrumentEqs` | `0x1ad5e..0x1b65d` | 2304 | [Instrument EQs](#instrument-eqs) |
 | `mixEq` | `0x1b65e..0x1b66f` | 18 | [Mix EQ](#mix-eq) |
 | `modFxEq` | `0x1b670..0x1b681` | 18 | [ModFX EQ](#modfx-eq) |
 | `delayEq` | `0x1b682..0x1b693` | 18 | [Delay EQ](#delay-eq) |
@@ -461,6 +461,24 @@ Offsets are relative to the start of each embedded Scale interval.
 | `offset` | `+0x00..+0x01` | 2 | `i2le` |
 
 `offset` is stored as hundredths of a semitone.
+
+### Instrument EQs
+
+The Song stores 128 assignable Instrument EQ banks. Each bank uses the same
+18-byte, three-band layout as [Mix EQ](#mix-eq). An Instrument's `eq` field
+selects a bank; bank number does not imply the same-numbered Instrument.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0]` | `0x1ad5e..0x1ad6f` | 18 | [EQ Band](#eq-band) `[3]` |
+| `entries[1..126]` | `0x1ad70..0x1b64b` | 2268 | [EQ Band](#eq-band) `[3]` per bank |
+| `entries[127]` | `0x1b64c..0x1b65d` | 18 | [EQ Band](#eq-band) `[3]` |
+
+Record `n` begins at `0x1ad5e + 18*n`. `EQS.m8s` changes the first and last
+records, confirming both table boundaries and the shared band layout. The
+revised fixture verifies bank `00` low-band gain `-40.00` and mid-band mode
+`SIDE`, and bank `7F` low-band gain `-5.75`. Both high bands start from
+`HI.SHELF`, as confirmed by the baseline.
 
 ### MIDI Settings
 
@@ -1019,6 +1037,8 @@ are mapped.
 | Mix & Limiter Scope manifest (`LIMIT_SCOPE`) | `fixtures/6.5.x/songs/LIMIT_SCOPE.yaml` |
 | Mix EQ fixture | `fixtures/6.5.x/songs/MIX_EQ.m8s` |
 | Mix EQ manifest | `fixtures/6.5.x/songs/MIX_EQ.yaml` |
+| Instrument EQs fixture | `fixtures/6.5.x/songs/EQS.m8s` |
+| Instrument EQs manifest | `fixtures/6.5.x/songs/EQS.yaml` |
 | ModFX EQ fixture | `fixtures/6.5.x/songs/MODFX_EQ.m8s` |
 | ModFX EQ manifest | `fixtures/6.5.x/songs/MODFX_EQ.yaml` |
 | Delay EQ fixture | `fixtures/6.5.x/songs/DELAY_EQ.m8s` |
