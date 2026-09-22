@@ -1516,6 +1516,24 @@ modulators, but it can store an editable table. `NONE_DEFAULT.m8i` verifies the
 `none` instrument type value, the fixed name location, and preservation of
 unused body bytes. `NONE_TABLE.m8i` verifies the table location and row layout.
 
+### Unknown Region Defaults (6.5.x)
+
+The following comparison uses the 6.5.2C default fixtures. Across each type's
+available default, params, mods, and table fixtures, no byte classified as
+unknown for that type changes. This establishes stability under the tested
+edits, not that the bytes are unused or constant in every valid file.
+
+| Offset / Range | Observed default values |
+| --- | --- |
+| `0x1d..0x1e` | `00 00` for Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External. MIDI Out uses these offsets for known parameters. |
+| `0x1f` | `80` for Wavsynth, Macrosynth, FM Synth, and Hypersynth; `00` for External. Sampler uses this offset for its mode-dependent value, and MIDI Out uses it for `bank`. |
+| `0x65..0xe4` | All `00` for Wavsynth, Macrosynth, FM Synth, and NONE. MIDI Out and External have identical repeating defaults that also match Hypersynth's default chord bytes at `0x65..0xd4` and its trailing bytes at `0xd5..0xe4`. Sampler uses this range for `samplePath`. |
+
+The unknown ranges before `eq` begin at different offsets for different
+instrument types. A same-offset comparison there may compare an unknown byte in
+one type with a known parameter in another. Matching tail bytes likewise do
+not establish that MIDI Out or External uses Hypersynth chords.
+
 ## Notes
 
 - `INSTRUMENTS.m8s` verifies that standalone Instrument files and instruments
