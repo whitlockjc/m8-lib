@@ -4,9 +4,9 @@ screen: project
 
 ignoredRanges:
   - name: songSaveState.beforeProject
-    offset: 0x001b
-    size: 0x0073
-    reason: changed while saving PROJECT fixture; not mapped to Project UI fields
+    offset: 0x001c
+    size: 0x0072
+    reason: changed after directory terminator while saving PROJECT fixture; meaning unknown
   - name: project.unknownTrailingState
     offset: 0x00bd
     size: 0x0002

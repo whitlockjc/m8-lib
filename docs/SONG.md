@@ -29,7 +29,7 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | M8 File Header | `0x0000..0x000d` | 14 | [M8 File Header](FILE_HEADER.md) |
-| `unknownBeforeProject` | `0x000e..0x008d` | 128 | unknown bytes |
+| `directoryRegion` | `0x000e..0x008d` | 128 | [Directory Region](#directory-region) |
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
 | `unknownBetweenProjectAndMixer` | `0x00bf..0x00cd` | 15 | unknown bytes |
 | `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
@@ -50,6 +50,19 @@ Offsets are absolute file offsets.
 | `delayEq` | `0x1b682..0x1b693` | 18 | [Delay EQ](#delay-eq) |
 | `reverbEq` | `0x1b694..0x1b6a5` | 18 | [Reverb EQ](#reverb-eq) |
 | `unknownAfterReverbEq` | `0x1b6a6..0x1b6c5` | 32 | unknown bytes |
+
+### Directory Region
+
+The 128-byte region begins with a null-terminated directory path. Its remaining
+bytes are preserved raw because they vary between fixtures and are not known to
+be padding. The path is `/Songs/6_5_X/` in all 21 current 6.5.x Song fixtures,
+with a terminator at `0x001b`. The `PROJECT.m8s` fixture was refreshed to
+remove an extra trailing slash that appeared in its earlier version.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `path` | Starts at `0x000e` | Variable, including terminator | Null-terminated ASCII string |
+| `trailing` | After the terminator through `0x008d` | Remaining bytes | Preserved unknown bytes |
 
 ### Project Settings
 
@@ -962,10 +975,9 @@ are mapped.
   <https://github.com/whitlockjc/m8-js> reference code suggests some of these
   bytes may contain Delay or Reverb filter storage, but that is not
   fixture-verified for 6.5.x yet.
-- `unknownBeforeProject` changed in the fixture diff, but those changes were
-  not mapped to Project UI fields. This region is preserved until targeted Song
-  fixtures identify whether it contains save/path state, project state, or other
-  fields.
+- The directory path in `directoryRegion` is mapped, but bytes after its null
+  terminator still change between fixture saves. Those trailing bytes remain
+  preserved until targeted fixtures identify their meaning.
 - `unknownTrailingState` changed in the fixture diff but does not yet have a
   Project UI meaning. It is preserved and should be revisited with additional
   Project or Song fixtures.

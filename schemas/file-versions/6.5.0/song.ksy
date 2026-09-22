@@ -18,12 +18,13 @@ doc: |
   regions are preserved as raw bytes until future fixtures provide evidence for
   their layout.
 seq:
-  - id: unknown_before_project
+  - id: directory_region
+    type: directory_region
     size: 128
     doc: |
-      Preserved bytes before the mapped Project settings region. The PROJECT
-      fixture changes bytes in this region during save, but those changes are
-      not mapped to Project UI fields yet.
+      Null-terminated directory path followed by preserved bytes. The path is
+      /Songs/6_5_X/ in all current 6.5.x Song fixtures. The post-terminator
+      bytes vary between fixtures and must not be treated as string padding.
   - id: project
     type: project_settings
   - id: unknown_between_project_and_mixer
@@ -74,6 +75,15 @@ seq:
   - id: unknown_after_reverb_eq
     size-eos: true
 types:
+  directory_region:
+    doc: Fixed 128-byte region containing the Song directory and trailing bytes.
+    seq:
+      - id: path
+        type: strz
+        encoding: ASCII
+      - id: trailing
+        size: _io.size - _io.pos
+        doc: Preserved bytes after the path terminator; meaning unknown.
   grooves:
     doc: |
       Groove storage. Offsets are relative to absolute file offset 0x00ee in

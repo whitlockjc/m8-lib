@@ -72,8 +72,10 @@ Status: open
 Observation:
 
 - The 6.5.x `PROJECT.m8s` fixture maps Project page fields at `0x008e..0x00bc`.
-- The same fixture also changes bytes at `0x001b..0x008d` and
-  `0x00bd..0x00be` that were not part of the intended Project page changes.
+- Song fixtures verify a null-terminated directory path beginning at `0x000e`.
+- The same fixture also changes bytes after the directory terminator through
+  `0x008d` and `0x00bd..0x00be` that were not part of the intended Project
+  page changes.
 
 Implication:
 
@@ -84,8 +86,8 @@ Implication:
 
 Needed research:
 
-- Create targeted Song fixtures that isolate save/path/device state from
-  Project page setting changes.
+- Create targeted Song fixtures that isolate save/device state from Project
+  page setting changes.
 - Revisit `0x00bd..0x00be` with additional Project fixtures to determine
   whether those bytes are Project state, derived data, or unrelated save state.
 
