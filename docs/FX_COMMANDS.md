@@ -205,7 +205,8 @@ the structural FX slot layout:
 | Current Instrument commands | Finish command coverage for the active instrument's common and instrument-specific commands |
 | Instrument Mods commands | Map labels, byte values, and amount semantics per target modulator type |
 | Phrase FX slots | Structural storage and Sequencer/Mixer & Effects command values verified by `PHRASES.m8s` |
-| Instrument table FX slots | Verify which command families are available inside instrument tables |
+| Song Table FX slots | Sequencer and Mixer & Effects families verified by `TABLES.m8s` |
+| Standalone Instrument table FX slots | Current Instrument commands verified by instrument-specific table fixtures; other family coverage remains open |
 | NONE instrument table | Map command byte values available when the active instrument is NONE |
 | Version boundaries | Check command values after firmware releases that mention new or changed FX commands |
 
@@ -213,6 +214,8 @@ the structural FX slot layout:
 
 - `fixtures/6.5.x/songs/PHRASES.m8s`
 - `fixtures/6.5.x/songs/PHRASES.yaml`
+- `fixtures/6.5.x/songs/TABLES.m8s`
+- `fixtures/6.5.x/songs/TABLES.yaml`
 - Dirtywave M8 Operation Manual v6.5.2, Appendix sections "Relative and
   Absolute FX Commands", "Sequencer FX Commands", "Mixer & Effects Commands",
   and "Instrument FX Commands":

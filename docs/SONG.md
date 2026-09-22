@@ -3,10 +3,10 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Song
-View, Phrase View, Bookmarks, Chain View, Instruments, Mixer, Grooves, Effects
-Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI
-Mapping, and Scales pages. Remaining unknown Song bytes are preserved until
-additional fixtures map those regions.
+View, Phrase View, Bookmarks, Chain View, Tables, Instruments, Mixer, Grooves,
+Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ,
+MIDI Mapping, and Scales pages. Remaining unknown Song bytes are preserved
+until additional fixtures map those regions.
 
 ## Schema
 
@@ -367,6 +367,20 @@ verifies the record shape and region boundaries. The M8's documented indexing
 rule associates the first 128 Tables directly with the 128 Instruments:
 `tables[n]` belongs to `instruments[n]` for indexes `0x00..0x7f`. The role of
 Tables `0x80..0xff` is not yet documented here.
+
+`TABLES.m8s` verifies both boundaries and the complete 16-row Table stride by
+modifying rows `0` and `F` in Tables `0x00` and `0xff`:
+
+| Table | Row | Offset / Range | Commands |
+| --- | --- | --- | --- |
+| `0x00` | `0` | `0xba3e..0xba45` | `ARP`, `ARC`, `CHA` |
+| `0x00` | `F` | `0xbab6..0xbabd` | `VMV`, `VMX`, `VDE` |
+| `0xff` | `0` | `0x139be..0x139c5` | `MTT`, `OFF`, `KIL` |
+| `0xff` | `F` | `0x13a36..0x13a3d` | `OTI`, `OTC`, `OTT` |
+
+This also verifies that Song Table FX slots accept Sequencer and Mixer &
+Effects command families. The test description named the final row `FE`; byte
+placement shows that the modified final row is row `F` (`0x0f`).
 
 ### Instruments
 
@@ -892,6 +906,9 @@ are mapped.
 - The Tables region occupies `0xba3e..0x13a3d` as 256 records of 128 bytes.
   Its boundaries and record shape are fixture-verified. Tables `0x00..0x7f`
   are associated by matching index with Instruments `0x00..0x7f`.
+- `TABLES.m8s` modifies rows `0` and `F` in Tables `0x00` and `0xff`, directly
+  verifying both Table-region boundaries, the 16-row record shape, and
+  Sequencer/Mixer & Effects commands in Song Table FX slots.
 - The Instruments region is verified at `0x13a3e..0x1a5bd` as 128 records of
   215 bytes. Boundary records `0x00` and `0x7f` match standalone Wavsynth and
   Hypersynth instrument data except for their unset embedded names.
@@ -972,6 +989,8 @@ are mapped.
 | Chains manifest | `fixtures/6.5.x/songs/CHAINS.yaml` |
 | Instruments fixture | `fixtures/6.5.x/songs/INSTRUMENTS.m8s` |
 | Instruments manifest | `fixtures/6.5.x/songs/INSTRUMENTS.yaml` |
+| Tables fixture | `fixtures/6.5.x/songs/TABLES.m8s` |
+| Tables manifest | `fixtures/6.5.x/songs/TABLES.yaml` |
 | Scales fixture | `fixtures/6.5.x/songs/SCALES.m8s` |
 | Scales manifest | `fixtures/6.5.x/songs/SCALES.yaml` |
 | Key-only fixture | `fixtures/6.5.x/songs/KEY_ONLY.m8s` |
@@ -1000,8 +1019,9 @@ are mapped.
 | Verification command | `npm run verify` |
 
 The manifest-driven mapper matched the Project, MIDI Settings, Song View,
-Bookmarks, Chain View, Scales View, Mixer, Effects Settings, Mix & Limiter
-Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping field changes
-exactly. It also accounts for fixture-changed bytes in explicitly ignored
-unknown ranges so page field mapping can be verified without assigning
-unsupported meanings to save/setup/state bytes.
+Phrase View, Bookmarks, Chain View, Table View, Instruments, Scales View,
+Mixer, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ,
+Reverb EQ, and MIDI Mapping field changes exactly. It also accounts for
+fixture-changed bytes in explicitly ignored unknown ranges so page field
+mapping can be verified without assigning unsupported meanings to
+save/setup/state bytes.

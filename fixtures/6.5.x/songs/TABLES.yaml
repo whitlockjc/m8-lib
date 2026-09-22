@@ -1,0 +1,44 @@
+fileType: song
+firmware: 6.5.2C
+screen: table
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving TABLES fixture; not mapped to Table fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving TABLES fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 54 41 42 4c 45 53 00 00 00 00 00 00
+
+  - name: chains[0].rows[0].phrase
+    offset: 0x9a5e
+    original: 0xff
+    new: 0x00
+
+  - name: tables[0].rows[0]
+    offset: 0xba3e
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: ff 7f 00 fe 45 fd 01 fc
+
+  - name: tables[0].rows[15]
+    offset: 0xbab6
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: fb 7e 1b fa 2a f9 2b f8
+
+  - name: tables[255].rows[0]
+    offset: 0x139be
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: ff 7f 4d fe 1a fd 05 fc
+
+  - name: tables[255].rows[15]
+    offset: 0x13a36
+    originalBytes: 00 ff ff 00 ff 00 ff 00
+    newBytes: fb 7e 4c fa 4b f9 4a f8

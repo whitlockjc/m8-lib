@@ -167,11 +167,14 @@ Observation:
   `0xba3e..0x13a3d`, immediately before the embedded Instrument records.
 - The region contains 256 adjacent 128-byte records, each matching the Table
   structure appended to standalone Instrument files.
-- All 256 records contain default Table bytes in the current fixture, so no
-  individual Song Table index is distinguished by changed data.
+- All 256 records contain default Table bytes in `INSTRUMENTS.m8s`; the later
+  `TABLES.m8s` fixture distinguishes boundary Table indexes.
 - The Song stores 128 Instrument records but 256 Table records.
 - M8 documentation establishes that Tables `0x00..0x7f` are associated by
   matching index with Instruments `0x00..0x7f`.
+- The 6.5.x `TABLES.m8s` fixture modifies the first and last rows of Tables
+  `0x00` and `0xff`, verifying both storage boundaries and direct access to
+  the full `0x00..0xff` Table index range.
 
 Implication:
 
@@ -184,9 +187,8 @@ Implication:
 
 Needed research:
 
-- Create a Song fixture with a deliberately modified Table to confirm the
-  documented matching-index storage for Tables `0x00..0x7f`.
-- Determine how Tables `0x80..0xff` are addressed and what role they serve.
+- Determine the semantic role of Tables `0x80..0xff` and whether they have any
+  relationship to Instruments beyond the documented first 128 associations.
 
 ## Song Mix & Limiter Scope Zoom
 

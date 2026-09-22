@@ -11,7 +11,7 @@ doc: |
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
   Phrase View, Bookmarks, Chain View, Scales View, Mixer, Grooves, Effects
   Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and
-  MIDI Mapping, and Instrument fixtures. The Project settings, MIDI Settings,
+  MIDI Mapping, Instrument, and Table fixtures. The Project settings, MIDI Settings,
   Song rows, Phrases, Bookmarks, Chains, Tables, Instruments, embedded Scales,
   Mixer, Grooves, Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay
   EQ, Reverb EQ, and MIDI Mapping regions are partially mapped. Remaining Song
@@ -197,7 +197,8 @@ types:
       256 fixed 128-byte tables using the same table structure appended to a
       standalone Instrument file. Tables 0x00 through 0x7f are associated with
       Instruments 0x00 through 0x7f by matching index. The purpose of Tables
-      0x80 through 0xff is not yet documented by this schema.
+      0x80 through 0xff is not yet documented by this schema. TABLES.m8s
+      verifies rows 0 and 15 in Tables 0x00 and 0xff.
     seq:
       - id: entries
         type: instrument_6_0_1::instrument_table
