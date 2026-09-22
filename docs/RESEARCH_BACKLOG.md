@@ -323,12 +323,14 @@ Needed research:
 
 ## FX Command Families
 
-Status: open
+Status: partially mapped
 
 Observation:
 
 - The M8 UI groups FX commands into Sequencer, Mixer & Effects, Current
   Instrument, and Instrument Mods sections.
+- The `PHRASES.m8s` fixture verifies the command byte values for the Sequencer
+  and Mixer & Effects families in Phrase FX slots.
 - Instrument table fixtures verify the two-byte FX slot shape and selected
   command byte values for Current Instrument commands.
 - Instrument Mods command labels can change based on the target modulator slot
@@ -348,8 +350,8 @@ Implication:
 
 Needed research:
 
-- Create fixtures that exercise Sequencer, Mixer & Effects, Current Instrument,
-  and Instrument Mods commands in phrase FX slots.
+- Create fixtures that exercise Current Instrument and Instrument Mods commands
+  in phrase FX slots.
 - Create fixtures that exercise Sequencer, Mixer & Effects, Current Instrument,
   and Instrument Mods commands in instrument table FX slots.
 - Create a NONE table fixture with non-Current-Instrument commands selected.
@@ -357,3 +359,42 @@ Needed research:
   `AHD ENV`, `ADSR ENV`, `DRUM ENV`, `LFO`, `TRIG ENV`, and `TRACKING`.
 - Promote verified command byte values into schema/doc references only after
   fixture mapping accounts for every changed byte.
+
+## Phrase Value Semantics
+
+Status: raw structure mapped; semantic decoding deferred
+
+Observation:
+
+- The `PHRASES.m8s` fixture verifies the Phrase table location, 255 Phrase
+  records, 16 steps per Phrase, the 9-byte step layout, unset sentinels, and
+  Sequencer and Mixer & Effects command byte values.
+- The fixture verifies several note bytes and labels, including the ordinary
+  chromatic sequence beginning at `C-1` and the boundary label `G-B`, but it
+  does not establish the complete note-byte range or decoding rule.
+- Each Phrase FX slot stores a command byte and a raw value byte. The meaning
+  of the value byte depends on the selected command.
+- Current Instrument and Instrument Mods commands are contextual: available
+  commands and value semantics may depend on the active instrument, target
+  modulator slot, and modulation type.
+
+Implication:
+
+- The Phrase schema is structurally complete for the current 6.5.x evidence.
+- The raw schema should continue exposing note, command, and FX value bytes
+  without claiming an unverified complete semantic decoder.
+- User-facing readers may eventually provide decoded note labels and
+  command-specific FX value views on top of the raw fields.
+
+Needed research:
+
+- Verify the complete note-byte range, chromatic decoding rule, special note
+  labels, and unset sentinel with targeted Phrase fixtures.
+- Document the valid FX value range, labels, and relative or absolute behavior
+  for every Sequencer and Mixer & Effects command.
+- Verify Current Instrument and Instrument Mods command availability in Phrase
+  FX slots, including how the active instrument and selected modulation type
+  affect command labels and value semantics.
+- Document runtime behavior that cannot be expressed by the raw binary schema,
+  including command interactions and context-dependent interpretation, in the
+  generated semantic or API documentation when that layer is designed.

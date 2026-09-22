@@ -13,8 +13,8 @@ The M8 UI organizes FX command semantics into these families:
 
 | Family | Manual Section | Current Status |
 | --- | --- | --- |
-| Sequencer | Sequencer FX Commands | Labels documented below; byte values need fixture evidence |
-| Mixer & Effects | Mixer & Effects Commands | Labels documented below; byte values need fixture evidence |
+| Sequencer | Sequencer FX Commands | Labels and byte values verified by `PHRASES.m8s` |
+| Mixer & Effects | Mixer & Effects Commands | Labels and byte values verified by `PHRASES.m8s` |
 | Current Instrument | Instrument FX Commands and active instrument parameters | Some byte values verified by instrument table fixtures |
 | Instrument Mods | Instrument FX Commands | Labels depend on the target modulator type; byte values need fixture evidence |
 
@@ -45,85 +45,98 @@ instrument.
 
 ## Command Families
 
-Command labels below come from the M8 6.5.2 manual. Stored byte values are not
-canonical until fixture evidence verifies them.
+Sequencer and Mixer/Effects command byte values below are verified by the
+`PHRASES.m8s` fixture. Current Instrument command byte values are verified by
+instrument table fixtures and documented with the corresponding instrument
+schemas.
 
 ### Sequencer
 
-| Label | Meaning |
-| --- | --- |
-| `ARP` | Arpeggio |
-| `ARC` | Arpeggio config |
-| `CHA` | Chance |
-| `DEL` | Delay |
-| `GRV` | Groove |
-| `GGR` | Global groove |
-| `HOP` | Position hop |
-| `INS` | Trigger or change instrument |
-| `KIL` | Kill note |
-| `RND` | Randomize previous FX command |
-| `RNL` | Randomize command to the left |
-| `RET` | Retrig |
-| `REP` | Repeat |
-| `RTO` | Repeat boundary |
-| `RMX` | Remix |
-| `NTH` | Conditional trigger |
-| `PSL` | Pitch slide |
-| `PBN` | Pitch bend |
-| `PVB` | Vibrato |
-| `PVX` | Extreme vibrato |
-| `SCA` | Track scale |
-| `SCG` | Global scale |
-| `SNG` | Song hop |
-| `SED` | Random seed |
-| `TBL` | Instrument table |
-| `THO` | Table hop |
-| `TIC` | Table tick |
-| `TBX` | Aux table |
-| `TPO` | Tempo |
-| `TSP` | Global song transpose |
-| `NXT` | Trigger instrument on next track |
-| `OFF` | Note off |
-| `MTT` | Micro-time |
+| Stored Value | Label | Meaning |
+| --- | --- | --- |
+| `0x00` | `ARP` | Arpeggio |
+| `0x45` | `ARC` | Arpeggio config |
+| `0x01` | `CHA` | Chance |
+| `0x02` | `DEL` | Delay |
+| `0x03` | `GRV` | Groove |
+| `0x46` | `GGR` | Global groove |
+| `0x04` | `HOP` | Position hop |
+| `0x43` | `INS` | Trigger or change instrument |
+| `0x05` | `KIL` | Kill note |
+| `0x06` | `RND` | Randomize previous FX command |
+| `0x07` | `RNL` | Randomize command to the left |
+| `0x08` | `RET` | Retrig |
+| `0x09` | `REP` | Repeat |
+| `0x44` | `RTO` | Repeat boundary |
+| `0x0a` | `RMX` | Remix |
+| `0x0b` | `NTH` | Conditional trigger |
+| `0x0c` | `PSL` | Pitch slide |
+| `0x0d` | `PBN` | Pitch bend |
+| `0x0e` | `PVB` | Vibrato |
+| `0x0f` | `PVX` | Extreme vibrato |
+| `0x10` | `SCA` | Track scale |
+| `0x11` | `SCG` | Global scale |
+| `0x13` | `SNG` | Song hop |
+| `0x12` | `SED` | Random seed |
+| `0x14` | `TBL` | Instrument table |
+| `0x15` | `THO` | Table hop |
+| `0x16` | `TIC` | Table tick |
+| `0x17` | `TBX` | Aux table |
+| `0x18` | `TPO` | Tempo |
+| `0x19` | `TSP` | Global song transpose |
+| `0x47` | `NXT` | Trigger instrument on next track |
+| `0x1a` | `OFF` | Note off |
+| `0x4d` | `MTT` | Micro-time |
 
 ### Mixer & Effects
 
-| Label | Meaning |
-| --- | --- |
-| `EQM` | Main song EQ assignment |
-| `EQI` | Current instrument EQ assignment |
-| `VMV` | Main volume |
-| `VMX` | ModFX volume |
-| `VDE` | Delay volume |
-| `VRE` | Reverb volume |
-| `VT1`..`VT8` | Track volume |
-| `DJC` | DJ filter cutoff |
-| `DJR` | DJ filter resonance |
-| `DJT` | DJ filter type |
-| `IVO` | Line input volume |
-| `IMX` | Line input ModFX send |
-| `IDE` | Line input delay send |
-| `IRV` | Line input reverb send |
-| `IV2` | Second line input volume |
-| `IM2` | Second line input ModFX send |
-| `ID2` | Second line input delay send |
-| `IR2` | Second line input reverb send |
-| `USB` | USB input volume |
-| `XMT` | ModFX type and phase |
-| `XMM` | ModFX modulation depth |
-| `XMF` | ModFX modulation frequency |
-| `XMW` | ModFX stereo width |
-| `XMR` | ModFX to reverb mix |
-| `XDT` | Delay time |
-| `XDF` | Delay feedback |
-| `XDW` | Delay stereo width |
-| `XDR` | Delay to reverb mix |
-| `XRS` | Reverb room size |
-| `XRD` | Reverb decay |
-| `XRM` | Reverb modulation depth |
-| `XRF` | Reverb modulation frequency |
-| `XRW` | Reverb stereo width |
-| `XRZ` | Reverb freeze |
+| Stored Value | Label | Meaning |
+| --- | --- | --- |
+| `0x41` | `EQM` | Main song EQ assignment |
+| `0x42` | `EQI` | Current instrument EQ assignment |
+| `0x1b` | `VMV` | Main volume |
+| `0x2a` | `VMX` | ModFX volume |
+| `0x2b` | `VDE` | Delay volume |
+| `0x2c` | `VRE` | Reverb volume |
+| `0x2d` | `VT1` | Track 1 volume |
+| `0x2e` | `VT2` | Track 2 volume |
+| `0x2f` | `VT3` | Track 3 volume |
+| `0x30` | `VT4` | Track 4 volume |
+| `0x31` | `VT5` | Track 5 volume |
+| `0x32` | `VT6` | Track 6 volume |
+| `0x33` | `VT7` | Track 7 volume |
+| `0x34` | `VT8` | Track 8 volume |
+| `0x35` | `DJC` | DJ filter cutoff |
+| `0x3f` | `DJR` | DJ filter resonance |
+| `0x40` | `DJT` | DJ filter type |
+| `0x36` | `VIN` | Line input volume |
+| `0x37` | `IMX` | Line input ModFX send |
+| `0x38` | `IDE` | Line input delay send |
+| `0x39` | `IRE` | Line input reverb send |
+| `0x3a` | `VI2` | Second line input volume |
+| `0x3b` | `IM2` | Second line input ModFX send |
+| `0x3c` | `ID2` | Second line input delay send |
+| `0x3d` | `IR2` | Second line input reverb send |
+| `0x3e` | `USB` | USB input volume |
+| `0x49` | `XMT` | ModFX type and phase |
+| `0x1c` | `XMM` | ModFX modulation depth |
+| `0x1d` | `XMF` | ModFX modulation frequency |
+| `0x1e` | `XMW` | ModFX stereo width |
+| `0x1f` | `XMR` | ModFX to reverb mix |
+| `0x20` | `XDT` | Delay time |
+| `0x21` | `XDF` | Delay feedback |
+| `0x22` | `XDW` | Delay stereo width |
+| `0x23` | `XDR` | Delay to reverb mix |
+| `0x24` | `XRS` | Reverb room size |
+| `0x25` | `XRD` | Reverb decay |
+| `0x26` | `XRM` | Reverb modulation depth |
+| `0x27` | `XRF` | Reverb modulation frequency |
+| `0x28` | `XRW` | Reverb stereo width |
+| `0x48` | `XRH` | Reverb highpass |
+| `0x29` | `XRZ` | Reverb freeze |
+| `0x4a` | `OTT` | OTT amount |
+| `0x4b` | `OTC` | OTT color |
+| `0x4c` | `OTI` | OTT time |
 
 ### Current Instrument
 
@@ -180,24 +193,26 @@ Known modulator types to cover:
 | `TRIG ENV` | Slot parameter storage verified | Command labels/values need fixture evidence |
 | `TRACKING` | Slot parameter storage verified | Command labels/values need fixture evidence |
 
-## Verification Plan
+## Verification Status
 
-Future fixtures should verify command-family availability and stored byte values
-separately from the structural FX slot layout:
+Command-family availability and stored byte values are verified separately from
+the structural FX slot layout:
 
 | Research Target | Goal |
 | --- | --- |
-| Sequencer commands | Map labels, byte values, and amount semantics |
-| Mixer & Effects commands | Map labels, byte values, and amount semantics |
+| Sequencer commands | Labels and byte values verified by `PHRASES.m8s`; amount semantics remain command-specific |
+| Mixer & Effects commands | Labels and byte values verified by `PHRASES.m8s`; amount semantics remain command-specific |
 | Current Instrument commands | Finish command coverage for the active instrument's common and instrument-specific commands |
 | Instrument Mods commands | Map labels, byte values, and amount semantics per target modulator type |
-| Phrase FX slots | Verify which command families are available in song phrases |
+| Phrase FX slots | Structural storage and Sequencer/Mixer & Effects command values verified by `PHRASES.m8s` |
 | Instrument table FX slots | Verify which command families are available inside instrument tables |
 | NONE instrument table | Map command byte values available when the active instrument is NONE |
 | Version boundaries | Check command values after firmware releases that mention new or changed FX commands |
 
 ## Sources
 
+- `fixtures/6.5.x/songs/PHRASES.m8s`
+- `fixtures/6.5.x/songs/PHRASES.yaml`
 - Dirtywave M8 Operation Manual v6.5.2, Appendix sections "Relative and
   Absolute FX Commands", "Sequencer FX Commands", "Mixer & Effects Commands",
   and "Instrument FX Commands":

@@ -1,0 +1,39 @@
+fileType: song
+firmware: 6.5.2C
+screen: phrase
+
+ignoredRanges:
+  - name: songSaveState.beforeProject
+    offset: 0x001b
+    size: 0x0073
+    reason: changed while saving PHRASES fixture; not mapped to Phrase fields
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: changed while saving PHRASES fixture; Project UI meaning is unknown
+
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 50 48 52 41 53 45 53 00 00 00 00 00
+
+  - name: phrases[0]
+    offset: 0x0aee
+    originalBytes: ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00
+    newBytes: 00 7f 7e 00 ff 45 fe 01 fd 01 7d 7c 02 fc 03 fb 04 fa 02 7b 7a 06 f9 07 f8 08 f7 03 79 78 09 f6 44 f5 0b f4 04 77 76 0c f3 0d f2 0e f1 05 75 74 0f f0 10 ef 11 ee 06 73 72 12 ed 13 ec 14 eb 07 71 70 15 ea 16 e9 17 e8 08 6f 6e 18 e7 19 e6 46 e5 09 6d 6c 0a e4 43 e3 47 e2 0a 6b 6a ff 00 ff 00 ff 00 0b 69 68 ff 00 ff 00 ff 00 0c 67 66 ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 7f 65 64 05 e1 1a e0 4d df
+
+  - name: phrases[254]
+    offset: 0x99ce
+    originalBytes: ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00 ff ff ff ff 00 ff 00 ff 00
+    newBytes: 00 7f 7e 1b ff 2a fe 2b fd 01 7d 7c 2c fc 36 fb 3e fa 02 7b 7a 42 f9 41 f8 2d f7 03 79 78 2e f6 2f f5 30 f4 04 77 76 31 f3 32 f2 33 f1 05 75 74 34 f0 49 ef 1c ee 06 73 72 1d ed 1e ec 1f eb 07 71 70 20 ea 21 e9 22 e8 08 6f 6e 23 e7 24 e6 25 e5 09 6d 6c 26 e4 27 e3 28 e2 0a 6b 6a 48 e1 29 e0 37 df 0b 69 68 38 de 39 dd 3a dc 0c 67 66 3b db 3c da 3d d9 0d 65 64 35 d8 3f d7 40 d6 ff ff ff ff 00 ff 00 ff 00 0e 63 62 4a d5 4b d4 4c d3
+
+  - name: chains[0].rows[0].phrase
+    offset: 0x9a5e
+    original: 0xff
+    new: 0x00
+
+  - name: chains[0].rows[1].phrase
+    offset: 0x9a60
+    original: 0xff
+    new: 0xfe

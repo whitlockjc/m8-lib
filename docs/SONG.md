@@ -3,10 +3,10 @@
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Song
-View, Bookmarks, Chain View, Mixer, Grooves, Effects Settings, Mix & Limiter
-Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI Mapping, and Scales pages.
-Most of the Song body remains preserved as unknown bytes until additional Song
-fixtures map those regions.
+View, Phrase View, Bookmarks, Chain View, Mixer, Grooves, Effects Settings, Mix
+& Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, MIDI Mapping, and
+Scales pages. Most of the Song body remains preserved as unknown bytes until
+additional Song fixtures map those regions.
 
 ## Schema
 
@@ -35,7 +35,7 @@ Offsets are absolute file offsets.
 | `mixer` | `0x00ce..0x00ed` | 32 | [Mixer](#mixer) |
 | `grooves` | `0x00ee..0x02ed` | 512 | [Grooves](#grooves) |
 | `rows` | `0x02ee..0x0aed` | 2048 | [Song Rows](#song-rows) |
-| `unknownBetweenRowsAndChains` | `0x0aee..0x9a5d` | 36720 | unknown bytes |
+| `phrases` | `0x0aee..0x9a5d` | 36720 | [Phrases](#phrases) |
 | `chains` | `0x9a5e..0xba5d` | 8192 | [Chains](#chains) |
 | `unknownBetweenChainsAndEffectsAndScope` | `0xba5e..0x1a5bd` | 60256 | unknown bytes |
 | `effectsAndScope` | `0x1a5be..0x1a5da` | 29 | [Effects & Scope Storage](#effects--scope-storage) |
@@ -161,6 +161,7 @@ The verified fixture pair shows:
 | `MIX_SCOPE.m8s` | `MIX_SCOPE` followed by three `0x00` bytes |
 | `LIMIT_SCOPE.m8s` | `LIMIT_SCOPE` followed by one `0x00` byte |
 | `GROOVES.m8s` | `GROOVES` followed by five `0x00` bytes |
+| `PHRASES.m8s` | `PHRASES` followed by five `0x00` bytes |
 
 ### Grooves
 
@@ -214,6 +215,57 @@ Offsets are relative to the start of a Song row.
 
 The default row value for each track is `0xff`, which the M8 UI displays as
 unset. Other observed values are chain indexes.
+
+### Phrases
+
+The Phrase View stores phrase indexes `0x00` through `0xfe`. The value `0xff`
+is observed as an unset phrase reference and is not a stored Phrase record in
+this region. Each Phrase stores 16 steps. The `PHRASES.m8s` fixture verifies
+phrase `0x00`, phrase `0xfe`, and the `0x90` byte phrase stride.
+
+Offsets are absolute file offsets.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `entries[0..254]` | `0x0aee..0x9a5d` | 36720 | [Phrase](#phrase) |
+
+### Phrase
+
+Offsets are relative to the start of a Phrase.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `steps[0..15]` | `+0x00..+0x8f` | 144 | [Phrase Step](#phrase-step) |
+
+### Phrase Step
+
+Offsets are relative to the start of a Phrase step.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `note` | `+0x00` | 1 | `u1` |
+| `volume` | `+0x01` | 1 | `u1` |
+| `instrument` | `+0x02` | 1 | `u1` |
+| `fx1` | `+0x03..+0x04` | 2 | [Phrase FX](#phrase-fx) |
+| `fx2` | `+0x05..+0x06` | 2 | [Phrase FX](#phrase-fx) |
+| `fx3` | `+0x07..+0x08` | 2 | [Phrase FX](#phrase-fx) |
+
+The default step bytes are `ff ff ff ff 00 ff 00 ff 00`. The observed unset
+value for `note`, `volume`, `instrument`, and FX command bytes is `0xff`. The
+FX value bytes default to `0x00`.
+
+### Phrase FX
+
+Offsets are relative to the start of a Phrase FX slot.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `command` | `+0x00` | 1 | [FX Command](FX_COMMANDS.md) |
+| `value` | `+0x01` | 1 | `u1` |
+
+The `PHRASES.m8s` fixture verifies Sequencer and Mixer/Effects command byte
+values in Phrase FX slots. See [FX Commands](FX_COMMANDS.md) for the
+fixture-backed command labels and values.
 
 ### Bookmarks
 
@@ -783,6 +835,12 @@ are mapped.
 - The Song rows table is verified at `0x02ee..0x0aed`. The fixture modifies row
   `0x00` and row `0xff`, which verifies the table boundaries as 256 eight-byte
   rows.
+- The Phrases table is verified at `0x0aee..0x9a5d`. The fixture modifies
+  phrase `0x00` and phrase `0xfe`, which verifies 255 Phrase records with a
+  `0x90` byte stride. Phrase reference value `0xff` is observed as unset.
+- The `PHRASES.m8s` fixture also creates chain rows that reference phrase
+  `0x00` and phrase `0xfe`; those setup bytes are accounted for in the fixture
+  manifest.
 - The Bookmarks table is verified at `0x1a97e..0x1aa7d`. The fixture modifies
   rows `0x00`, `0x01`, `0xfe`, and `0xff`, which verifies the table boundaries
   as 256 one-byte row bitmasks.
@@ -858,6 +916,8 @@ are mapped.
 | MIDI Settings manifest | `fixtures/6.5.x/songs/MIDI_SETTING.yaml` |
 | Song Rows fixture | `fixtures/6.5.x/songs/SONG_ROWS.m8s` |
 | Song Rows manifest | `fixtures/6.5.x/songs/SONG_ROWS.yaml` |
+| Phrases fixture | `fixtures/6.5.x/songs/PHRASES.m8s` |
+| Phrases manifest | `fixtures/6.5.x/songs/PHRASES.yaml` |
 | Bookmarks fixture | `fixtures/6.5.x/songs/BOOKMARKS.m8s` |
 | Bookmarks manifest | `fixtures/6.5.x/songs/BOOKMARKS.yaml` |
 | Chains fixture | `fixtures/6.5.x/songs/CHAINS.m8s` |

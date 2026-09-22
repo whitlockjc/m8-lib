@@ -7,13 +7,13 @@ doc: |
   Body schema for song files with header schema version 6.5.0.
 
   Initial schema verified against M8 6.5.2C Project, MIDI Settings, Song View,
-  Bookmarks, Chain View, Scales View, Mixer, Grooves, Effects Settings, Mix &
-  Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping page
-  fixtures. The Project settings, MIDI Settings, Song rows, Bookmarks, Chains,
-  embedded Scales, Mixer, Grooves, Effects Settings, Mix & Limiter Scope, Mix
-  EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping regions are partially
-  mapped. Remaining Song regions are preserved as raw bytes until future
-  fixtures provide evidence for their layout.
+  Phrase View, Bookmarks, Chain View, Scales View, Mixer, Grooves, Effects
+  Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and
+  MIDI Mapping page fixtures. The Project settings, MIDI Settings, Song rows,
+  Phrases, Bookmarks, Chains, embedded Scales, Mixer, Grooves, Effects Settings,
+  Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ, and MIDI Mapping
+  regions are partially mapped. Remaining Song regions are preserved as raw
+  bytes until future fixtures provide evidence for their layout.
 seq:
   - id: unknown_before_project
     size: 128
@@ -32,9 +32,8 @@ seq:
     type: grooves
   - id: rows
     type: song_rows
-  - id: unknown_between_rows_and_chains
-    size: 36720
-    doc: Preserved bytes between Song rows and Chains.
+  - id: phrases
+    type: phrases
   - id: chains
     type: chains
   - id: unknown_between_chains_and_effects_and_scope
@@ -88,6 +87,49 @@ types:
         type: u1
         repeat: expr
         repeat-expr: 16
+  phrases:
+    doc: |
+      Phrase View storage. Offsets are relative to absolute file offset 0x0aee
+      in 6.5.x fixtures. The M8 stores phrase indexes 0x00 through 0xfe. Value
+      0xff is observed as an unset phrase reference rather than a stored phrase
+      record.
+    seq:
+      - id: entries
+        type: phrase
+        repeat: expr
+        repeat-expr: 255
+  phrase:
+    doc: One hundred forty-four byte Phrase record containing 16 phrase steps.
+    seq:
+      - id: steps
+        type: phrase_step
+        repeat: expr
+        repeat-expr: 16
+  phrase_step:
+    doc: |
+      Nine-byte Phrase step. 0xff is observed as unset for note, volume,
+      instrument, and FX command bytes. FX value bytes default to 0x00.
+    seq:
+      - id: note
+        type: u1
+      - id: volume
+        type: u1
+      - id: instrument
+        type: u1
+      - id: fx1
+        type: phrase_fx
+      - id: fx2
+        type: phrase_fx
+      - id: fx3
+        type: phrase_fx
+  phrase_fx:
+    doc: Two-byte Phrase FX command/value slot.
+    seq:
+      - id: command
+        type: u1
+        enum: phrase_fx_command
+      - id: value
+        type: u1
   song_rows:
     doc: |
       Song View row storage. Offsets are relative to absolute file offset
@@ -530,6 +572,244 @@ types:
         value: type_and_mode >> 5
         enum: eq_filter_mode
 enums:
+  phrase_fx_command:
+    0x00:
+      id: arpeggio
+      -label: ARP
+    0x01:
+      id: chance
+      -label: CHA
+    0x02:
+      id: delay
+      -label: DEL
+    0x03:
+      id: groove
+      -label: GRV
+    0x04:
+      id: hop
+      -label: HOP
+    0x05:
+      id: kill_note
+      -label: KIL
+    0x06:
+      id: randomize
+      -label: RND
+    0x07:
+      id: randomize_left
+      -label: RNL
+    0x08:
+      id: retrig
+      -label: RET
+    0x09:
+      id: repeat
+      -label: REP
+    0x0a:
+      id: remix
+      -label: RMX
+    0x0b:
+      id: nth
+      -label: NTH
+    0x0c:
+      id: pitch_slide
+      -label: PSL
+    0x0d:
+      id: pitch_bend
+      -label: PBN
+    0x0e:
+      id: vibrato
+      -label: PVB
+    0x0f:
+      id: extreme_vibrato
+      -label: PVX
+    0x10:
+      id: track_scale
+      -label: SCA
+    0x11:
+      id: global_scale
+      -label: SCG
+    0x12:
+      id: random_seed
+      -label: SED
+    0x13:
+      id: song_hop
+      -label: SNG
+    0x14:
+      id: table
+      -label: TBL
+    0x15:
+      id: table_hop
+      -label: THO
+    0x16:
+      id: table_tick
+      -label: TIC
+    0x17:
+      id: aux_table
+      -label: TBX
+    0x18:
+      id: tempo
+      -label: TPO
+    0x19:
+      id: transpose
+      -label: TSP
+    0x1a:
+      id: note_off
+      -label: OFF
+    0x1b:
+      id: main_volume
+      -label: VMV
+    0x1c:
+      id: mod_fx_modulation_depth
+      -label: XMM
+    0x1d:
+      id: mod_fx_modulation_frequency
+      -label: XMF
+    0x1e:
+      id: mod_fx_stereo_width
+      -label: XMW
+    0x1f:
+      id: mod_fx_reverb_mix
+      -label: XMR
+    0x20:
+      id: delay_time
+      -label: XDT
+    0x21:
+      id: delay_feedback
+      -label: XDF
+    0x22:
+      id: delay_stereo_width
+      -label: XDW
+    0x23:
+      id: delay_reverb_mix
+      -label: XDR
+    0x24:
+      id: reverb_room_size
+      -label: XRS
+    0x25:
+      id: reverb_decay
+      -label: XRD
+    0x26:
+      id: reverb_modulation_depth
+      -label: XRM
+    0x27:
+      id: reverb_modulation_frequency
+      -label: XRF
+    0x28:
+      id: reverb_stereo_width
+      -label: XRW
+    0x29:
+      id: reverb_freeze
+      -label: XRZ
+    0x2a:
+      id: mod_fx_volume
+      -label: VMX
+    0x2b:
+      id: delay_volume
+      -label: VDE
+    0x2c:
+      id: reverb_volume
+      -label: VRE
+    0x2d:
+      id: track_1_volume
+      -label: VT1
+    0x2e:
+      id: track_2_volume
+      -label: VT2
+    0x2f:
+      id: track_3_volume
+      -label: VT3
+    0x30:
+      id: track_4_volume
+      -label: VT4
+    0x31:
+      id: track_5_volume
+      -label: VT5
+    0x32:
+      id: track_6_volume
+      -label: VT6
+    0x33:
+      id: track_7_volume
+      -label: VT7
+    0x34:
+      id: track_8_volume
+      -label: VT8
+    0x35:
+      id: dj_filter_cutoff
+      -label: DJC
+    0x36:
+      id: line_input_volume
+      -label: VIN
+    0x37:
+      id: line_input_mod_fx_send
+      -label: IMX
+    0x38:
+      id: line_input_delay_send
+      -label: IDE
+    0x39:
+      id: line_input_reverb_send
+      -label: IRE
+    0x3a:
+      id: second_line_input_volume
+      -label: VI2
+    0x3b:
+      id: second_line_input_mod_fx_send
+      -label: IM2
+    0x3c:
+      id: second_line_input_delay_send
+      -label: ID2
+    0x3d:
+      id: second_line_input_reverb_send
+      -label: IR2
+    0x3e:
+      id: usb_input_volume
+      -label: USB
+    0x3f:
+      id: dj_filter_resonance
+      -label: DJR
+    0x40:
+      id: dj_filter_type
+      -label: DJT
+    0x41:
+      id: main_song_eq_assignment
+      -label: EQM
+    0x42:
+      id: current_instrument_eq_assignment
+      -label: EQI
+    0x43:
+      id: instrument
+      -label: INS
+    0x44:
+      id: repeat_boundary
+      -label: RTO
+    0x45:
+      id: arpeggio_config
+      -label: ARC
+    0x46:
+      id: global_groove
+      -label: GGR
+    0x47:
+      id: next_track
+      -label: NXT
+    0x48:
+      id: reverb_highpass
+      -label: XRH
+    0x49:
+      id: mod_fx_type_and_phase
+      -label: XMT
+    0x4a:
+      id: ott
+      -label: OTT
+    0x4b:
+      id: ott_color
+      -label: OTC
+    0x4c:
+      id: ott_time
+      -label: OTI
+    0x4d:
+      id: micro_time
+      -label: MTT
+    0xff:
+      id: unset
+      -label: --
   mod_fx_type:
     0x00:
       id: chorus
