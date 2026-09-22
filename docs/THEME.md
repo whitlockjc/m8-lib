@@ -51,9 +51,8 @@ Offsets are relative to the start of each `Color`.
 
 - Theme display name is derived from the `.m8t` filename, not stored in the
   file body.
-- RGB/HSV editing mode is not stored in the Theme file. If the mode is stored in
-  an M8 file, it should be documented with that file's schema after fixture
-  evidence identifies its location.
+- RGB/HSV editing mode is not stored in any M8 file and is outside the Theme
+  schema.
 
 ## Evidence
 

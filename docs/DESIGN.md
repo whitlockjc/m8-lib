@@ -237,12 +237,11 @@ Research findings that are not yet schema fields should be tracked in
 `docs/RESEARCH_BACKLOG.md`. This includes settings observed in the UI but not
 found in the expected file type.
 
-Known open finding:
+Known finding:
 
-- Theme RGB/HSV editing mode is not stored in M8 6.5.x theme files. Theme files
-  should be modeled as color triples plus any other fixture-proven fields, while
-  RGB/HSV mode remains a research target for Song/Project or device/global
-  storage.
+- Theme RGB/HSV editing mode is not stored in any M8 file. Theme files should
+  be modeled as color triples plus any other fixture-proven fields; editing
+  mode is outside the file schemas.
 
 ## Post-Song Schema Review
 

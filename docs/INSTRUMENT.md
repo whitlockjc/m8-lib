@@ -1535,9 +1535,8 @@ unused body bytes. `NONE_TABLE.m8i` verifies the table location and row layout.
   or `bpm` depending on `playMode`.
 - `SAMB_PARAMS.m8i` does not change `transpose`; its manifest only records the
   byte changes present in the fixture.
-- `FM_PARAMS.m8i` does not change `filter.type` or `amp.limit`; their FM Synth
-  offsets are inferred from the surrounding common parameter group layout and
-  should be verified by a future fixture.
+- `FM_PARAMS.m8i` directly verifies `filter.type` at `0x41` and `amp.limit`
+  at `0x45`, as well as FM Synth EQ assignment at `0x4c`.
 - `MID_PARAMS.m8i` does not change `eq`; the M8 UI does not expose an EQ
   assignment control for MIDI Out. Common EQ assignment remains verified by the
   Wavsynth, Macrosynth, Sampler, FM Synth, and External fixtures.
@@ -1797,9 +1796,9 @@ three two-byte FX slots. The manifest-driven mapper matched all 71 changed
 bytes exactly and reported zero unaccounted changed bytes.
 
 The `FM_PARAMS.m8i` fixture verifies common transpose/table TIC values, FM Synth
-params, filter cutoff/resonance, amp/pan values, mixer params, and common EQ
-assignment. The manifest-driven mapper matched all 50 changed bytes exactly and
-reported zero unaccounted changed bytes.
+params, filter type/cutoff/resonance, amp/limit/pan values, mixer params, and
+common EQ assignment. The manifest-driven mapper matched all 52 changed bytes
+exactly and reported zero unaccounted changed bytes.
 
 The `FM_MODS_A.m8i` fixture verifies the common instrument modulation block at
 `0x4d..0x64` using FM Synth as the carrier instrument. It verifies `TRACKING`,

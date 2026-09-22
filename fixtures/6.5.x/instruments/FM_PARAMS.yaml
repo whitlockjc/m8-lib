@@ -169,6 +169,11 @@ changes:
     original: 0x00
     new: 0xf4
 
+  - name: filter.type
+    original: 0x00
+    new: 0x07
+    originalLabel: OFF
+    newLabel: ZDF HP
   - name: filter.cutoff
     original: 0xff
     new: 0xf3
@@ -176,6 +181,11 @@ changes:
     original: 0x00
     new: 0xf2
 
+  - name: amp.limit
+    original: 0x00
+    new: 0x08
+    originalLabel: CLIP
+    newLabel: POST:W3
   - name: amp.amp
     original: 0x00
     new: 0xf1

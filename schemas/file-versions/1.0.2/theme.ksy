@@ -9,9 +9,8 @@ doc: |
   Verified against M8 6.5.2C theme fixtures. The body contains 13 color triples
   and no unaccounted bytes.
 
-  M8 6.5.x fixture evidence indicates that RGB versus HSV editing mode is not
-  stored in the theme file itself. Do not add a theme-level mode field unless
-  future fixture evidence proves one exists.
+  RGB versus HSV editing mode is not stored in any M8 file and is outside this
+  schema.
 seq:
   - id: background
     type: color

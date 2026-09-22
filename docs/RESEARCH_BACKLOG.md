@@ -5,28 +5,20 @@ before it can become schema documentation.
 
 ## Theme Color Mode
 
-Status: open
+Status: resolved; outside M8 files
 
 Observation:
 
-- M8 6.5.x theme files store theme color values, but RGB versus HSV editing mode
-  is not stored in the theme file itself.
+- M8 6.5.x theme files store theme color values. RGB versus HSV editing mode
+  is not stored in any M8 file.
 
 Implication:
 
 - Theme schemas should model stored color triples without a theme-level
   `mode` field unless future evidence proves otherwise.
-- RGB/HSV editing mode may be stored in Song/Project data, device/global
-  settings, or another location outside portable M8 files.
+- RGB/HSV editing mode is outside the M8 file schemas.
 
-Needed research:
-
-- Create fixtures that toggle theme RGB/HSV mode while holding theme color bytes
-  constant.
-- Compare Song/Project files or other available M8 storage before and after
-  toggling the mode.
-- If no portable M8 file changes, document the setting as device/global state
-  outside the file schemas.
+No M8 file fixture is needed for this setting.
 
 ## Theme Display Name
 
@@ -310,27 +302,19 @@ Resolved comparison:
 
 ## FM Synth Common Enum Slots
 
-Status: open
+Status: mapped
 
 Observation:
 
-- The `FM_PARAMS.m8i` fixture changed FM Synth filter cutoff/resonance, amp,
-  pan, mixer values, and EQ, but `filter.type` remained `0x00` and `amp.limit`
-  remained `0x00`.
-- The current FM Synth schema places `filter.type` at `0x41` and `amp.limit` at
-  `0x45` based on the surrounding common parameter group layout.
+- The refreshed `FM_PARAMS.m8i` fixture changes `filter.type` from `OFF`
+  (`0x00`) to `ZDF HP` (`0x07`) at `0x41` and `amp.limit` from `CLIP` (`0x00`)
+  to `POST:W3` (`0x08`) at `0x45`.
+- It also changes `eq` at `0x4c` from unset (`0x80`) to `7F` (`0x7f`).
 
 Implication:
 
-- The FM Synth `filter.type` and `amp.limit` offsets are inferred from layout,
-  not directly verified by byte changes in the current FM fixture.
-
-Needed research:
-
-- Create an FM Synth fixture that changes only `filter.type` and `amp.limit`, or
-  include unique changed values for those fields in a future FM Synth params
-  fixture.
-- Verify whether those bytes match the inferred offsets.
+- Both common parameter offsets are now directly verified for FM Synth.
+- FM-specific EQ assignment remains fixture-verified.
 
 ## MIDI Out Post-CC Bytes
 
