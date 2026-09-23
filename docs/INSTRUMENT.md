@@ -632,6 +632,13 @@ Instrument modulation is stored as four six-byte slots at `0x4d..0x64`.
 `EXT_MODS_B.m8i` verify the same storage layout for Macrosynth, Sampler, MIDI
 Out, FM Synth, Hypersynth, and External.
 
+This is the shared Common Modulation Settings structure for those seven
+editable instrument types. `slots[0]` corresponds to the M8 UI's first
+modulation slot, and `slots[3]` to its fourth. NONE's bytes at `0x4d..0x64`
+remain preserved as unknown; the UI does not expose modulation settings for
+NONE. Modulation-type payloads and instrument-specific destination labels are
+covered separately below.
+
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
 | `slots` | `+0x00..+0x17` | 24 | [Modulation Slot](#modulation-slot) |
@@ -639,7 +646,7 @@ Out, FM Synth, Hypersynth, and External.
 The slot offset is:
 
 ```txt
-slotOffset = 0x4d + (index * 6)
+slot_offset = 0x4d + (index * 6)
 ```
 
 ### Modulation Slot

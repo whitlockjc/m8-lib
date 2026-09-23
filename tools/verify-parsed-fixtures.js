@@ -47,6 +47,13 @@ for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   }
 }
 
+{
+  const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')
+  assert.equal(file.body.instrument.tail.modulators, undefined)
+  assert.deepEqual(Buffer.from(file.body.instrument.tail.unknown),
+    bytes.subarray(0x4d, 0xe5))
+}
+
 for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
   const params = file.body.instrument.bodyBeforeEq.controls

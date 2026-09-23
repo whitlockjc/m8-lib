@@ -526,6 +526,11 @@ types:
       - id: notes
         type: hypersynth_chord_notes
   instrument_modulators:
+    doc: |
+      Shared Common Modulation Settings block. Four six-byte slots occupy
+      standalone offsets 0x4d..0x64 in all seven editable instrument types.
+      slots[0] is M8 modulation slot 1. NONE preserves the corresponding
+      bytes as unknown, without assigning modulation semantics.
     seq:
       - id: slots
         type: modulation_slot
@@ -549,6 +554,10 @@ types:
         repeat: expr
         repeat-expr: 3
   modulation_slot:
+    doc: |
+      Shared six-byte modulation slot: one packed type/destination byte, one
+      amount byte, and four type-dependent parameter bytes. The slot layout is
+      independent of the instrument-specific destination labels.
     seq:
       - id: type_and_destination
         type: u1

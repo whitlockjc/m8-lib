@@ -66,10 +66,10 @@ Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#mixer-parameters).
 
 ### Common Modulation Settings
 
-| Item | Verified storage | Proposal | Status |
+| Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
-| Modulation block | Four six-byte slots at `0x4d..0x64`, verified for seven editable types including MIDI Out | Retain one shared block and slot layout. Treat `slots[0]` as the M8's first modulation slot. | Review |
-| NONE | Corresponding bytes remain unclassified | Preserve them without assigning editable modulation semantics. | Review |
+| Modulation block | Four six-byte slots at `0x4d..0x64`, verified for seven editable types including MIDI Out | Keep shared `instrument_modulators` and `modulation_slot` types; `slots[0]` is the M8's first modulation slot. | Done |
+| NONE | Corresponding bytes remain unclassified | Preserve them without assigning editable modulation semantics. | Done |
 
 Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#instrument-modulation).
 
@@ -166,7 +166,7 @@ must stay contextual even when their raw storage is shared.
 ## Review Order And Checks
 
 1. General Instrument Settings, Instrument-Specific Parameters, Multi-mode
-   Filter Parameters, Amplifier Settings, and Mixer Parameters are done. Review modulation, tail, and table concepts
+   Filter Parameters, Amplifier Settings, Mixer Parameters, and Common Modulation Settings are done. Review modulation-type parameters, destination labels, tail, and table concepts
    above in order. Implement and verify each agreed concept separately.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
