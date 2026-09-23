@@ -38,13 +38,13 @@ Evidence: `*_PARAMS.m8i`, the [M8 manual](https://cdn.shopify.com/s/files/1/0455
 
 ### Multi-Mode Filter Parameters
 
-| Item | Verified storage | Proposal | Status |
+| Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
-| Filter group | Three adjacent bytes at type-dependent offsets for Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External | Keep the existing shared `filter_params` type and each body's placement. Review whether its field names and documentation match the manual. | Review |
-| Filter labels | Wavsynth has additional WAV-only modes | Keep contextual valid-value labels separate from the shared three-byte layout. | Review |
-| MIDI Out and NONE | UI does not expose this group | Do not interpret their corresponding bytes as an editable filter without fixture evidence. | Review |
+| Filter group | Three adjacent bytes at type-dependent offsets for Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External | Keep shared `filter_params` with `type`, `cutoff`, and `resonance`; verify each placement with parsed fixtures. | Done |
+| Filter labels | Wavsynth has additional WAV-only modes | Keep `type` raw and `filter_type` as a label catalog; `0x08..0x0b` apply only to Wavsynth. | Done |
+| MIDI Out and NONE | UI does not expose this group | Preserve their bytes without assigning editable filter semantics. | Done |
 
-Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#filter-parameters).
+Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#multi-mode-filter-parameters).
 
 ### Amplifier Settings
 
@@ -165,8 +165,8 @@ must stay contextual even when their raw storage is shared.
 
 ## Review Order And Checks
 
-1. General Instrument Settings and Instrument-Specific Parameters are done.
-   Review the filter, amplifier, mixer, modulation, tail, and table concepts
+1. General Instrument Settings, Instrument-Specific Parameters, and Multi-mode
+   Filter Parameters are done. Review amplifier, mixer, modulation, tail, and table concepts
    above in order. Implement and verify each agreed concept separately.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry

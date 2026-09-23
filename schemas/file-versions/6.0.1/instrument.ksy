@@ -181,8 +181,7 @@ types:
       - id: filter
         type: filter_params
         doc: |
-          Cutoff and resonance offsets are verified by FM Synth fixtures. The
-          filter type offset is inferred from the common filter group layout.
+          Type, cutoff, and resonance offsets are verified by FM_PARAMS.
       - id: amp
         type: amp_params
         doc: |
@@ -441,10 +440,14 @@ types:
       - id: mod_4
         type: u1
   filter_params:
+    doc: |
+      Shared three-byte Multi-mode Filter Parameters layout. The type byte is
+      raw because valid labels depend on the instrument: filter_type lists
+      0x00..0x07 for all filter-capable instruments and 0x08..0x0b for
+      Wavsynth only. MIDI Out and NONE do not expose this group.
     seq:
       - id: type
         type: u1
-        enum: filter_type
       - id: cutoff
         type: u1
       - id: resonance
