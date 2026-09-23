@@ -3,6 +3,8 @@ meta:
   endian: le
   license: Apache-2.0
   ks-version: 0.11
+  imports:
+    - ../../common/fx_slot
 doc: |
   Body schema for instrument files with header schema version 6.0.1.
 
@@ -26,26 +28,15 @@ types:
     doc: |
       Fixed 215-byte instrument record. This record is stored directly in Song
       files; standalone Instrument files append one 128-byte instrument table.
+      The M8 manual groups general_settings and eq as General Instrument
+      Settings. EQ is stored after the type-specific region, so it remains a
+      separate field in the raw storage sequence.
     seq:
-      - id: instrument_type
-        type: u1
-        enum: instrument_type
-      - id: name
-        size: 12
-        doc: |
-          Fixed-size byte range for the instrument name. Padding bytes are
-          preserved as stored.
-      - id: transpose
-        type: u1
-        doc: |
-          Common instrument transpose setting. Observed values: 0x01 means ON,
-          0x00 means OFF.
-      - id: table_tic
-        type: u1
-        doc: Common instrument table TIC setting.
+      - id: general_settings
+        type: general_instrument_settings
       - id: body_before_eq
         type:
-          switch-on: instrument_type
+          switch-on: general_settings.type
           cases:
             'instrument_type::wavsynth': wavsynth_body_before_eq
             'instrument_type::macrosynth': macrosynth_body_before_eq
@@ -63,7 +54,7 @@ types:
           --, 0x7f displays as 7F.
       - id: tail
         type:
-          switch-on: instrument_type
+          switch-on: general_settings.type
           cases:
             'instrument_type::sampler': sampler_data_tail
             'instrument_type::hypersynth': hypersynth_data_tail
@@ -74,6 +65,27 @@ types:
             'instrument_type::external': standard_data_tail
             'instrument_type::none': none_data_tail
         doc: Instrument-specific tail after the common EQ field.
+  general_instrument_settings:
+    doc: |
+      Contiguous General Instrument Settings prefix. The M8 manual also groups
+      the noncontiguous eq assignment with these settings.
+    seq:
+      - id: type
+        type: u1
+        enum: instrument_type
+      - id: name
+        size: 12
+        doc: |
+          Fixed-size byte range for the instrument name. Padding bytes are
+          preserved as stored.
+      - id: transpose
+        type: u1
+        doc: |
+          Common instrument transpose setting. Observed values: 0x01 means ON,
+          0x00 means OFF.
+      - id: table_tic
+        type: u1
+        doc: Common instrument table TIC setting.
   unused_body_before_eq:
     doc: |
       Preserved bytes between the common instrument prefix and common EQ field
@@ -511,23 +523,10 @@ types:
       - id: volume
         type: u1
         doc: Observed value 0xff displays as --.
-      - id: fx1
-        type: instrument_table_fx
-      - id: fx2
-        type: instrument_table_fx
-      - id: fx3
-        type: instrument_table_fx
-  instrument_table_fx:
-    seq:
-      - id: command
-        type: u1
-        doc: |
-          Table FX command byte. Observed value 0xff displays as --. Command
-          meaning depends on the surrounding FX context and active instrument.
-          Verified command labels are documented in table FX command enums.
-          Command family organization is documented in docs/FX_COMMANDS.md.
-      - id: amount
-        type: u1
+      - id: fx
+        type: fx_slot
+        repeat: expr
+        repeat-expr: 3
   modulation_slot:
     seq:
       - id: type_and_destination

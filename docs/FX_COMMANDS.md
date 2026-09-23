@@ -25,12 +25,16 @@ depending on where they are used.
 
 ## Storage
 
-Verified instrument tables store each FX slot as two adjacent bytes:
+Phrase steps and Instrument Tables use the same two-byte raw FX slot. The
+canonical layout is [fx_slot.ksy](../schemas/common/fx_slot.ksy):
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
 | `command` | `+0x00` | 1 | raw command byte |
-| `amount` | `+0x01` | 1 | raw command amount |
+| `value` | `+0x01` | 1 | raw command argument |
+
+The Instrument Table UI may describe `value` as an amount. That label does not
+change its stored type or position.
 
 Observed unset value:
 

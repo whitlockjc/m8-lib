@@ -16,33 +16,33 @@ changes:
     original: 0xff
     new: 0x7f
     originalLabel: --
-  - name: table.rows.0.fx1.command
+  - name: table.rows.0.fx[0].command
     offset: 0x00e7
     original: 0xff
     new: 0x80
     originalLabel: --
     newLabel: VOL
-  - name: table.rows.0.fx1.amount
+  - name: table.rows.0.fx[0].value
     offset: 0x00e8
     original: 0x00
     new: 0x01
-  - name: table.rows.0.fx2.command
+  - name: table.rows.0.fx[1].command
     offset: 0x00e9
     original: 0xff
     new: 0x81
     originalLabel: --
     newLabel: PIT
-  - name: table.rows.0.fx2.amount
+  - name: table.rows.0.fx[1].value
     offset: 0x00ea
     original: 0x00
     new: 0x02
-  - name: table.rows.0.fx3.command
+  - name: table.rows.0.fx[2].command
     offset: 0x00eb
     original: 0xff
     new: 0x82
     originalLabel: --
     newLabel: FIN
-  - name: table.rows.0.fx3.amount
+  - name: table.rows.0.fx[2].value
     offset: 0x00ec
     original: 0x00
     new: 0x03
@@ -56,33 +56,33 @@ changes:
     original: 0xff
     new: 0x7e
     originalLabel: --
-  - name: table.rows.1.fx1.command
+  - name: table.rows.1.fx[0].command
     offset: 0x00ef
     original: 0xff
     new: 0x83
     originalLabel: --
     newLabel: OSC
-  - name: table.rows.1.fx1.amount
+  - name: table.rows.1.fx[0].value
     offset: 0x00f0
     original: 0x00
     new: 0x11
-  - name: table.rows.1.fx2.command
+  - name: table.rows.1.fx[1].command
     offset: 0x00f1
     original: 0xff
     new: 0x84
     originalLabel: --
     newLabel: SIZ
-  - name: table.rows.1.fx2.amount
+  - name: table.rows.1.fx[1].value
     offset: 0x00f2
     original: 0x00
     new: 0x12
-  - name: table.rows.1.fx3.command
+  - name: table.rows.1.fx[2].command
     offset: 0x00f3
     original: 0xff
     new: 0x85
     originalLabel: --
     newLabel: MUL
-  - name: table.rows.1.fx3.amount
+  - name: table.rows.1.fx[2].value
     offset: 0x00f4
     original: 0x00
     new: 0x13
@@ -96,33 +96,33 @@ changes:
     original: 0xff
     new: 0x7d
     originalLabel: --
-  - name: table.rows.2.fx1.command
+  - name: table.rows.2.fx[0].command
     offset: 0x00f7
     original: 0xff
     new: 0x86
     originalLabel: --
     newLabel: WRP
-  - name: table.rows.2.fx1.amount
+  - name: table.rows.2.fx[0].value
     offset: 0x00f8
     original: 0x00
     new: 0x21
-  - name: table.rows.2.fx2.command
+  - name: table.rows.2.fx[1].command
     offset: 0x00f9
     original: 0xff
     new: 0x87
     originalLabel: --
     newLabel: SCN
-  - name: table.rows.2.fx2.amount
+  - name: table.rows.2.fx[1].value
     offset: 0x00fa
     original: 0x00
     new: 0x22
-  - name: table.rows.2.fx3.command
+  - name: table.rows.2.fx[2].command
     offset: 0x00fb
     original: 0xff
     new: 0x88
     originalLabel: --
     newLabel: FIL
-  - name: table.rows.2.fx3.amount
+  - name: table.rows.2.fx[2].value
     offset: 0x00fc
     original: 0x00
     new: 0x23
@@ -136,33 +136,33 @@ changes:
     original: 0xff
     new: 0x7c
     originalLabel: --
-  - name: table.rows.3.fx1.command
+  - name: table.rows.3.fx[0].command
     offset: 0x00ff
     original: 0xff
     new: 0x89
     originalLabel: --
     newLabel: CUT
-  - name: table.rows.3.fx1.amount
+  - name: table.rows.3.fx[0].value
     offset: 0x0100
     original: 0x00
     new: 0x31
-  - name: table.rows.3.fx2.command
+  - name: table.rows.3.fx[1].command
     offset: 0x0101
     original: 0xff
     new: 0x8a
     originalLabel: --
     newLabel: RES
-  - name: table.rows.3.fx2.amount
+  - name: table.rows.3.fx[1].value
     offset: 0x0102
     original: 0x00
     new: 0x32
-  - name: table.rows.3.fx3.command
+  - name: table.rows.3.fx[2].command
     offset: 0x0103
     original: 0xff
     new: 0x8b
     originalLabel: --
     newLabel: AMP
-  - name: table.rows.3.fx3.amount
+  - name: table.rows.3.fx[2].value
     offset: 0x0104
     original: 0x00
     new: 0x33
@@ -176,33 +176,33 @@ changes:
     original: 0xff
     new: 0x7b
     originalLabel: --
-  - name: table.rows.4.fx1.command
+  - name: table.rows.4.fx[0].command
     offset: 0x0107
     original: 0xff
     new: 0x8c
     originalLabel: --
     newLabel: LIM
-  - name: table.rows.4.fx1.amount
+  - name: table.rows.4.fx[0].value
     offset: 0x0108
     original: 0x00
     new: 0x41
-  - name: table.rows.4.fx2.command
+  - name: table.rows.4.fx[1].command
     offset: 0x0109
     original: 0xff
     new: 0x8d
     originalLabel: --
     newLabel: PAN
-  - name: table.rows.4.fx2.amount
+  - name: table.rows.4.fx[1].value
     offset: 0x010a
     original: 0x00
     new: 0x42
-  - name: table.rows.4.fx3.command
+  - name: table.rows.4.fx[2].command
     offset: 0x010b
     original: 0xff
     new: 0xa6
     originalLabel: --
     newLabel: SNC
-  - name: table.rows.4.fx3.amount
+  - name: table.rows.4.fx[2].value
     offset: 0x010c
     original: 0x00
     new: 0x43
@@ -216,33 +216,33 @@ changes:
     original: 0xff
     new: 0x7a
     originalLabel: --
-  - name: table.rows.5.fx1.command
+  - name: table.rows.5.fx[0].command
     offset: 0x010f
     original: 0xff
     new: 0xa7
     originalLabel: --
     newLabel: ERR
-  - name: table.rows.5.fx1.amount
+  - name: table.rows.5.fx[0].value
     offset: 0x0110
     original: 0x00
     new: 0x51
-  - name: table.rows.5.fx2.command
+  - name: table.rows.5.fx[1].command
     offset: 0x0111
     original: 0xff
     new: 0x8e
     originalLabel: --
     newLabel: DRY
-  - name: table.rows.5.fx2.amount
+  - name: table.rows.5.fx[1].value
     offset: 0x0112
     original: 0x00
     new: 0x52
-  - name: table.rows.5.fx3.command
+  - name: table.rows.5.fx[2].command
     offset: 0x0113
     original: 0xff
     new: 0x8f
     originalLabel: --
     newLabel: SMX
-  - name: table.rows.5.fx3.amount
+  - name: table.rows.5.fx[2].value
     offset: 0x0114
     original: 0x00
     new: 0x53
@@ -256,23 +256,23 @@ changes:
     original: 0xff
     new: 0x79
     originalLabel: --
-  - name: table.rows.6.fx1.command
+  - name: table.rows.6.fx[0].command
     offset: 0x0117
     original: 0xff
     new: 0x90
     originalLabel: --
     newLabel: SDL
-  - name: table.rows.6.fx1.amount
+  - name: table.rows.6.fx[0].value
     offset: 0x0118
     original: 0x00
     new: 0x61
-  - name: table.rows.6.fx2.command
+  - name: table.rows.6.fx[1].command
     offset: 0x0119
     original: 0xff
     new: 0x91
     originalLabel: --
     newLabel: SRV
-  - name: table.rows.6.fx2.amount
+  - name: table.rows.6.fx[1].value
     offset: 0x011a
     original: 0x00
     new: 0x62

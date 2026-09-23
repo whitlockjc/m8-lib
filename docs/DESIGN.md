@@ -249,6 +249,9 @@ Defer broad schema reorganization until after the Song file is structurally
 mapped. Song is expected to expose the final reuse boundaries because it embeds
 or references many structures that also appear in standalone files.
 
+The [6.5.x schema review](SCHEMA_REVIEW.md) catalogs manual-aligned concepts,
+fixture-backed storage boundaries, and a proposed incremental file split.
+
 After Song research, review the schemas and documentation for shared components:
 
 - Instrument body and embedded Song instrument storage,

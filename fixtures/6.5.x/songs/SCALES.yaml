@@ -25,7 +25,7 @@ changes:
     originalLabel: C
     newLabel: E
 
-  - name: rows[0].track1
+  - name: rows[0].tracks[0]
     offset: 0x02ee
     original: 0xff
     new: 0x00

@@ -6,5 +6,8 @@
     "inspect:headers": "node tools/inspect-headers.js",
     "map:fixture": "node tools/map-fixture.js",
     "verify": "tools/verify"
+  },
+  "devDependencies": {
+    "kaitai-struct": "^0.11.0"
   }
 }

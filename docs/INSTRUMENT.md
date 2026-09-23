@@ -53,25 +53,38 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | M8 File Header | `0x00..0x0d` | 14 | [M8 File Header](FILE_HEADER.md) |
-| `instrumentData` | `0x0e..0xe4` | 215 | instrument record |
-| `instrumentType` | `0x0e` | 1 | [Instrument Type](#instrument-type) |
+| `instrument_data` | `0x0e..0xe4` | 215 | instrument record |
+| `general_settings` | `0x0e..0x1c` | 15 | [General Instrument Settings](#general-instrument-settings) |
+| `general_settings.type` | `0x0e` | 1 | [Instrument Type](#instrument-type) |
 | `name` | `0x0f..0x1a` | 12 | [Fixed String](#fixed-strings) |
 | `transpose` | `0x1b` | 1 | `u1` |
-| `tableTic` | `0x1c` | 1 | `u1` |
-| `bodyBeforeEq` | `0x1d..0x4b` | 47 | [Body Before EQ](#body-before-eq) |
+| `table_tic` | `0x1c` | 1 | `u1` |
+| `body_before_eq` | `0x1d..0x4b` | 47 | [Body Before EQ](#body-before-eq) |
 | `eq` | `0x4c` | 1 | `u1` |
 | `tail` | `0x4d..0xe4` | 152 | [Tail](#tail) |
 | `table` | `0xe5..0x164` | 128 | [Instrument Table](#instrument-table) |
 
-The `bodyBeforeEq` layout depends on `instrumentType`. For `none`, this range
+The `body_before_eq` layout depends on `general_settings.type`. For `none`, this range
 is preserved but not documented as meaningful fields, because the M8 UI does
 not expose editable `NONE` instrument parameters.
 
-`INSTRUMENTS.m8s` verifies that Song files reuse `instrumentData` exactly. Its
+`INSTRUMENTS.m8s` verifies that Song files reuse `instrument_data` exactly. Its
 embedded Wavsynth and Hypersynth records match the first 215 body bytes of
 `WAV_DEFAULT.m8i` and `HYP_DEFAULT.m8i`, respectively, except that the embedded
 12-byte names are unset (`0xff`). Song Tables are stored separately from the
 128 embedded Instrument records.
+
+### General Instrument Settings
+
+The M8 manual groups `type`, `name`, `transpose`, `table_tic`, and
+`eq` as General Instrument Settings. All Instrument types store these fields at
+the same offsets in the 215-byte record. The first four form the
+`general_settings` prefix; `eq` is stored separately at `0x4c` after the
+type-specific body. NONE does not expose all of these settings for editing.
+
+The `eq` value selects an EQ bank. The 128 bank definitions are stored
+separately in a [Song](SONG.md#instrument-eqs); the Instrument record stores
+the assignment, not the EQ's three-band definition.
 
 ### Instrument Type
 
@@ -144,7 +157,7 @@ The verified fixtures show both full and padded values:
 ## Body Before EQ
 
 The bytes between the common prefix and the common `eq` field are interpreted by
-`instrumentType`.
+`general_settings.type`.
 
 | Instrument Type | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
@@ -257,7 +270,7 @@ The byte at `0x1f` is displayed according to `playMode`.
 
 ## Instrument-Specific Parameters
 
-Instrument-specific parameter storage depends on `instrumentType`. Wavsynth and
+Instrument-specific parameter storage depends on `general_settings.type`. Wavsynth and
 Macrosynth use a compact five-byte parameter block at `0x20..0x24`. MIDI Out
 uses a 29-byte parameter block at `0x1d..0x39`. FM Synth uses a larger 33-byte
 block at `0x20..0x40`. Hypersynth uses a 12-byte block at `0x20..0x2b`.
@@ -276,7 +289,7 @@ Sampler has a distinct body layout and does not use these block shapes.
 ### Wavsynth Parameters
 
 Offsets are relative to the start of `instrumentParams` when
-`instrumentType = wavsynth`.
+`general_settings.type = wavsynth`.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -289,7 +302,7 @@ Offsets are relative to the start of `instrumentParams` when
 ### Macrosynth Parameters
 
 Offsets are relative to the start of `instrumentParams` when
-`instrumentType = macrosynth`.
+`general_settings.type = macrosynth`.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -302,7 +315,7 @@ Offsets are relative to the start of `instrumentParams` when
 ### MIDI Out Parameters
 
 Offsets are relative to the start of `instrumentParams` when
-`instrumentType = midiOut`.
+`general_settings.type = midi_out`.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -341,7 +354,7 @@ customCcOffset = 0x26 + (index * 2)
 ### External Parameters
 
 Offsets are relative to the start of `instrumentParams` when
-`instrumentType = external`.
+`general_settings.type = external`.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -379,7 +392,7 @@ customCcOffset = 0x25 + (index * 2)
 ### FM Synth Parameters
 
 Offsets are relative to the start of `instrumentParams` when
-`instrumentType = fmSynth`.
+`general_settings.type = fm_synth`.
 
 The raw file stores operator data in grouped columns, not as four complete
 operator structs. A higher-level API can still expose this as `operators[0..3]`
@@ -430,7 +443,7 @@ Each operator level/feedback pair is stored as two adjacent bytes.
 ### Hypersynth Parameters
 
 Offsets are relative to the start of `instrumentParams` when
-`instrumentType = hypersynth`.
+`general_settings.type = hypersynth`.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
@@ -509,10 +522,10 @@ Offsets are relative to the start of `mixer`.
 
 ## Tail
 
-The 152-byte tail is the final portion of `instrumentData`, and its layout
-depends on `instrumentType`. Verified editable instruments start with a shared
+The 152-byte tail is the final portion of `instrument_data`, and its layout
+depends on `general_settings.type`. Verified editable instruments start with a shared
 24-byte modulation block. The standalone Instrument Table follows the tail at
-`0xe5`; Song files store the same 215-byte `instrumentData` records and keep
+`0xe5`; Song files store the same 215-byte `instrument_data` records and keep
 their Tables in a separate region.
 
 ### Standard Tail
@@ -682,9 +695,7 @@ Offsets are relative to the start of a table row.
 | --- | --- | ---: | --- |
 | `transpose` | `+0x00` | 1 | `u1` |
 | `volume` | `+0x01` | 1 | `u1` |
-| `fx1` | `+0x02..+0x03` | 2 | [Instrument Table FX](#instrument-table-fx) |
-| `fx2` | `+0x04..+0x05` | 2 | [Instrument Table FX](#instrument-table-fx) |
-| `fx3` | `+0x06..+0x07` | 2 | [Instrument Table FX](#instrument-table-fx) |
+| `fx[0..2]` | `+0x02..+0x07` | 6 | [FX Slot](FX_COMMANDS.md#storage) `[3]` |
 
 The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`,
 `FM_TABLE.m8i`, `HYP_TABLE.m8i`, `EXT_TABLE.m8i`, and `NONE_TABLE.m8i`
@@ -694,20 +705,11 @@ provided, then leave the remaining FX slots at their baseline values.
 `NONE_TABLE.m8i` leaves every FX slot unset, so it verifies the FX slot layout
 but not the available command-family values for NONE tables.
 
-### Instrument Table FX
-
-Offsets are relative to the start of a table FX slot.
-
-| Name | Relative Offset | Size | Type |
-| --- | --- | ---: | --- |
-| `command` | `+0x00` | 1 | table FX command |
-| `amount` | `+0x01` | 1 | `u1` |
-
-The command byte `0xff` displays as unset (`--`). Some command labels are
-specific to the active instrument, while other command labels belong to
-Sequencer, Mixer & Effects, Current Instrument, or Instrument Mods command
-families. See [FX Commands](FX_COMMANDS.md) for the command-family model and
-verification plan.
+Each slot uses the shared two-byte [FX Slot](FX_COMMANDS.md#storage) layout.
+Its second byte is named `value` in the raw schema; the M8 table UI may call
+that value an amount. Command labels and availability depend on the active
+instrument and command family. See [FX Commands](FX_COMMANDS.md) for the
+contextual model and verification plan.
 
 ## Enums
 
@@ -1504,7 +1506,7 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `hypersynth.unknownAfterChords` | `0xd5..0xe4` | 16 | Preserved until future fixtures map this region |
 | `external.unknownBeforeParams` | `0x1f` | 1 | Preserved until future fixtures map this byte |
 | `external.unknownBeforeEq` | `0x37..0x4b` | 21 | Preserved until future fixtures map this region |
-| `none.bodyBeforeEq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
+| `none.body_before_eq` | `0x1d..0x4b` | 47 | Preserved for `none` but not modeled as editable parameters |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until future fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
 | `unknownAfterModulators` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, and External until future fixtures map this region |
@@ -1537,7 +1539,7 @@ not establish that MIDI Out or External uses Hypersynth chords.
 ## Notes
 
 - `INSTRUMENTS.m8s` verifies that standalone Instrument files and instruments
-  embedded in Song files share the same 215-byte `instrumentData`
+  embedded in Song files share the same 215-byte `instrument_data`
   representation. Standalone files append one 128-byte Table, while Songs
   store Tables in a separate region.
 - Enumerated values should document both stored representation and UI label.

@@ -5,6 +5,8 @@ meta:
   ks-version: 0.11
   imports:
     - ../6.0.1/instrument
+    - ../4.0.1/scale
+    - ../../common/fx_slot
 doc: |
   Body schema for song files with header schema version 6.5.0.
 
@@ -130,20 +132,10 @@ types:
         type: u1
       - id: instrument
         type: u1
-      - id: fx1
-        type: phrase_fx
-      - id: fx2
-        type: phrase_fx
-      - id: fx3
-        type: phrase_fx
-  phrase_fx:
-    doc: Two-byte Phrase FX command/value slot.
-    seq:
-      - id: command
-        type: u1
-        enum: phrase_fx_command
-      - id: value
-        type: u1
+      - id: fx
+        type: fx_slot
+        repeat: expr
+        repeat-expr: 3
   song_rows:
     doc: |
       Song View row storage. Offsets are relative to absolute file offset
@@ -157,24 +149,12 @@ types:
   song_row:
     doc: |
       Eight-byte Song View row. Each byte stores the chain index assigned to a
-      specific track. 0xff is observed as unset.
+      track; tracks[0] is M8 Track 1. 0xff is observed as unset.
     seq:
-      - id: track_1
+      - id: tracks
         type: u1
-      - id: track_2
-        type: u1
-      - id: track_3
-        type: u1
-      - id: track_4
-        type: u1
-      - id: track_5
-        type: u1
-      - id: track_6
-        type: u1
-      - id: track_7
-        type: u1
-      - id: track_8
-        type: u1
+        repeat: expr
+        repeat-expr: 8
   chains:
     doc: |
       Chain View storage. Offsets are relative to absolute file offset 0x9a5e
@@ -521,29 +501,9 @@ types:
       standalone Scale file headers.
     seq:
       - id: entries
-        type: embedded_scale
+        type: scale_4_0_1
         repeat: expr
         repeat-expr: 16
-  embedded_scale:
-    doc: |
-      Embedded Scale body. This matches the standalone Scale file body layout:
-      enabled notes, 12 intervals, a fixed-size name, and tuning offset.
-    seq:
-      - id: enabled_notes
-        type: u2
-      - id: intervals
-        type: scale_interval
-        repeat: expr
-        repeat-expr: 12
-      - id: name
-        size: 16
-      - id: tuning_offset
-        type: f4
-  scale_interval:
-    doc: Signed interval offset stored as hundredths of a semitone.
-    seq:
-      - id: offset
-        type: s2
   midi_mapping:
     doc: |
       Seven-byte MIDI Mapping record. Historical m8-js reference code reads

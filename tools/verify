@@ -290,6 +290,8 @@ if command -v kaitai-struct-compiler >/dev/null 2>&1; then
     cd "$SCHEMA_CHECK_DIR"
     kaitai-struct-compiler -t javascript 6.5.x.ksy
   )
+  NODE_PATH="$ROOT/node_modules${NODE_PATH:+:$NODE_PATH}" \
+    node tools/verify-parsed-fixtures.js "$SCHEMA_CHECK_DIR"
 else
   echo "warning: kaitai-struct-compiler not found; skipping schema compilation" >&2
 fi

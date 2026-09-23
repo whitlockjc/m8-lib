@@ -220,17 +220,11 @@ Offsets are relative to the start of a Song row.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `track1` | `+0x00` | 1 | `u1` |
-| `track2` | `+0x01` | 1 | `u1` |
-| `track3` | `+0x02` | 1 | `u1` |
-| `track4` | `+0x03` | 1 | `u1` |
-| `track5` | `+0x04` | 1 | `u1` |
-| `track6` | `+0x05` | 1 | `u1` |
-| `track7` | `+0x06` | 1 | `u1` |
-| `track8` | `+0x07` | 1 | `u1` |
+| `tracks[0..7]` | `+0x00..+0x07` | 8 | `u1[8]` |
 
-The default row value for each track is `0xff`, which the M8 UI displays as
-unset. Other observed values are chain indexes.
+`tracks[0]` corresponds to M8 Track 1 and `tracks[7]` to Track 8. The default
+value for each track is `0xff`, which the M8 UI displays as unset. Other
+observed values are chain indexes.
 
 ### Phrases
 
@@ -262,26 +256,15 @@ Offsets are relative to the start of a Phrase step.
 | `note` | `+0x00` | 1 | `u1` |
 | `volume` | `+0x01` | 1 | `u1` |
 | `instrument` | `+0x02` | 1 | `u1` |
-| `fx1` | `+0x03..+0x04` | 2 | [Phrase FX](#phrase-fx) |
-| `fx2` | `+0x05..+0x06` | 2 | [Phrase FX](#phrase-fx) |
-| `fx3` | `+0x07..+0x08` | 2 | [Phrase FX](#phrase-fx) |
+| `fx[0..2]` | `+0x03..+0x08` | 6 | [FX Slot](FX_COMMANDS.md#storage) `[3]` |
 
 The default step bytes are `ff ff ff ff 00 ff 00 ff 00`. The observed unset
 value for `note`, `volume`, `instrument`, and FX command bytes is `0xff`. The
 FX value bytes default to `0x00`.
 
-### Phrase FX
-
-Offsets are relative to the start of a Phrase FX slot.
-
-| Name | Offset / Range | Size | Type |
-| --- | --- | ---: | --- |
-| `command` | `+0x00` | 1 | [FX Command](FX_COMMANDS.md) |
-| `value` | `+0x01` | 1 | `u1` |
-
 The `PHRASES.m8s` fixture verifies Sequencer and Mixer/Effects command byte
-values in Phrase FX slots. See [FX Commands](FX_COMMANDS.md) for the
-fixture-backed command labels and values.
+values in the shared two-byte [FX Slot](FX_COMMANDS.md#storage) layout. See
+[FX Commands](FX_COMMANDS.md) for contextual labels and values.
 
 ### Bookmarks
 
@@ -428,7 +411,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `entries[0..15]` | `0x1aa7e..0x1ad5d` | 736 | [Embedded Scale](#embedded-scale) |
+| `entries[0..15]` | `0x1aa7e..0x1ad5d` | 736 | [Scale Body](SCALE.md#layout) `[16]` |
 
 The `SCALES.m8s` fixture verifies:
 
@@ -440,29 +423,9 @@ The `SCALES.m8s` fixture verifies:
 Although the test note originally named Scale `0x04`, byte evidence from the
 fixture stores `IWATO` in slot `0x0f`.
 
-### Embedded Scale
-
-Offsets are relative to the start of an embedded Scale record.
-
-| Name | Offset / Range | Size | Type |
-| --- | --- | ---: | --- |
-| `enabledNotes` | `+0x00..+0x01` | 2 | `u2le` |
-| `intervals[0..11]` | `+0x02..+0x19` | 24 | [Embedded Scale Interval](#embedded-scale-interval) |
-| `name` | `+0x1a..+0x29` | 16 | [Fixed String](#fixed-string) |
-| `tuningOffset` | `+0x2a..+0x2d` | 4 | `f4` |
-
-`tuningOffset` has the same meaning as standalone Scale files: a 32-bit
-little-endian float offset from `440.00` Hz.
-
-### Embedded Scale Interval
-
-Offsets are relative to the start of each embedded Scale interval.
-
-| Name | Offset / Range | Size | Type |
-| --- | --- | ---: | --- |
-| `offset` | `+0x00..+0x01` | 2 | `i2le` |
-
-`offset` is stored as hundredths of a semitone.
+Song entries import the same 46-byte [Scale body](SCALE.md#layout) as a
+standalone `.m8n` file, without its 14-byte file header. The standalone Scale
+reference defines the interval and tuning offset layout for both contexts.
 
 ### Instrument EQs
 

@@ -18,12 +18,12 @@ changes:
     originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
     newBytes: 43 48 41 49 4e 53 00 00 00 00 00 00
 
-  - name: rows[0].track1
+  - name: rows[0].tracks[0]
     offset: 0x02ee
     original: 0xff
     new: 0x00
 
-  - name: rows[0].track2
+  - name: rows[0].tracks[1]
     offset: 0x02ef
     original: 0xff
     new: 0xfe
