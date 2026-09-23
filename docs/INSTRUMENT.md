@@ -539,12 +539,19 @@ Offsets are relative to the start of `amp`.
 
 ### Mixer Parameters
 
+The M8 manual groups `dry`, `mod_fx`, `delay`, and `reverb` as instrument Mixer
+Parameters. Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External
+use the same four-byte `mixer_params` layout immediately after their Amplifier
+Settings, at the type-dependent offsets shown above. This is not the Song's
+master [Mixer](SONG.md#mixer). MIDI Out and NONE do not expose this group;
+their preserved bytes are not assigned instrument mixer semantics.
+
 Offsets are relative to the start of `mixer`.
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
 | `dry` | `+0x00` | 1 | `u1` |
-| `modFx` | `+0x01` | 1 | `u1` |
+| `mod_fx` | `+0x01` | 1 | `u1` |
 | `delay` | `+0x02` | 1 | `u1` |
 | `reverb` | `+0x03` | 1 | `u1` |
 

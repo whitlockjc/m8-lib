@@ -102,6 +102,22 @@ for (const [name, offset, expectedAmp, expectedPan] of [
     [expectedAmp, 0x08, expectedPan], `${name} amplifier values`)
 }
 
+for (const [name, offset, expected] of [
+  ['WAV', 0x2b, [0xf7, 0xf6, 0xf5, 0xf4]],
+  ['MAC', 0x2b, [0xf7, 0xf6, 0xf5, 0xf4]],
+  ['SAM', 0x2c, [0xf6, 0xf5, 0xf4, 0xf3]],
+  ['FM', 0x47, [0xef, 0xee, 0xed, 0xec]],
+  ['HYP', 0x32, [0xf1, 0xf0, 0xef, 0xee]],
+  ['EXT', 0x33, [0xfa, 0xf9, 0xf8, 0xf7]]
+]) {
+  const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
+  const mixer = file.body.instrument.bodyBeforeEq.mixer
+  const values = [mixer.dry, mixer.modFx, mixer.delay, mixer.reverb]
+  assert.deepEqual(values, [...bytes.subarray(offset, offset + 4)],
+    `${name} instrument mixer layout`)
+  assert.deepEqual(values, expected, `${name} instrument mixer values`)
+}
+
 {
   const { file } = parse('fixtures/6.5.x/instruments/HYP_PARAMS.m8i')
   const instrument = file.body.instrument

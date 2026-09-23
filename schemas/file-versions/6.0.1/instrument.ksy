@@ -465,6 +465,11 @@ types:
       - id: pan
         type: u1
   mixer_params:
+    doc: |
+      Shared four-byte instrument Mixer Parameters layout: dry, mod_fx,
+      delay, and reverb. Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth,
+      and External expose this group at type-dependent offsets. It is distinct
+      from the Song's master Mixer; MIDI Out and NONE do not expose it.
     seq:
       - id: dry
         type: u1
