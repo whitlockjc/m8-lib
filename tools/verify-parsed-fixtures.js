@@ -47,6 +47,48 @@ for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   }
 }
 
+for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) {
+  const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
+  const params = file.body.instrument.bodyBeforeEq.controls
+  assert.equal(params.modeValue, bytes[0x1f], `${name} mode value`)
+  assert.equal(params.playMode, playMode, `${name} play mode`)
+  assert.deepEqual(
+    [params.slice, params.start, params.loopStart, params.length, params.degrade],
+    [...bytes.subarray(0x21, 0x26)], `${name} Sampler parameters`
+  )
+}
+
+{
+  const { bytes, file } = parse('fixtures/6.5.x/instruments/SAM_PARAMS.m8i')
+  const pathBytes = Buffer.from(file.body.instrument.tail.samplePath)
+  assert.equal(pathBytes.length, 128)
+  assert.deepEqual(pathBytes, bytes.subarray(0x65, 0xe5))
+  assert.equal(pathBytes.subarray(0, 17).toString('utf8'), '/Samples/Kick.wav')
+  assert.ok(pathBytes.subarray(17).every(byte => byte === 0))
+}
+
+for (const [name, firstOffset, count] of [['MID', 0x26, 10], ['EXT', 0x25, 4]]) {
+  const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
+  const entries = file.body.instrument.bodyBeforeEq.params.customCcs
+  assert.equal(entries.length, count, `${name} custom CC count`)
+  for (const [index, entry] of entries.entries()) {
+    assert.deepEqual([entry.cc, entry.value],
+      [...bytes.subarray(firstOffset + index * 2, firstOffset + index * 2 + 2)],
+      `${name} custom CC ${index}`)
+  }
+}
+
+{
+  const { file } = parse('fixtures/6.5.x/instruments/HYP_PARAMS.m8i')
+  const instrument = file.body.instrument
+  const current = instrument.bodyBeforeEq.params.currentChord
+  const stored = instrument.tail.chords[current.index]
+  assert.equal(instrument.tail.chords.length, 16)
+  for (const note of ['note1', 'note2', 'note3', 'note4', 'note5', 'note6']) {
+    assert.equal(current.notes[note], stored.notes[note], `Hypersynth current ${note}`)
+  }
+}
+
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/WAV_TABLE.m8i')
   const row = file.body.table.rows[0]

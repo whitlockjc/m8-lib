@@ -191,13 +191,7 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `unknownCommon0` | `0x1d..0x1e` | 2 | unknown bytes |
-| `modeValue` | `0x1f` | 1 | [Sampler Mode Value](#sampler-mode-value) |
-| `playMode` | `0x20` | 1 | [Sampler Play Mode](#sampler-play-mode) |
-| `slice` | `0x21` | 1 | `u1` |
-| `start` | `0x22` | 1 | `u1` |
-| `loopStart` | `0x23` | 1 | `u1` |
-| `length` | `0x24` | 1 | `u1` |
-| `degrade` | `0x25` | 1 | `u1` |
+| `controls` | `0x1f..0x25` | 7 | [Sampler Parameters](#sampler-parameters) |
 | `filter` | `0x26..0x28` | 3 | [Filter Parameters](#filter-parameters) |
 | `amp` | `0x29..0x2b` | 3 | [Amplification Parameters](#amplification-parameters) |
 | `mixer` | `0x2c..0x2f` | 4 | [Mixer Parameters](#mixer-parameters) |
@@ -209,7 +203,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `instrumentParams` | `0x1d..0x39` | 29 | [MIDI Out Parameters](#midi-out-parameters) |
+| `params` | `0x1d..0x39` | 29 | [MIDI Out Parameters](#midi-out-parameters) |
 | `unknownBeforeEq` | `0x3a..0x4b` | 18 | unknown bytes |
 
 MIDI Out does not expose Filter, Amplification, or Mixer parameter groups in the
@@ -274,17 +268,46 @@ Instrument-specific parameter storage depends on `general_settings.type`. Wavsyn
 Macrosynth use a compact five-byte parameter block at `0x20..0x24`. MIDI Out
 uses a 29-byte parameter block at `0x1d..0x39`. FM Synth uses a larger 33-byte
 block at `0x20..0x40`. Hypersynth uses a 12-byte block at `0x20..0x2b`.
-External uses a 13-byte parameter block at `0x20..0x2c`.
-Sampler has a distinct body layout and does not use these block shapes.
+External uses a 13-byte parameter block at `0x20..0x2c`. Sampler's
+instrument-specific configuration spans two locations: seven control bytes at
+`0x1f..0x25` and the selected sample path at `0x65..0xe4`.
 
 | Instrument Type | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `wavsynth` | `0x20..0x24` | 5 | [Wavsynth Parameters](#wavsynth-parameters) |
 | `macrosynth` | `0x20..0x24` | 5 | [Macrosynth Parameters](#macrosynth-parameters) |
+| `sampler` | `0x1f..0x25`, `0x65..0xe4` | 7 + 128 | [Sampler Parameters](#sampler-parameters) |
 | `midiOut` | `0x1d..0x39` | 29 | [MIDI Out Parameters](#midi-out-parameters) |
 | `fmSynth` | `0x20..0x40` | 33 | [FM Synth Parameters](#fm-synth-parameters) |
 | `hypersynth` | `0x20..0x2b` | 12 | [Hypersynth Parameters](#hypersynth-parameters) |
 | `external` | `0x20..0x2c` | 13 | [External Parameters](#external-parameters) |
+
+### Sampler Parameters
+
+These fields make up one Sampler-specific configuration, but the file stores
+them in two places. `controls` is parsed by `sampler_body_before_eq`; the
+selected `sample_path` is parsed by `sampler_data_tail` after the modulators.
+
+| Name | Offset / Range | Size | Type |
+| --- | --- | ---: | --- |
+| `controls.mode_value` | `0x1f` | 1 | [Sampler Mode Value](#sampler-mode-value) |
+| `controls.play_mode` | `0x20` | 1 | [Sampler Play Mode](#sampler-play-mode) |
+| `controls.slice` | `0x21` | 1 | `u1` |
+| `controls.start` | `0x22` | 1 | `u1` |
+| `controls.loop_start` | `0x23` | 1 | `u1` |
+| `controls.length` | `0x24` | 1 | `u1` |
+| `controls.degrade` | `0x25` | 1 | `u1` |
+| `sample_path` | `0x65..0xe4` | 128 | selected sample path; [Sampler Tail](#sampler-tail) |
+
+`mode_value` is one stored byte. The M8 UI labels it detune, steps, or BPM
+according to `play_mode`; these are not three separate stored fields.
+
+`SAM_PARAMS.m8i` stores `/Samples/Kick.wav` as 17 ASCII bytes at `0x65`,
+followed by 111 zero bytes. The region runs through `0xe4`, immediately before
+the Instrument Table. The [M8 manual](https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699)
+requires the entire sample path to be under 128 characters. The fixture
+verifies zero padding for this short ASCII path; near-limit and non-ASCII paths
+have not been tested.
 
 ### Wavsynth Parameters
 
@@ -325,16 +348,17 @@ Offsets are relative to the start of `instrumentParams` when
 | `unknownBeforeProgramChange` | `+0x03..+0x04` | 2 | unknown bytes |
 | `programChange` | `+0x05` | 1 | `u1` |
 | `unknownBeforeCustomCcs` | `+0x06..+0x08` | 3 | unknown bytes |
-| `customCcs` | `+0x09..+0x1c` | 20 | [MIDI Out Custom CC](#midi-out-custom-cc) |
+| `custom_ccs` | `+0x09..+0x1c` | 20 | [Custom CC Entry](#custom-cc-entry) (10 entries) |
 
 The M8 UI displays `channel`, `bank`, `programChange`, and custom CC numbers as
 decimal values. The fixture verifies that those display values are stored as
 their byte equivalents: channel `16` is `0x10`, bank `127` is `0x7f`, program
 change `126` is `0x7e`, CC `125` is `0x7d`, and CC `123` is `0x7b`.
 
-#### MIDI Out Custom CC
+#### Custom CC Entry
 
-The custom CC table stores ten two-byte entries for `CCA` through `CCJ`.
+MIDI Out and External use the same `custom_cc` two-byte entry. MIDI Out stores
+ten entries (`CCA` through `CCJ`); External stores four (`CCA` through `CCD`).
 
 Offsets are relative to the start of a custom CC entry.
 
@@ -349,7 +373,7 @@ The entry offset is:
 customCcOffset = 0x26 + (index * 2)
 ```
 
-`CCA` is index `0` and `CCJ` is index `9`.
+For MIDI Out, `CCA` is index `0` and `CCJ` is index `9`.
 
 ### External Parameters
 
@@ -363,23 +387,12 @@ Offsets are relative to the start of `instrumentParams` when
 | `channel` | `+0x02` | 1 | `u1` |
 | `bank` | `+0x03` | 1 | `u1` |
 | `programChange` | `+0x04` | 1 | `u1` |
-| `customCcs` | `+0x05..+0x0c` | 8 | [External Custom CC](#external-custom-cc) |
+| `custom_ccs` | `+0x05..+0x0c` | 8 | [Custom CC Entry](#custom-cc-entry) (4 entries) |
 
 The M8 UI displays `channel`, `bank`, `programChange`, and custom CC numbers as
 decimal values. The fixture verifies that those display values are stored as
 their byte equivalents: channel `16` is `0x10`, bank `127` is `0x7f`, program
 change `126` is `0x7e`, CC `125` is `0x7d`, and CC `123` is `0x7b`.
-
-#### External Custom CC
-
-The custom CC table stores four two-byte entries for `CCA` through `CCD`.
-
-Offsets are relative to the start of a custom CC entry.
-
-| Name | Relative Offset | Size | Type |
-| --- | --- | ---: | --- |
-| `cc` | `+0x00` | 1 | `u1` |
-| `value` | `+0x01` | 1 | `u1` |
 
 The entry offset is:
 
@@ -447,17 +460,17 @@ Offsets are relative to the start of `instrumentParams` when
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |
-| `currentChord` | `+0x00..+0x06` | 7 | [Hypersynth Current Chord](#hypersynth-current-chord) |
+| `current_chord` | `+0x00..+0x06` | 7 | [Hypersynth Current Chord](#hypersynth-current-chord) |
 | `scale` | `+0x07` | 1 | `u1` |
 | `shift` | `+0x08` | 1 | `u1` |
 | `swarm` | `+0x09` | 1 | `u1` |
 | `width` | `+0x0a` | 1 | `u1` |
 | `subosc` | `+0x0b` | 1 | `u1` |
 
-The `currentChord` bytes model the current/edit chord as stored in memory. The
-persistent 16-chord table is stored separately in the Hypersynth tail. Observed
-M8 files should keep `currentChord.notes` synchronized with
-`chords[currentChord.index].notes`.
+The `current_chord` bytes represent the current/edit chord state. The
+persistent 16-chord table is stored separately in the Hypersynth tail. In
+`HYP_PARAMS.m8i`, the current note bytes match the table entry selected by
+`current_chord.index`; the two regions remain distinct stored data.
 
 #### Hypersynth Current Chord
 
@@ -552,11 +565,13 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
-| `samplePath` | `0x65..0xe4` | 128 | [Fixed String](#fixed-strings) |
+| `sample_path` | `0x65..0xe4` | 128 | selected sample path; [Sampler Parameters](#sampler-parameters) |
 
-The Sampler fixtures verify that the selected sample path `/Samples/Kick.wav`
-starts at `0x65`. The full 128-byte `samplePath` range is provisional until a
-fixture with a longer path verifies the maximum stored length.
+`SAM_PARAMS.m8i` verifies that `/Samples/Kick.wav` occupies the first 17 bytes
+and the remaining 111 bytes are zero. The 128-byte storage region is bounded
+by the Table at `0xe5`; the M8 manual requires the entire path to be under 128
+characters. A short ASCII fixture does not establish near-limit or non-ASCII
+encoding behavior.
 
 ### Hypersynth Tail
 
@@ -1510,7 +1525,7 @@ the M8 6.5.2 manual until future fixtures select those values.
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | Preserved for Wavsynth/Macrosynth until future fixtures map this region |
 | `sampler.unknownBeforeEq` | `0x30..0x4b` | 28 | Preserved until future fixtures map this region |
 | `unknownAfterModulators` | `0x65..0xe4` | 128 | Preserved for Wavsynth, Macrosynth, MIDI Out, FM Synth, and External until future fixtures map this region |
-| `sampler.samplePath` | `0x65..0xe4` | 128 | Start and stored path bytes verified; full maximum length is provisional |
+| `sampler.sample_path` | `0x65..0xe4` | 128 | Selected sample path; manual limit is under 128 characters; short fixture shows zero padding |
 | `none.unknown` | `0x4d..0xe4` | 152 | Preserved for `none` until future fixtures map this region |
 
 The `NONE` instrument does not expose editable instrument parameters or
@@ -1529,7 +1544,7 @@ edits, not that the bytes are unused or constant in every valid file.
 | --- | --- |
 | `0x1d..0x1e` | `00 00` for Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External. MIDI Out uses these offsets for known parameters. |
 | `0x1f` | `80` for Wavsynth, Macrosynth, FM Synth, and Hypersynth; `00` for External. Sampler uses this offset for its mode-dependent value, and MIDI Out uses it for `bank`. |
-| `0x65..0xe4` | All `00` for Wavsynth, Macrosynth, FM Synth, and NONE. MIDI Out and External have identical repeating defaults that also match Hypersynth's default chord bytes at `0x65..0xd4` and its trailing bytes at `0xd5..0xe4`. Sampler uses this range for `samplePath`. |
+| `0x65..0xe4` | All `00` for Wavsynth, Macrosynth, FM Synth, and NONE. MIDI Out and External have identical repeating defaults that also match Hypersynth's default chord bytes at `0x65..0xd4` and its trailing bytes at `0xd5..0xe4`. Sampler uses this range for `sample_path`. |
 
 The unknown ranges before `eq` begin at different offsets for different
 instrument types. A same-offset comparison there may compare an unknown byte in
@@ -1599,7 +1614,7 @@ not establish that MIDI Out or External uses Hypersynth chords.
 - `SAM_TABLE.m8i` verifies that the Sampler instrument table starts at `0xe5`,
   contains 16 rows, and uses the same eight-byte row layout as Wavsynth and
   Macrosynth. In Sampler files, this places the table immediately after the
-  128-byte `samplePath` region.
+  128-byte `sample_path` region.
 - `MID_MODS_A.m8i` verifies that MIDI Out uses the common modulation slot
   width, offset, packed type/destination byte, and parameter layouts for
   `TRACKING`, `TRIG ENV`, `AHD ENV`, and `ADSR ENV`.
@@ -1789,7 +1804,7 @@ The manifest-driven mapper matched all 17 changed bytes exactly and reported
 zero unaccounted changed bytes.
 
 The `SAM_TABLE.m8i` fixture verifies the Sampler instrument table at
-`0xe5..0x164` as 16 eight-byte rows immediately after `samplePath`. Each row
+`0xe5..0x164` as 16 eight-byte rows immediately after `sample_path`. Each row
 stores `transpose`, `volume`, and three two-byte FX slots. The manifest-driven
 mapper matched all 79 changed bytes exactly and reported zero unaccounted
 changed bytes.

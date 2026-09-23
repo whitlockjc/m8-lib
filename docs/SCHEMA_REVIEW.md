@@ -7,42 +7,109 @@ and applicability. The schema sequence describes raw storage order, while
 reusable schema types and the documented object model should follow verified
 M8 concepts.
 
-Conventions for the schema refactor:
-
-- Kaitai 0.11 requires snake_case field and type identifiers. Use snake_case
-  in schemas and schema-facing documentation. Generated bindings may apply
-  language-specific naming conventions, but those do not rename schema fields.
-- Represent repeated fixed-count values as arrays (`fx[0..2]`,
-  `tracks[0..7]`, and similar), preserving storage order. Document that array
-  index zero corresponds to the M8 UI's first slot or Track 1.
-- Share a raw Kaitai type when the byte layout is the same. Keep contextual
-  limits on valid values and UI labels separate; an instrument-specific enum
-  must not imply a different modulation slot layout.
-
-## Instrument Mapping
+## Instrument Concepts
 
 Offsets below are absolute offsets in standalone `.m8i` files. In Songs, the
 same 215-byte Instrument record starts at `0x13a3e + 215 * index`, without the
 standalone 14-byte header. See [Instrument](INSTRUMENT.md) for field-level
 layouts and [Song](SONG.md) for embedded record boundaries.
 
-| Manual concept | Verified storage and evidence | Applicability / exception | Proposed owner |
-| --- | --- | --- | --- |
-| General Instrument Settings: type, name, transpose, table TIC, EQ | `0x0e..0x1c` contiguous prefix plus `0x4c` EQ; `*_DEFAULT.m8i` and `*_PARAMS.m8i` | Same field offsets for every instrument type; NONE does not expose all settings for editing | `general_instrument_settings` type for the prefix; EQ assignment remains separate in storage and references a Song bank |
-| Instrument-specific parameters | Type-dependent region within `0x1d..0x4b`; `*_PARAMS.m8i` | Distinct layouts; Sampler's `0x1f` meaning depends on play mode | Per-type parameter structures |
-| Multi-mode Filter Parameters | Three-byte `filter` group, present at type-dependent offsets; `*_PARAMS.m8i` | Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, External; WAV-only filter labels remain contextual; MIDI Out and NONE do not expose this group | Shared filter structure, contextual enum labels |
-| Amplifier Settings | Three-byte `amp` group immediately after filter; `*_PARAMS.m8i` | Same six types; MIDI Out and NONE do not expose it | Shared amplifier structure |
-| Mixer Parameters | Four-byte `mixer` group immediately after amp; `*_PARAMS.m8i` | Same six types; MIDI Out and NONE do not expose it | Shared instrument mixer structure; distinct from Song mixer |
-| Common Modulation Settings | Four six-byte slots at `0x4d..0x64`; `*_MODS_A/B.m8i` | Verified for seven editable types, including MIDI Out; NONE's corresponding bytes remain unclassified | Shared modulation block and slot |
-| Modulation type parameters | Four bytes per slot after packed type/destination and amount; `*_MODS_A/B.m8i` | Six distinct type-dependent layouts | Modulation-type structures |
-| Modulation destination labels | Low nibble of each slot's first byte; `*_MODS_A/B.m8i` | Values are instrument-specific; do not use one universal destination enum | Contextual label tables |
-| Instrument-specific tail | `0x65..0xe4`; Sampler path and Hypersynth chord fixtures | Sampler path and Hypersynth chords verified; other bytes preserved, not declared unused | Per-type tail structures |
-| Instrument Table | 16 eight-byte rows at `0xe5..0x164`; `*_TABLE.m8i` | All types, including NONE; in Songs, Tables occupy a separate 256-entry array | Shared table and row structures |
+### General Instrument Settings
 
-The common filter, amplifier, and instrument mixer structures already exist in
-`instrument.ksy`. The main work here is file ownership and clearer
-documentation, not rediscovering those bytes. Exact type-dependent offsets and
-evidence distinctions remain in [Instrument](INSTRUMENT.md).
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| `type`, `name`, `transpose`, `table_tic` | Contiguous `0x0e..0x1c`; same offsets for every type | Group as `general_settings` of type `general_instrument_settings`. Use `type` for the field and `instrument_type` for its enum. | Done |
+| `eq` | `0x4c`; assignment to a separate Song EQ bank | Keep in raw storage order after `body_before_eq`; document it with General Instrument Settings without relocating or duplicating its byte. | Done |
+| Applicability | NONE stores the same prefix but does not expose every setting for editing | Distinguish stored fields from UI editability. | Done |
+
+Evidence: `*_DEFAULT.m8i`, `*_PARAMS.m8i`, and [Instrument](INSTRUMENT.md#general-instrument-settings).
+
+### Instrument-Specific Parameters
+
+| Item | Verified storage | Agreed treatment | Status |
+| --- | --- | --- | --- |
+| Wavsynth, Macrosynth, FM Synth | Distinct `*_params` types at type-dependent offsets within `0x1d..0x4b` | Keep distinct types and field names; their layouts and meanings differ. | Done |
+| Sampler configuration | Seven control bytes at `0x1f..0x25`; `sample_path` occupies `0x65..0xe4` | Treat `sampler_controls` and `sample_path` together as Sampler's instrument-specific configuration, while preserving both physical locations. One raw `mode_value` means detune, steps, or BPM according to `play_mode`. The manual requires a path under 128 characters; `SAM_PARAMS.m8i` shows 17 ASCII bytes followed by 111 zero bytes. | Done |
+| MIDI Out and External | Distinct parameter layouts; custom CC entries are each `cc` followed by `value` | Keep distinct parameter layouts and counts; reuse one `custom_cc` entry type for both. | Done |
+| Hypersynth | `current_chord` in `hypersynth_params`; persistent 16-chord table in the tail | Keep both locations distinct. Document the observed relationship without treating them as one stored field. | Done |
+| NONE | `0x1d..0x4b` is preserved without editable parameters | Keep bytes explicit and unclassified; do not invent a NONE parameter model. | Done |
+
+Evidence: `*_PARAMS.m8i`, the [M8 manual](https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699), and [Instrument](INSTRUMENT.md#instrument-specific-parameters). Near-limit and non-ASCII sample paths are untested; none of these changes alters offsets, byte order, or enum values.
+
+### Multi-Mode Filter Parameters
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Filter group | Three adjacent bytes at type-dependent offsets for Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External | Keep the existing shared `filter_params` type and each body's placement. Review whether its field names and documentation match the manual. | Review |
+| Filter labels | Wavsynth has additional WAV-only modes | Keep contextual valid-value labels separate from the shared three-byte layout. | Review |
+| MIDI Out and NONE | UI does not expose this group | Do not interpret their corresponding bytes as an editable filter without fixture evidence. | Review |
+
+Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#filter-parameters).
+
+### Amplifier Settings
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Amplifier group | Three adjacent bytes immediately after the filter for the same six editable types | Keep the existing shared `amp_params` type and type-dependent placement; align its documentation with the manual's Amplifier Settings name. | Review |
+| MIDI Out and NONE | UI does not expose amplifier settings | Preserve their bytes without asserting amplifier semantics. | Review |
+
+Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#amplification-parameters).
+
+### Mixer Parameters
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Instrument mixer | Four adjacent bytes immediately after the amplifier for the same six editable types | Keep the existing shared `mixer_params` type and type-dependent placement. Distinguish it from the Song's master Mixer. | Review |
+| MIDI Out and NONE | UI does not expose instrument mixer settings | Preserve their bytes without asserting mixer semantics. | Review |
+
+Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#mixer-parameters).
+
+### Common Modulation Settings
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Modulation block | Four six-byte slots at `0x4d..0x64`, verified for seven editable types including MIDI Out | Retain one shared block and slot layout. Treat `slots[0]` as the M8's first modulation slot. | Review |
+| NONE | Corresponding bytes remain unclassified | Preserve them without assigning editable modulation semantics. | Review |
+
+Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#instrument-modulation).
+
+### Modulation Type Parameters
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Slot payload | Four bytes after packed type/destination and amount; interpretation depends on one of six modulation types | Keep six type-dependent payload layouts within the shared slot. Reuse their storage definition across instrument types. | Review |
+| Type-specific names | A byte may represent different controls for different modulation types | Name fields within the selected payload type; do not give the same raw byte simultaneous meanings. | Review |
+
+Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#modulation-parameters).
+
+### Modulation Destination Labels
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Destination | Low nibble of each slot's first byte | Keep one raw storage field in the shared slot type. | Review |
+| Valid labels | Depend on instrument type; the same value can name different controls | Document contextual label sets without creating a different slot layout for each instrument. | Review |
+
+Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#enums).
+
+### Instrument-Specific Tail
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Tail region | `0x65..0xe4` after modulators | Keep type-dependent tail selection in the instrument record. | Review |
+| Sampler and Hypersynth | Sample path and persistent chord table are fixture-verified | Keep their distinct tail structures; relate Hypersynth's table to `current_chord` in documentation. | Review |
+| Other regions | Preserved bytes have not been assigned a meaning | Keep them unknown rather than labeling them unused or reserved. | Review |
+
+Evidence: Sampler and Hypersynth fixtures and [Instrument](INSTRUMENT.md#tail).
+
+### Instrument Table
+
+| Item | Verified storage | Proposal | Status |
+| --- | --- | --- | --- |
+| Standalone table | Sixteen eight-byte rows at `0xe5..0x164`; available for all types, including NONE | Keep shared table and row types. The three FX slots use the shared raw `fx_slot` type. | Review |
+| Song placement | Song has a separate 256-entry Table array; the first 128 correspond to Instruments | Reuse the row/table layout, but keep Song placement and table count separate. | Review |
+| FX commands | Available labels depend on context and current instrument | Keep raw command/value storage shared; document contextual command labels separately. | Review |
+
+Evidence: `*_TABLE.m8i`, `TABLES.m8s`, and [Instrument](INSTRUMENT.md#instrument-table).
 
 ## Cross-File Mapping
 
@@ -96,25 +163,23 @@ changes one of those layouts, introduce a versioned replacement without
 rewriting earlier schemas. Instrument-specific FX enums and destination labels
 must stay contextual even when their raw storage is shared.
 
-## Migration Order And Checks
+## Review Order And Checks
 
-1. Done: add parsed-field assertions for representative standalone Instrument
-   and Song fixtures, including shared FX slots, Song rows, embedded Scales,
-   and modulation slots. The suite also checks fixture byte differences and
-   compiles Kaitai; it does not yet validate Markdown layout tables against
-   the schema.
-2. Pilot `instrument/modulation.ksy`: move the four-slot and six modulation
-   parameter layouts without renaming fields or changing their parsed values.
-   Verify both modulation fixtures for every supported instrument type.
-3. Move instrument parameters and table layouts only after the pilot confirms
-   import behavior and generated parser shape. Keep type-specific exceptions
-   visible in `instrument.ksy`.
-4. Done: share the raw FX slot and imported Scale body, covered by standalone
-   and Song fixtures. The raw FX argument is named `value`; the Instrument
-   Table UI may call it an amount.
-5. Split Song by storage ownership, preserving its existing entry type and
-   ordering. Then build schema-derived layout and enum checks for the Markdown
-   references, leaving evidence and interpretation as authored prose.
+1. General Instrument Settings and Instrument-Specific Parameters are done.
+   Review the filter, amplifier, mixer, modulation, tail, and table concepts
+   above in order. Implement and verify each agreed concept separately.
+2. After those conceptual reviews, split large Kaitai files where a verified
+   ownership boundary makes the source easier to maintain. Preserve entry
+   types, field names, offsets, and parsed values. In particular, moving
+   modulation types to `instrument/modulation.ksy` is a file-organization step,
+   not a prerequisite for reviewing Instrument-Specific Parameters.
+3. Extend parsed-field assertions as each area changes. Current verification
+   checks fixture byte differences, compiles Kaitai, and parses representative
+   Instrument and Song fixtures; it does not yet validate Markdown tables
+   against schema definitions.
+4. Build schema-derived layout and enum checks for Markdown references after
+   the schema organization settles. Leave evidence and interpretation as
+   authored prose.
 
 No schema or documentation should mark preserved bytes as unused merely because
 all current fixtures leave them unchanged.

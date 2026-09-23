@@ -126,13 +126,31 @@ types:
       - id: unknown_before_eq
         size: 29
   sampler_body_before_eq:
+    doc: |
+      Sampler-specific controls are stored here; the selected sample_path is
+      another Sampler-specific parameter stored in sampler_data_tail.
     seq:
       - id: unknown_common_0
         size: 2
+      - id: controls
+        type: sampler_controls
+      - id: filter
+        type: filter_params
+      - id: amp
+        type: amp_params
+      - id: mixer
+        type: mixer_params
+      - id: unknown_before_eq
+        size: 28
+  sampler_controls:
+    doc: |
+      Contiguous Sampler-specific controls. These and the selected sample_path
+      in sampler_data_tail together form the Sampler's instrument-specific
+      configuration. The raw mode_value byte is displayed as detune, steps, or
+      BPM according to play_mode.
+    seq:
       - id: mode_value
         type: u1
-        doc: |
-          Displayed as detune, steps, or BPM depending on play_mode.
       - id: play_mode
         type: u1
         enum: sampler_play_mode
@@ -146,14 +164,6 @@ types:
         type: u1
       - id: degrade
         type: u1
-      - id: filter
-        type: filter_params
-      - id: amp
-        type: amp_params
-      - id: mixer
-        type: mixer_params
-      - id: unknown_before_eq
-        size: 28
   midi_out_body_before_eq:
     seq:
       - id: params
@@ -265,10 +275,11 @@ types:
       - id: unknown_before_custom_ccs
         size: 3
       - id: custom_ccs
-        type: midi_out_custom_cc
+        type: custom_cc
         repeat: expr
         repeat-expr: 10
-  midi_out_custom_cc:
+  custom_cc:
+    doc: Two-byte custom CC entry shared by MIDI Out and External.
     seq:
       - id: cc
         type: u1
@@ -299,16 +310,9 @@ types:
           Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies
           displayed program change 126 is stored as 0x7e.
       - id: custom_ccs
-        type: external_custom_cc
+        type: custom_cc
         repeat: expr
         repeat-expr: 4
-  external_custom_cc:
-    seq:
-      - id: cc
-        type: u1
-        doc: Displayed as decimal in the M8 UI.
-      - id: value
-        type: u1
   fm_synth_params:
     seq:
       - id: algo
@@ -333,8 +337,9 @@ types:
         doc: |
           Current/edit chord state. The HYP_PARAMS fixture verifies index 0x0c
           when chord 0C is selected. The note bytes are a memory representation
-          of the current chord; observed M8 files should keep them synchronized
-          with the matching entry in the persistent Hypersynth tail chord table.
+          of the current chord; in HYP_PARAMS they match the entry selected in
+          the persistent Hypersynth tail chord table. Both byte regions remain
+          separately stored.
       - id: scale
         type: u1
       - id: shift
@@ -474,16 +479,21 @@ types:
       - id: unknown
         size: 152
   sampler_data_tail:
+    doc: |
+      Stores shared modulators followed by the Sampler-specific sample_path.
+      The path and sampler_controls belong to the same instrument-specific
+      configuration despite their noncontiguous storage.
     seq:
       - id: modulators
         type: instrument_modulators
       - id: sample_path
         size: 128
         doc: |
-          Fixed-size sample path byte range. Start offset and stored path bytes
-          are verified by Sampler fixtures; full maximum length is inferred from
-          the surrounding fixed instrument layout and should be refined if future
-          evidence contradicts it.
+          Selected sample path. SAM_PARAMS stores /Samples/Kick.wav beginning at
+          standalone offset 0x65: 17 ASCII path bytes followed by 111 zero
+          bytes. The 128-byte region ends at the Instrument Table boundary.
+          The M8 manual requires the entire sample path to be under 128
+          characters. Near-limit and non-ASCII byte encoding remain untested.
   hypersynth_data_tail:
     seq:
       - id: modulators
