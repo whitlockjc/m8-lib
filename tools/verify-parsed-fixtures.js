@@ -89,6 +89,19 @@ for (const [name, offset, expectedType] of [
   assert.equal(filter.type, expectedType, `${name} filter type`)
 }
 
+for (const [name, offset, expectedAmp, expectedPan] of [
+  ['WAV', 0x28, 0xf9, 0xf8], ['MAC', 0x28, 0xf9, 0xf8],
+  ['SAM', 0x29, 0xf8, 0xf7], ['FM', 0x44, 0xf1, 0xf0],
+  ['HYP', 0x2f, 0xf3, 0xf2], ['EXT', 0x30, 0xfc, 0xfb]
+]) {
+  const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
+  const amp = file.body.instrument.bodyBeforeEq.amp
+  assert.deepEqual([amp.amp, amp.limit, amp.pan],
+    [...bytes.subarray(offset, offset + 3)], `${name} amplifier layout`)
+  assert.deepEqual([amp.amp, amp.limit, amp.pan],
+    [expectedAmp, 0x08, expectedPan], `${name} amplifier values`)
+}
+
 {
   const { file } = parse('fixtures/6.5.x/instruments/HYP_PARAMS.m8i')
   const instrument = file.body.instrument

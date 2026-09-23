@@ -185,8 +185,7 @@ types:
       - id: amp
         type: amp_params
         doc: |
-          Amp and pan offsets are verified by FM Synth fixtures. The limit
-          offset is inferred from the common amplification group layout.
+          Amp, limit, and pan offsets are verified by FM_PARAMS.
       - id: mixer
         type: mixer_params
       - id: unknown_before_eq
@@ -453,6 +452,10 @@ types:
       - id: resonance
         type: u1
   amp_params:
+    doc: |
+      Shared three-byte Amplifier Settings layout: amp, limit, and pan.
+      Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External expose
+      this group at type-dependent offsets. MIDI Out and NONE do not.
     seq:
       - id: amp
         type: u1

@@ -180,7 +180,7 @@ Offsets are absolute file offsets.
 | `unknownBeforeParams` | `0x1f` | 1 | unknown byte |
 | `instrumentParams` | `0x20..0x24` | 5 | [Instrument-Specific Parameters](#instrument-specific-parameters) |
 | `filter` | `0x25..0x27` | 3 | [Multi-mode Filter Parameters](#multi-mode-filter-parameters) |
-| `amp` | `0x28..0x2a` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `amp` | `0x28..0x2a` | 3 | [Amplifier Settings](#amplifier-settings) |
 | `mixer` | `0x2b..0x2e` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x2f..0x4b` | 29 | unknown bytes |
 
@@ -193,7 +193,7 @@ Offsets are absolute file offsets.
 | `unknownCommon0` | `0x1d..0x1e` | 2 | unknown bytes |
 | `controls` | `0x1f..0x25` | 7 | [Sampler Parameters](#sampler-parameters) |
 | `filter` | `0x26..0x28` | 3 | [Multi-mode Filter Parameters](#multi-mode-filter-parameters) |
-| `amp` | `0x29..0x2b` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `amp` | `0x29..0x2b` | 3 | [Amplifier Settings](#amplifier-settings) |
 | `mixer` | `0x2c..0x2f` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x30..0x4b` | 28 | unknown bytes |
 
@@ -220,7 +220,7 @@ Offsets are absolute file offsets.
 | `unknownBeforeParams` | `0x1f` | 1 | unknown byte |
 | `instrumentParams` | `0x20..0x40` | 33 | [FM Synth Parameters](#fm-synth-parameters) |
 | `filter` | `0x41..0x43` | 3 | [Multi-mode Filter Parameters](#multi-mode-filter-parameters) |
-| `amp` | `0x44..0x46` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `amp` | `0x44..0x46` | 3 | [Amplifier Settings](#amplifier-settings) |
 | `mixer` | `0x47..0x4a` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x4b` | 1 | unknown byte |
 
@@ -234,7 +234,7 @@ Offsets are absolute file offsets.
 | `unknownBeforeParams` | `0x1f` | 1 | unknown byte |
 | `instrumentParams` | `0x20..0x2b` | 12 | [Hypersynth Parameters](#hypersynth-parameters) |
 | `filter` | `0x2c..0x2e` | 3 | [Multi-mode Filter Parameters](#multi-mode-filter-parameters) |
-| `amp` | `0x2f..0x31` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `amp` | `0x2f..0x31` | 3 | [Amplifier Settings](#amplifier-settings) |
 | `mixer` | `0x32..0x35` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x36..0x4b` | 22 | unknown bytes |
 
@@ -248,7 +248,7 @@ Offsets are absolute file offsets.
 | `unknownBeforeParams` | `0x1f` | 1 | unknown byte |
 | `instrumentParams` | `0x20..0x2c` | 13 | [External Parameters](#external-parameters) |
 | `filter` | `0x2d..0x2f` | 3 | [Multi-mode Filter Parameters](#multi-mode-filter-parameters) |
-| `amp` | `0x30..0x32` | 3 | [Amplification Parameters](#amplification-parameters) |
+| `amp` | `0x30..0x32` | 3 | [Amplifier Settings](#amplifier-settings) |
 | `mixer` | `0x33..0x36` | 4 | [Mixer Parameters](#mixer-parameters) |
 | `unknownBeforeEq` | `0x37..0x4b` | 21 | unknown bytes |
 
@@ -522,7 +522,12 @@ Offsets are relative to the start of `filter`.
 catalog preserves UI labels, but `0x08..0x0b` are valid only for Wavsynth;
 the other five filter-capable instruments use `0x00..0x07`.
 
-### Amplification Parameters
+### Amplifier Settings
+
+The M8 manual groups `amp`, `limit`, and `pan` as Amplifier Settings. All six
+filter-capable instruments store them in the same three-byte `amp_params`
+layout, immediately after their filter group. MIDI Out and NONE do not expose
+this group; their preserved bytes are not assigned amplifier semantics.
 
 Offsets are relative to the start of `amp`.
 

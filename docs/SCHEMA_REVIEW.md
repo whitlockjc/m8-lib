@@ -48,12 +48,12 @@ Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#multi-mode-filter-parame
 
 ### Amplifier Settings
 
-| Item | Verified storage | Proposal | Status |
+| Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
-| Amplifier group | Three adjacent bytes immediately after the filter for the same six editable types | Keep the existing shared `amp_params` type and type-dependent placement; align its documentation with the manual's Amplifier Settings name. | Review |
-| MIDI Out and NONE | UI does not expose amplifier settings | Preserve their bytes without asserting amplifier semantics. | Review |
+| Amplifier group | Three adjacent bytes immediately after the filter for the same six editable types | Keep shared `amp_params` (`amp`, `limit`, `pan`) at each type-dependent offset; verify every placement with parsed fixtures. | Done |
+| MIDI Out and NONE | UI does not expose amplifier settings | Preserve their bytes without asserting amplifier semantics. | Done |
 
-Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#amplification-parameters).
+Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#amplifier-settings).
 
 ### Mixer Parameters
 
@@ -165,8 +165,8 @@ must stay contextual even when their raw storage is shared.
 
 ## Review Order And Checks
 
-1. General Instrument Settings, Instrument-Specific Parameters, and Multi-mode
-   Filter Parameters are done. Review amplifier, mixer, modulation, tail, and table concepts
+1. General Instrument Settings, Instrument-Specific Parameters, Multi-mode
+   Filter Parameters, and Amplifier Settings are done. Review mixer, modulation, tail, and table concepts
    above in order. Implement and verify each agreed concept separately.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
