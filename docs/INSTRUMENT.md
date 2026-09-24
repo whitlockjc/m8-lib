@@ -570,7 +570,7 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
-| `unknownAfterModulators` | `0x65..0xe4` | 128 | unknown bytes |
+| `unknown_after_modulators` | `0x65..0xe4` | 128 | unknown bytes |
 
 ### NONE Tail
 
@@ -603,10 +603,13 @@ Offsets are absolute file offsets.
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
 | `chords` | `0x65..0xd4` | 112 | [Hypersynth Chord](#hypersynth-chord) |
-| `unknownAfterChords` | `0xd5..0xe4` | 16 | unknown bytes |
+| `unknown_after_chords` | `0xd5..0xe4` | 16 | unknown bytes |
 
 The `HYP_PARAMS.m8i` fixture verifies chord `0` begins at `0x65` and chord
 `15` begins at `0xce`. This implies 16 chord entries of 7 bytes each.
+The 16 bytes following the chord table remain unknown. The separately stored
+`current_chord` matches its selected table entry in this fixture; they are not
+one field in the raw schema.
 
 #### Hypersynth Chord
 
@@ -1582,6 +1585,10 @@ The unknown ranges before `eq` begin at different offsets for different
 instrument types. A same-offset comparison there may compare an unknown byte in
 one type with a known parameter in another. Matching tail bytes likewise do
 not establish that MIDI Out or External uses Hypersynth chords.
+Parsed-fixture verification checks every available instrument fixture's tail
+against its raw byte range, including all 16 Hypersynth chord entries and the
+`0xe5` Instrument Table boundary. The unchanged unknown bytes are evidence of
+the tested fixtures only, not proof of reserved or unused storage.
 
 ## Notes
 

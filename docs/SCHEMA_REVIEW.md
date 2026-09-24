@@ -97,13 +97,13 @@ the contextual catalogs and per-fixture evidence boundaries.
 
 ### Instrument-Specific Tail
 
-| Item | Verified storage | Proposal | Status |
+| Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
-| Tail region | `0x65..0xe4` after modulators | Keep type-dependent tail selection in the instrument record. | Review |
-| Sampler and Hypersynth | Sample path and persistent chord table are fixture-verified | Keep their distinct tail structures; relate Hypersynth's table to `current_chord` in documentation. | Review |
-| Other regions | Preserved bytes have not been assigned a meaning | Keep them unknown rather than labeling them unused or reserved. | Review |
+| Tail region | `0x4d..0xe4`; editable types have modulators at `0x4d..0x64` | Keep type-dependent tail selection in the instrument record. Verify each fixture's parsed tail and the Table boundary at `0xe5`. | Done |
+| Sampler and Hypersynth | Sample path at `0x65..0xe4`; 16 seven-byte chords at `0x65..0xd4` | Keep their distinct tail structures; keep Hypersynth's persistent chords separate from `current_chord`. Verify first and last chord values. | Done |
+| Other regions | Unknown bytes are unchanged within each type's available fixtures; MIDI Out and External share a chord-like default pattern | Preserve unknown bytes without assigning chord semantics or calling them unused or reserved. | Done |
 
-Evidence: Sampler and Hypersynth fixtures and [Instrument](INSTRUMENT.md#tail).
+Evidence: all 6.5.x instrument fixtures, parsed-fixture tail checks, and [Instrument](INSTRUMENT.md#tail). A stable pattern does not prove a field's meaning; near-limit and non-ASCII sample paths remain untested.
 
 ### Instrument Table
 
@@ -170,8 +170,8 @@ must stay contextual even when their raw storage is shared.
 ## Review Order And Checks
 
 1. General Instrument Settings, Instrument-Specific Parameters, Multi-mode
-   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, and Modulation Destination Labels are done. Review tail and table concepts
-   above in order. Implement and verify each agreed concept separately.
+   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, Modulation Destination Labels, and Instrument-Specific Tail are done. Review the Instrument Table concept
+   above next. Implement and verify each agreed concept separately.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
    types, field names, offsets, and parsed values. In particular, moving
