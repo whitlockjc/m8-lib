@@ -556,8 +556,10 @@ types:
   modulation_slot:
     doc: |
       Shared six-byte modulation slot: one packed type/destination byte, one
-      amount byte, and four type-dependent parameter bytes. The slot layout is
-      independent of the instrument-specific destination labels.
+      amount byte, and four type-dependent parameter bytes. The first two
+      bytes are Common Modulation Settings; params selects one of six
+      modulation-type-specific structures. The slot layout is independent of
+      the instrument-specific destination labels.
     seq:
       - id: type_and_destination
         type: u1
@@ -586,6 +588,7 @@ types:
           Instrument-specific destination value. Destination labels are
           documented in per-instrument modulation destination enums.
   modulation_ahd_env_params:
+    doc: AHD ENV payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: attack
         type: u1
@@ -593,7 +596,7 @@ types:
         type: u1
       - id: decay
         type: u1
-      - id: unused
+      - id: unknown
         type: u1
   modulation_adsr_env_params:
     seq:
@@ -606,6 +609,7 @@ types:
       - id: release
         type: u1
   modulation_drum_env_params:
+    doc: DRUM ENV payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: peak
         type: u1
@@ -613,9 +617,10 @@ types:
         type: u1
       - id: decay
         type: u1
-      - id: unused
+      - id: unknown
         type: u1
   modulation_lfo_params:
+    doc: LFO payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: oscillator
         type: u1
@@ -625,7 +630,7 @@ types:
         enum: modulation_lfo_trigger
       - id: frequency
         type: u1
-      - id: unused
+      - id: unknown
         type: u1
   modulation_trig_env_params:
     seq:
@@ -638,6 +643,7 @@ types:
       - id: source
         type: u1
   modulation_tracking_params:
+    doc: TRACKING payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: source
         type: u1
@@ -646,7 +652,7 @@ types:
         type: u1
       - id: highest_value
         type: u1
-      - id: unused
+      - id: unknown
         type: u1
 enums:
   modulation_type:

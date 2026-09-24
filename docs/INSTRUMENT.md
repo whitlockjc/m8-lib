@@ -690,34 +690,26 @@ Hypersynth destinations `MOD BINV = 0x0e` and `MOD BOTH = 0x0d`.
 
 ### Modulation Parameters
 
-Offsets are relative to the start of `params`.
+The first two bytes of every slot are the shared Common Modulation Settings:
+`type_and_destination` and `amount`. The selected modulation type determines
+the names and meaning of the remaining four `params` bytes. Each row below is
+one Kaitai payload type reused by all seven editable instrument types.
+Offsets are relative to `params` (slot offset `+0x02`). Every listed field is
+one byte.
 
-| Modulation Type | Field | Relative Offset | Size | Type |
-| --- | --- | --- | ---: | --- |
-| `AHD ENV` | `attack` | `+0x00` | 1 | `u1` |
-| `AHD ENV` | `hold` | `+0x01` | 1 | `u1` |
-| `AHD ENV` | `decay` | `+0x02` | 1 | `u1` |
-| `AHD ENV` | `unused` | `+0x03` | 1 | preserved byte |
-| `ADSR ENV` | `attack` | `+0x00` | 1 | `u1` |
-| `ADSR ENV` | `decay` | `+0x01` | 1 | `u1` |
-| `ADSR ENV` | `sustain` | `+0x02` | 1 | `u1` |
-| `ADSR ENV` | `release` | `+0x03` | 1 | `u1` |
-| `DRUM ENV` | `peak` | `+0x00` | 1 | `u1` |
-| `DRUM ENV` | `body` | `+0x01` | 1 | `u1` |
-| `DRUM ENV` | `decay` | `+0x02` | 1 | `u1` |
-| `DRUM ENV` | `unused` | `+0x03` | 1 | preserved byte |
-| `LFO` | `oscillator` | `+0x00` | 1 | [Modulation LFO Oscillator](#modulation-lfo-oscillator) |
-| `LFO` | `trigger` | `+0x01` | 1 | [Modulation LFO Trigger](#modulation-lfo-trigger) |
-| `LFO` | `frequency` | `+0x02` | 1 | `u1` |
-| `LFO` | `unused` | `+0x03` | 1 | preserved byte |
-| `TRIG ENV` | `attack` | `+0x00` | 1 | `u1` |
-| `TRIG ENV` | `hold` | `+0x01` | 1 | `u1` |
-| `TRIG ENV` | `decay` | `+0x02` | 1 | `u1` |
-| `TRIG ENV` | `source` | `+0x03` | 1 | [Modulation Trigger Source](#modulation-trigger-source) |
-| `TRACKING` | `source` | `+0x00` | 1 | [Modulation Tracking Source](#modulation-tracking-source) |
-| `TRACKING` | `lowestValue` | `+0x01` | 1 | `u1` |
-| `TRACKING` | `highestValue` | `+0x02` | 1 | `u1` |
-| `TRACKING` | `unused` | `+0x03` | 1 | preserved byte |
+| Modulation Type | Schema Type | `+0x00` | `+0x01` | `+0x02` | `+0x03` |
+| --- | --- | --- | --- | --- | --- |
+| AHD ENV | `modulation_ahd_env_params` | `attack` | `hold` | `decay` | `unknown` |
+| ADSR ENV | `modulation_adsr_env_params` | `attack` | `decay` | `sustain` | `release` |
+| DRUM ENV | `modulation_drum_env_params` | `peak` | `body` | `decay` | `unknown` |
+| LFO | `modulation_lfo_params` | [oscillator](#modulation-lfo-oscillator) | [trigger](#modulation-lfo-trigger) | `frequency` | `unknown` |
+| TRIG ENV | `modulation_trig_env_params` | `attack` | `hold` | `decay` | [source](#modulation-trigger-source) |
+| TRACKING | `modulation_tracking_params` | [source](#modulation-tracking-source) | `lowest_value` | `highest_value` | `unknown` |
+
+`unknown` preserves the fourth byte for AHD ENV, DRUM ENV, LFO, and TRACKING.
+The current fixtures do not establish that those bytes are unused. The
+`*_MODS_A.m8i` fixtures cover AHD ENV, ADSR ENV, TRIG ENV, and TRACKING;
+`*_MODS_B.m8i` covers LFO and DRUM ENV.
 
 ## Instrument Table
 

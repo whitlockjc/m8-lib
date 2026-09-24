@@ -75,10 +75,10 @@ Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#instrum
 
 ### Modulation Type Parameters
 
-| Item | Verified storage | Proposal | Status |
+| Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
-| Slot payload | Four bytes after packed type/destination and amount; interpretation depends on one of six modulation types | Keep six type-dependent payload layouts within the shared slot. Reuse their storage definition across instrument types. | Review |
-| Type-specific names | A byte may represent different controls for different modulation types | Name fields within the selected payload type; do not give the same raw byte simultaneous meanings. | Review |
+| Slot payload | Four bytes after packed type/destination and amount; interpretation depends on one of six modulation types | Keep six type-dependent payload layouts within the shared slot. Verify all six against A/B fixtures for all seven editable instrument types. | Done |
+| Type-specific names | A byte may represent different controls for different modulation types | Name fields only within the selected payload type. Preserve unproven fourth bytes as `unknown`, not `unused`. | Done |
 
 Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#modulation-parameters).
 
@@ -166,7 +166,7 @@ must stay contextual even when their raw storage is shared.
 ## Review Order And Checks
 
 1. General Instrument Settings, Instrument-Specific Parameters, Multi-mode
-   Filter Parameters, Amplifier Settings, Mixer Parameters, and Common Modulation Settings are done. Review modulation-type parameters, destination labels, tail, and table concepts
+   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, and Modulation Type Parameters are done. Review destination labels, tail, and table concepts
    above in order. Implement and verify each agreed concept separately.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry

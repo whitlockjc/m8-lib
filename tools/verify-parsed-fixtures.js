@@ -31,6 +31,16 @@ for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   assert.equal(file.body.table.rows[0].fx.length, 3, `${name} table FX slots`)
 }
 
+const modulationFields = [
+  ['attack', 'hold', 'decay', 'unknown'],
+  ['attack', 'decay', 'sustain', 'release'],
+  ['peak', 'body', 'decay', 'unknown'],
+  ['oscillator', 'trigger', 'frequency', 'unknown'],
+  ['attack', 'hold', 'decay', 'source'],
+  ['source', 'lowestValue', 'highestValue', 'unknown']
+]
+const observedModulationTypes = new Set()
+
 for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   for (const variant of ['A', 'B']) {
     const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_MODS_${variant}.m8i`)
@@ -43,9 +53,16 @@ for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
       assert.equal(slot.amount, bytes[offset + 1], `${name} mod ${index} amount`)
       assert.equal(slot.modulationType, bytes[offset] >> 4, `${name} mod ${index} type`)
       assert.equal(slot.destination, bytes[offset] & 0x0f, `${name} mod ${index} destination`)
+      const fields = modulationFields[slot.modulationType]
+      assert.ok(fields, `${name} mod ${index} known modulation type`)
+      assert.deepEqual(fields.map(field => slot.params[field]),
+        [...bytes.subarray(offset + 2, offset + 6)],
+        `${name} mod ${index} type-specific payload`)
+      observedModulationTypes.add(slot.modulationType)
     }
   }
 }
+assert.deepEqual([...observedModulationTypes].sort(), [0, 1, 2, 3, 4, 5])
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')
