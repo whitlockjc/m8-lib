@@ -667,7 +667,18 @@ type = typeAndDestination >> 4
 destination = typeAndDestination & 0x0f
 ```
 
-Destination labels are instrument-specific. `WAV_MODS_A.m8i` verifies Wavsynth
+`destination` is a raw nibble, not a universal enum. Interpret it using both
+`general_settings.type` and the appropriate [instrument-specific catalog](#wavsynth-modulation-destination)
+below. For example, `0x03` is `SIZE` for Wavsynth, `TIMBRE` for Macrosynth,
+and `CCC` for MIDI Out. The shared `modulation_slot` schema and byte offsets
+do not change with the instrument type.
+
+The M8 manual describes DEST as the parameter being modulated but does not
+list every catalog's numeric mapping. The following fixture evidence covers
+selected values; other catalog entries are documented UI labels whose numeric
+mappings remain to be individually fixture-verified.
+
+`WAV_MODS_A.m8i` verifies Wavsynth
 destinations `MOD BINV = 0x0e`, `MOD BOTH = 0x0d`, `MOD RATE = 0x0c`, and
 `MOD AMT = 0x0b`. `MAC_MODS_A.m8i` verifies those same high modulation
 destination values for Macrosynth. `SAM_MODS_A.m8i` verifies Sampler
@@ -767,8 +778,8 @@ Values `0x00`, `0x01`, `0x04`, and `0x05` are verified by the
 ### Wavsynth Modulation Destination
 
 Wavsynth destination values `0x0b..0x0e` are verified by `WAV_MODS_A.m8i`.
-`WAV_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
-M8 6.5.2 manual until future fixtures select those values.
+`WAV_MODS_B.m8i` also verifies `0x0d` and `0x0e`. The remaining numeric
+label mappings have not been individually fixture-verified.
 
 | Name | Stored Value |
 | --- | --- |
@@ -791,8 +802,8 @@ M8 6.5.2 manual until future fixtures select those values.
 ### Macrosynth Modulation Destination
 
 Macrosynth destination values `0x0b..0x0e` are verified by
-`MAC_MODS_A.m8i`. `MAC_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other
-labels are from the M8 6.5.2 manual until future fixtures select those values.
+`MAC_MODS_A.m8i`. `MAC_MODS_B.m8i` also verifies `0x0d` and `0x0e`. The
+remaining numeric label mappings have not been individually fixture-verified.
 
 | Name | Stored Value |
 | --- | --- |
@@ -815,8 +826,8 @@ labels are from the M8 6.5.2 manual until future fixtures select those values.
 ### Sampler Modulation Destination
 
 Sampler destination values `0x0a..0x0d` are verified by `SAM_MODS_A.m8i`.
-`SAM_MODS_B.m8i` also verifies `0x0c` and `0x0d`. Other labels are from the
-M8 6.5.2 manual until future fixtures select those values.
+`SAM_MODS_B.m8i` also verifies `0x0c` and `0x0d`. The remaining numeric
+label mappings have not been individually fixture-verified.
 
 | Name | Stored Value |
 | --- | --- |
@@ -838,8 +849,8 @@ M8 6.5.2 manual until future fixtures select those values.
 ### MIDI Out Modulation Destination
 
 MIDI Out destination values `0x0b..0x0e` are verified by `MID_MODS_A.m8i`.
-`MID_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
-M8 6.5.2 manual until future fixtures select those values.
+`MID_MODS_B.m8i` also verifies `0x0d` and `0x0e`. The remaining numeric
+label mappings have not been individually fixture-verified.
 
 | Name | Stored Value |
 | --- | --- |
@@ -862,8 +873,8 @@ M8 6.5.2 manual until future fixtures select those values.
 ### FM Synth Modulation Destination
 
 FM Synth destination values `0x0b..0x0e` are verified by `FM_MODS_A.m8i`.
-`FM_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
-M8 6.5.2 manual until future fixtures select those values.
+`FM_MODS_B.m8i` also verifies `0x0d` and `0x0e`. The remaining numeric
+label mappings have not been individually fixture-verified.
 
 | Name | Stored Value |
 | --- | --- |
@@ -886,8 +897,8 @@ M8 6.5.2 manual until future fixtures select those values.
 ### Hypersynth Modulation Destination
 
 Hypersynth destination values `0x0b..0x0e` are verified by `HYP_MODS_A.m8i`.
-`HYP_MODS_B.m8i` also verifies `0x0d` and `0x0e`. Other labels are from the
-M8 6.5.2 manual until future fixtures select those values.
+`HYP_MODS_B.m8i` also verifies `0x0d` and `0x0e`. The remaining numeric
+label mappings have not been individually fixture-verified.
 
 | Name | Stored Value |
 | --- | --- |
@@ -910,8 +921,8 @@ M8 6.5.2 manual until future fixtures select those values.
 ### External Modulation Destination
 
 External destination values `0x0a..0x0d` are verified by `EXT_MODS_A.m8i`.
-`EXT_MODS_B.m8i` also verifies `0x0c` and `0x0d`. Other labels are from the
-M8 6.5.2 manual until future fixtures select those values.
+`EXT_MODS_B.m8i` also verifies `0x0c` and `0x0d`. The remaining numeric
+label mappings have not been individually fixture-verified.
 
 | Name | Stored Value |
 | --- | --- |

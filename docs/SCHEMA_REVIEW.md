@@ -84,12 +84,16 @@ Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#modulat
 
 ### Modulation Destination Labels
 
-| Item | Verified storage | Proposal | Status |
+| Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
-| Destination | Low nibble of each slot's first byte | Keep one raw storage field in the shared slot type. | Review |
-| Valid labels | Depend on instrument type; the same value can name different controls | Document contextual label sets without creating a different slot layout for each instrument. | Review |
+| Destination | Low nibble of each slot's first byte | Keep one raw `destination` in shared `modulation_slot`; interpret it using `general_settings.type`. | Done |
+| Valid labels | Depend on instrument type; the same value can name different controls | Keep seven contextual enum catalogs without creating separate slot layouts. Verify `MOD AMT` through `MOD BINV` mappings in each A/B fixture. Other numeric label mappings remain unverified by individual fixtures. | Done |
 
-Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#enums).
+Evidence: `*_MODS_A.m8i` and `*_MODS_B.m8i` verify selected high values;
+the [M8 6.5.2 manual](https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699)
+defines DEST as the parameter being modulated but does not enumerate every
+instrument-specific numeric mapping. See [Instrument](INSTRUMENT.md#enums) for
+the contextual catalogs and per-fixture evidence boundaries.
 
 ### Instrument-Specific Tail
 
@@ -166,7 +170,7 @@ must stay contextual even when their raw storage is shared.
 ## Review Order And Checks
 
 1. General Instrument Settings, Instrument-Specific Parameters, Multi-mode
-   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, and Modulation Type Parameters are done. Review destination labels, tail, and table concepts
+   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, and Modulation Destination Labels are done. Review tail and table concepts
    above in order. Implement and verify each agreed concept separately.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry

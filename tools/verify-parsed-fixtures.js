@@ -11,6 +11,7 @@ if (!compiledDir) {
 }
 
 const { File65X } = require(path.resolve(compiledDir, 'File65X.js'))
+const { Instrument601 } = require(path.resolve(compiledDir, 'Instrument601.js'))
 
 function parse (fixture) {
   const bytes = fs.readFileSync(fixture)
@@ -40,8 +41,21 @@ const modulationFields = [
   ['source', 'lowestValue', 'highestValue', 'unknown']
 ]
 const observedModulationTypes = new Set()
+const destinationCatalogs = {
+  WAV: [Instrument601.WavsynthModulationDestination, 0x0b],
+  MAC: [Instrument601.MacrosynthModulationDestination, 0x0b],
+  SAM: [Instrument601.SamplerModulationDestination, 0x0a],
+  MID: [Instrument601.MidiOutModulationDestination, 0x0b],
+  FM: [Instrument601.FmSynthModulationDestination, 0x0b],
+  HYP: [Instrument601.HypersynthModulationDestination, 0x0b],
+  EXT: [Instrument601.ExternalModulationDestination, 0x0a]
+}
+const modulationDestinationLabels = ['MOD_AMOUNT', 'MOD_RATE', 'MOD_BOTH', 'MOD_BINV']
+const observedDestinations = new Map()
 
 for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
+  const [catalog, firstModDestination] = destinationCatalogs[name]
+  const observed = new Set()
   for (const variant of ['A', 'B']) {
     const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_MODS_${variant}.m8i`)
     const slots = file.body.instrument.tail.modulators.slots
@@ -53,6 +67,13 @@ for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
       assert.equal(slot.amount, bytes[offset + 1], `${name} mod ${index} amount`)
       assert.equal(slot.modulationType, bytes[offset] >> 4, `${name} mod ${index} type`)
       assert.equal(slot.destination, bytes[offset] & 0x0f, `${name} mod ${index} destination`)
+      if (slot.destination >= firstModDestination) {
+        const label = modulationDestinationLabels[slot.destination - firstModDestination]
+        assert.ok(label, `${name} mod ${index} known high destination`)
+        assert.equal(catalog[slot.destination], label,
+          `${name} mod ${index} contextual destination label`)
+        observed.add(slot.destination)
+      }
       const fields = modulationFields[slot.modulationType]
       assert.ok(fields, `${name} mod ${index} known modulation type`)
       assert.deepEqual(fields.map(field => slot.params[field]),
@@ -61,8 +82,17 @@ for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
       observedModulationTypes.add(slot.modulationType)
     }
   }
+  observedDestinations.set(name, observed)
 }
 assert.deepEqual([...observedModulationTypes].sort(), [0, 1, 2, 3, 4, 5])
+for (const [name, [, firstModDestination]] of Object.entries(destinationCatalogs)) {
+  assert.deepEqual([...observedDestinations.get(name)].sort(),
+    [0, 1, 2, 3].map(index => firstModDestination + index),
+    `${name} high destinations covered by fixtures`)
+}
+assert.equal(Instrument601.WavsynthModulationDestination[0x03], 'SIZE')
+assert.equal(Instrument601.MacrosynthModulationDestination[0x03], 'TIMBRE')
+assert.equal(Instrument601.MidiOutModulationDestination[0x03], 'CC_C')
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')

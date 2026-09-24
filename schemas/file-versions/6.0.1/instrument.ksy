@@ -585,8 +585,12 @@ types:
       destination:
         value: type_and_destination & 0x0f
         doc: |
-          Instrument-specific destination value. Destination labels are
-          documented in per-instrument modulation destination enums.
+          Raw destination nibble shared by all modulation slots. Interpret it
+          using the enclosing instrument type and its corresponding one of
+          seven modulation destination enums below. No single enum is valid
+          for every instrument. The A/B modulation fixtures directly verify
+          selected high destination values; other catalog entries have not
+          each been exercised by a fixture.
   modulation_ahd_env_params:
     doc: AHD ENV payload; fourth byte is preserved with unknown purpose.
     seq:
