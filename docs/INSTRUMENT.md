@@ -769,6 +769,8 @@ Its second byte is named `value` in the raw schema; the M8 table UI may call
 that value an amount. Command labels and availability depend on the active
 instrument and command family. See [FX Commands](FX_COMMANDS.md) for the
 contextual model and verification plan.
+Parsed-fixture checks compare every row and FX slot of every standalone
+Instrument fixture with the corresponding raw bytes.
 
 ## Enums
 

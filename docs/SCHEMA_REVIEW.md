@@ -109,13 +109,13 @@ The [M8 6.5.2 manual](https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_
 
 ### Instrument Table
 
-| Item | Verified storage | Proposal | Status |
+| Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
-| Standalone table | Sixteen eight-byte rows at `0xe5..0x164`; available for all types, including NONE | Keep shared table and row types. The three FX slots use the shared raw `fx_slot` type. | Review |
-| Song placement | Song has a separate 256-entry Table array; the first 128 correspond to Instruments | Reuse the row/table layout, but keep Song placement and table count separate. | Review |
-| FX commands | Available labels depend on context and current instrument | Keep raw command/value storage shared; document contextual command labels separately. | Review |
+| Standalone table | Sixteen eight-byte rows at `0xe5..0x164`; available for all types, including NONE | Keep shared table and row types. The three FX slots use the shared raw `fx_slot` type. Verify every parsed row in each standalone fixture. | Done |
+| Song placement | Song has a separate 256-entry Table array; the first 128 correspond to Instruments | Reuse the row/table layout, but keep Song placement and table count separate. Verify all 256 parsed tables and boundary fixture values. | Done |
+| FX commands | Available labels depend on context and current instrument | Keep raw command/value storage shared; document contextual command labels separately. | Done |
 
-Evidence: `*_TABLE.m8i`, `TABLES.m8s`, and [Instrument](INSTRUMENT.md#instrument-table).
+Evidence: `*_TABLE.m8i`, `TABLES.m8s`, parsed-fixture checks, [Instrument](INSTRUMENT.md#instrument-table), and [FX Commands](FX_COMMANDS.md#storage). These checks establish raw layout, not universal availability of every FX command.
 
 ## Cross-File Mapping
 
@@ -172,8 +172,7 @@ must stay contextual even when their raw storage is shared.
 ## Review Order And Checks
 
 1. General Instrument Settings, Instrument-Specific Parameters, Multi-mode
-   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, Modulation Destination Labels, and Instrument-Specific Tail are done. Review the Instrument Table concept
-   above next. Implement and verify each agreed concept separately.
+   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, Modulation Destination Labels, Instrument-Specific Tail, and Instrument Table are done. Continue with the cross-file mapping and schema organization review.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
    types, field names, offsets, and parsed values. In particular, moving

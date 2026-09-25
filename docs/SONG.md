@@ -353,6 +353,8 @@ stored Chain records.
 
 The Song stores 256 adjacent 128-byte Table records. Each record uses the same
 layout as the Table appended to a standalone Instrument file.
+Parsed-fixture checks compare every row and FX slot in `TABLES.m8s` with its
+raw bytes; `TABLES.m8s` provides distinct values at both ends of the region.
 
 Offsets are absolute file offsets.
 

@@ -18,6 +18,22 @@ function parse (fixture) {
   return { bytes, file: new File65X(new KaitaiStream(bytes)) }
 }
 
+function verifyTable (table, bytes, offset, label) {
+  assert.equal(table.rows.length, 16, `${label} row count`)
+  for (const [index, row] of table.rows.entries()) {
+    const rowOffset = offset + index * 8
+    assert.equal(row.transpose, bytes[rowOffset], `${label} row ${index} transpose`)
+    assert.equal(row.volume, bytes[rowOffset + 1], `${label} row ${index} volume`)
+    assert.equal(row.fx.length, 3, `${label} row ${index} FX count`)
+    for (const [slotIndex, slot] of row.fx.entries()) {
+      const slotOffset = rowOffset + 2 + slotIndex * 2
+      assert.deepEqual([slot.command, slot.value],
+        [...bytes.subarray(slotOffset, slotOffset + 2)],
+        `${label} row ${index} FX ${slotIndex}`)
+    }
+  }
+}
+
 for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_DEFAULT.m8i`)
   const instrument = file.body.instrument
@@ -42,7 +58,7 @@ for (const fixture of instrumentFixtures) {
   const table = file.body.table
 
   assert.equal(bytes.length, 0x165, `${fixture} standalone length`)
-  assert.equal(table.rows.length, 16, `${fixture} table boundary`)
+  verifyTable(table, bytes, 0xe5, fixture)
   if (name === 'NONE') {
     assert.deepEqual(Buffer.from(tail.unknown), bytes.subarray(0x4d, 0xe5), `${fixture} NONE tail`)
   } else {
@@ -70,6 +86,25 @@ for (const fixture of instrumentFixtures) {
       assert.deepEqual(Buffer.from(tail.unknownAfterModulators), bytes.subarray(0x65, 0xe5),
         `${fixture} unknown after modulators`)
     }
+  }
+}
+
+{
+  const { bytes, file } = parse('fixtures/6.5.x/songs/TABLES.m8s')
+  const tables = file.body.tables.entries
+  assert.equal(tables.length, 256, 'Song table count')
+  for (const [index, table] of tables.entries()) {
+    verifyTable(table, bytes, 0xba3e + index * 128, `Song table ${index}`)
+  }
+  for (const [tableIndex, rowIndex, expected] of [
+    [0, 0, [0xff, 0x7f, 0x00, 0xfe, 0x45, 0xfd, 0x01, 0xfc]],
+    [0, 15, [0xfb, 0x7e, 0x1b, 0xfa, 0x2a, 0xf9, 0x2b, 0xf8]],
+    [255, 0, [0xff, 0x7f, 0x4d, 0xfe, 0x1a, 0xfd, 0x05, 0xfc]],
+    [255, 15, [0xfb, 0x7e, 0x4c, 0xfa, 0x4b, 0xf9, 0x4a, 0xf8]]
+  ]) {
+    const row = tables[tableIndex].rows[rowIndex]
+    assert.deepEqual([row.transpose, row.volume, ...row.fx.flatMap(slot => [slot.command, slot.value])],
+      expected, `Song table ${tableIndex} row ${rowIndex} fixture values`)
   }
 }
 
