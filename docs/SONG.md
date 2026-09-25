@@ -18,6 +18,8 @@ Project page and MIDI Settings records are defined in
 [`song/project.ksy`](../schemas/file-versions/6.5.0/song/project.ksy).
 Mixer, Effects Settings, and Mix & Limiter Scope records are defined in
 [`song/mixer_effects.ksy`](../schemas/file-versions/6.5.0/song/mixer_effects.ksy).
+MIDI Mapping records and destination groups are defined in
+[`song/midi_mapping.ksy`](../schemas/file-versions/6.5.0/song/midi_mapping.ksy).
 
 ## Schema
 
