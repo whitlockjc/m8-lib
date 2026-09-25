@@ -127,7 +127,7 @@ Evidence: `*_TABLE.m8i`, `TABLES.m8s`, parsed-fixture checks, [Instrument](INSTR
 | Concept | Verified layout | Current boundary | Agreed treatment | Status |
 | --- | --- | --- | --- | --- |
 | Instrument record | 215 bytes | Song imports `instrument_data` | Keep one definition; compare embedded Wavsynth and Hypersynth records to standalone defaults, accounting for the Song's unset names. | Done |
-| Instrument Table | 128 bytes | Song imports `instrument_table` but stores 256 separately | Keep one row/table layout with file-specific placement and counts. | Done |
+| Instrument Table | 128 bytes | Standalone Instrument and Song import `instrument/table.ksy`; Song stores 256 separately | Keep one row/table layout with file-specific placement and counts. | Done |
 | FX slot | Command byte followed by argument byte | Phrase and Table import `common/fx_slot.ksy` | Keep raw storage shared; interpret command labels by context. | Done |
 | FX command labels | Shared families plus instrument-specific commands | Phrase and seven instrument catalogs remain separate | Keep context-aware catalogs; avoid flattening collisions. Revisit a canonical catalog when generating labels and documentation. | Review |
 | Scale body | 46 bytes | Song imports the standalone `scale_4_0_1` body | Keep one body definition; compare the default embedded Chromatic Scale to its standalone file. | Done |
@@ -155,7 +155,7 @@ schemas/
       instrument/
         parameters.ksy         # per-type params; filter, amp, mixer structures
         modulation.ksy         # done: slot, payloads, and general modulation enums
-        table.ksy              # table and row structures
+        table.ksy              # done: table, row, and contextual command catalogs
     6.5.0/
       song.ksy                 # Song body entry and placement
       song/
@@ -181,8 +181,8 @@ must stay contextual even when their raw storage is shared.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
    types, field names, offsets, and parsed values. The Instrument modulation
-   boundary is split and fixture-verified; review other proposed boundaries
-   individually.
+   and table boundaries are split and fixture-verified; review other proposed
+   boundaries individually.
 3. Extend parsed-field assertions as each area changes. Current verification
    checks fixture byte differences, compiles Kaitai, and parses representative
    Instrument and Song fixtures; it does not yet validate Markdown tables

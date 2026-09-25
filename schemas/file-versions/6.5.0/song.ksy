@@ -5,6 +5,7 @@ meta:
   ks-version: 0.11
   imports:
     - ../6.0.1/instrument
+    - ../6.0.1/instrument/table
     - ../4.0.1/scale
     - ../../common/fx_slot
 doc: |
@@ -191,7 +192,7 @@ types:
       verifies rows 0 and 15 in Tables 0x00 and 0xff.
     seq:
       - id: entries
-        type: instrument_6_0_1::instrument_table
+        type: instrument_table_6_0_1
         repeat: expr
         repeat-expr: 256
   instruments:

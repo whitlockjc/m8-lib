@@ -742,6 +742,8 @@ The current fixtures do not establish that those bytes are unused. The
 The Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, External,
 and NONE instrument tables are stored as 16 eight-byte rows at `0xe5..0x164`.
 Row labels are displayed as hexadecimal values `0..F` in the M8 UI.
+The shared row layout and contextual command catalogs are defined in
+[table.ksy](../schemas/file-versions/6.0.1/instrument/table.ksy).
 
 The row offset is:
 

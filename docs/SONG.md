@@ -352,7 +352,8 @@ stored Chain records.
 ### Tables
 
 The Song stores 256 adjacent 128-byte Table records. Each record uses the same
-layout as the Table appended to a standalone Instrument file.
+layout as the Table appended to a standalone Instrument file, imported from
+[table.ksy](../schemas/file-versions/6.0.1/instrument/table.ksy).
 Parsed-fixture checks compare every row and FX slot in `TABLES.m8s` with its
 raw bytes; `TABLES.m8s` provides distinct values at both ends of the region.
 

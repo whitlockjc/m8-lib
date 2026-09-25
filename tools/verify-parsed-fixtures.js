@@ -12,6 +12,7 @@ if (!compiledDir) {
 
 const { File65X } = require(path.resolve(compiledDir, 'File65X.js'))
 const { Instrument601 } = require(path.resolve(compiledDir, 'Instrument601.js'))
+const { InstrumentTable601 } = require(path.resolve(compiledDir, 'InstrumentTable601.js'))
 
 function parse (fixture) {
   const bytes = fs.readFileSync(fixture)
@@ -33,6 +34,21 @@ function verifyTable (table, bytes, offset, label) {
     }
   }
 }
+
+for (const [catalog, expected] of [
+  [InstrumentTable601.WavsynthTableFxCommand, 'OSCILLATOR'],
+  [InstrumentTable601.MacrosynthTableFxCommand, 'OSCILLATOR'],
+  [InstrumentTable601.SamplerTableFxCommand, 'PLAY'],
+  [InstrumentTable601.FmSynthTableFxCommand, 'ALGORITHM'],
+  [InstrumentTable601.MidiOutTableFxCommand, 'MIDI_PROGRAM_BANK'],
+  [InstrumentTable601.HypersynthTableFxCommand, 'CHORD'],
+  [InstrumentTable601.ExternalTableFxCommand, 'MIDI_PROGRAM']
+]) {
+  assert.equal(catalog[0x80], 'VOLUME')
+  assert.equal(catalog[0x83], expected)
+  assert.equal(catalog[0xff], 'UNSET')
+}
+assert.equal(InstrumentTable601.NoneTableFxCommand[0xff], 'UNSET')
 
 for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_DEFAULT.m8i`)
