@@ -73,6 +73,11 @@ Evidence: `*_PARAMS.m8i` and [Instrument](INSTRUMENT.md#mixer-parameters).
 
 Evidence: `*_MODS_A.m8i`, `*_MODS_B.m8i`, and [Instrument](INSTRUMENT.md#instrument-modulation).
 
+The shared slot, six payload layouts, and their general enums now live in
+`schemas/file-versions/6.0.1/instrument/modulation.ksy`. Instrument-specific
+destination label catalogs remain in `instrument.ksy`. This source split does
+not change the stored layout or parsed field values.
+
 ### Modulation Type Parameters
 
 | Item | Verified storage | Agreed treatment | Status |
@@ -149,7 +154,7 @@ schemas/
       instrument.ksy           # standalone body entry; keeps instrument_data
       instrument/
         parameters.ksy         # per-type params; filter, amp, mixer structures
-        modulation.ksy         # slot and type-dependent parameter structures
+        modulation.ksy         # done: slot, payloads, and general modulation enums
         table.ksy              # table and row structures
     6.5.0/
       song.ksy                 # Song body entry and placement
@@ -175,9 +180,9 @@ must stay contextual even when their raw storage is shared.
    Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, Modulation Destination Labels, Instrument-Specific Tail, and Instrument Table are done. Continue with the cross-file mapping and schema organization review.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
-   types, field names, offsets, and parsed values. In particular, moving
-   modulation types to `instrument/modulation.ksy` is a file-organization step,
-   not a prerequisite for reviewing Instrument-Specific Parameters.
+   types, field names, offsets, and parsed values. The Instrument modulation
+   boundary is split and fixture-verified; review other proposed boundaries
+   individually.
 3. Extend parsed-field assertions as each area changes. Current verification
    checks fixture byte differences, compiles Kaitai, and parses representative
    Instrument and Song fixtures; it does not yet validate Markdown tables
