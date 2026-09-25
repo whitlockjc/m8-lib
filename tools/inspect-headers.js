@@ -17,6 +17,13 @@ const EXT_KINDS = new Map([
   ['.m8t', 'theme']
 ])
 
+const SCHEMA_VERSIONS = new Map([
+  ['instrument', '6.0.1'],
+  ['scale', '4.0.1'],
+  ['song', '6.5.0'],
+  ['theme', '1.0.2']
+])
+
 function fixtureFiles (dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true })
   const files = []
@@ -71,22 +78,31 @@ function verifyHeader (header) {
   if (expectedKind && header.fileKind !== expectedKind) {
     throw new Error(`${header.path}: expected ${expectedKind}, got ${header.fileKind}`)
   }
+
+  const expectedVersion = SCHEMA_VERSIONS.get(header.fileKind)
+  if (expectedVersion && header.schemaVersion !== expectedVersion) {
+    throw new Error(`${header.path}: expected ${header.fileKind} schema version ${expectedVersion}, got ${header.schemaVersion}`)
+  }
 }
 
-const args = process.argv.slice(2)
-const files = args.length > 0 ? args : fixtureFiles('fixtures')
+if (require.main === module) {
+  const args = process.argv.slice(2)
+  const files = args.length > 0 ? args : fixtureFiles('fixtures')
 
-console.log(['path', 'kind', 'schema_version', 'size'].join('\t'))
+  console.log(['path', 'kind', 'schema_version', 'size'].join('\t'))
 
-for (const file of files.sort()) {
-  const header = readHeader(file)
+  for (const file of files.sort()) {
+    const header = readHeader(file)
 
-  verifyHeader(header)
+    verifyHeader(header)
 
-  console.log([
-    header.path,
-    header.fileKind,
-    header.schemaVersion,
-    header.size
-  ].join('\t'))
+    console.log([
+      header.path,
+      header.fileKind,
+      header.schemaVersion,
+      header.size
+    ].join('\t'))
+  }
 }
+
+module.exports = { readHeader, verifyHeader }

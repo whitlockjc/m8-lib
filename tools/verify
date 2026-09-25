@@ -9,6 +9,7 @@ SCHEMA_CHECK_DIR="$OUT_DIR/schemas"
 cd "$ROOT"
 
 tools/inspect-headers.js
+node tools/verify-header-versions.js
 
 tools/map-fixture.js \
   fixtures/6.5.x/instruments/NONE_DEFAULT.m8i \

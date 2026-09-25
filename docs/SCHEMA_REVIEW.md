@@ -129,11 +129,11 @@ Evidence: `*_TABLE.m8i`, `TABLES.m8s`, parsed-fixture checks, [Instrument](INSTR
 | Instrument record | 215 bytes | Song imports `instrument_data` | Keep one definition; compare embedded Wavsynth and Hypersynth records to standalone defaults, accounting for the Song's unset names. | Done |
 | Instrument Table | 128 bytes | Standalone Instrument and Song import `instrument/table.ksy`; Song stores 256 separately | Keep one row/table layout with file-specific placement and counts. | Done |
 | FX slot | Command byte followed by argument byte | Phrase and Table import `common/fx_slot.ksy` | Keep raw storage shared; interpret command labels by context. | Done |
-| FX command labels | Shared families plus instrument-specific commands | Phrase and seven instrument catalogs remain separate | Keep context-aware catalogs; avoid flattening collisions. Revisit a canonical catalog when generating labels and documentation. | Review |
+| FX command labels | Shared families plus instrument-specific commands | Phrase and seven instrument catalogs remain separate | Keep context-aware catalogs; avoid flattening collisions. Command coverage and availability remain in [FX Commands](FX_COMMANDS.md). | Done (organization) |
 | Scale body | 46 bytes | Song imports the standalone `scale_4_0_1` body | Keep one body definition; compare the default embedded Chromatic Scale to its standalone file. | Done |
 | EQ settings | Three adjacent six-byte bands, 18 bytes | Song imports `song/eq.ksy` for 128 Instrument banks and four effect/master EQs | Keep shared type; document bank selection separately. | Done |
 | Fixed strings | Field-specific length and terminator/fill behavior | Names differ; Sampler path and Song directory share a 128-byte path-field pattern | Keep raw sizes explicit and preserve post-terminator bytes. Share a type only when fixture evidence and maintenance justify it. | Done |
-| Header | 14 bytes | 6.5.x entry imports one shared header | Keep the header shared; validate file-kind-specific schema versions before decoding. | Review |
+| Header | 14 bytes | 6.5.x entry imports one shared header | Keep the header shared; the verification suite checks each fixture's file-kind-specific schema version before Kaitai decoding. | Done (verification) |
 
 ## Proposed File Tree
 
@@ -177,7 +177,7 @@ must stay contextual even when their raw storage is shared.
 ## Review Order And Checks
 
 1. General Instrument Settings, Instrument-Specific Parameters, Multi-mode
-   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, Modulation Destination Labels, Instrument-Specific Tail, and Instrument Table are done. Continue with the cross-file mapping and schema organization review.
+   Filter Parameters, Amplifier Settings, Mixer Parameters, Common Modulation Settings, Modulation Type Parameters, Modulation Destination Labels, Instrument-Specific Tail, Instrument Table, and cross-file organization are done for the current fixtures.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
    types, field names, offsets, and parsed values. The Instrument modulation

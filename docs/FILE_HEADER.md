@@ -42,6 +42,13 @@ The schema version is packed into three four-bit nibbles.
 The encoded version appears to describe the persisted file schema version, not
 necessarily the M8 firmware version used to create the file.
 
+The 6.5.x verification suite checks the expected version for each file kind
+before Kaitai decoding: Instrument `6.0.1`, Scale `4.0.1`, Song `6.5.0`, and
+Theme `1.0.2`. These are the file schema versions imported by
+[`6.5.x.ksy`](../schemas/6.5.x.ksy), not firmware versions. The shared header
+schema itself only decodes the version; consumers outside this verification
+suite must check compatibility before choosing a body schema.
+
 ### FileKind
 
 | Name | Value |
