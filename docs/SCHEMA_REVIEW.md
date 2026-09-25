@@ -187,10 +187,10 @@ must stay contextual even when their raw storage is shared.
    checks fixture byte differences, compiles Kaitai, and parses representative
    Instrument and Song fixtures; selected Markdown tables are also checked
    against schema definitions.
-4. Schema-derived checks now cover ten documented enum tables and the Theme,
-   Scale, Instrument, and Song top-level layouts. Extend them to nested layouts
-   and documented catalogs without treating authored evidence and
-   interpretation as generated data.
+4. Schema-derived checks now cover ten documented enum tables, four top-level
+   layouts, and the shared FX slot, Instrument Table row, modulation slot, and
+   EQ band layouts. Extend them to other nested layouts and documented catalogs
+   without treating authored evidence and interpretation as generated data.
 
 No schema or documentation should mark preserved bytes as unused merely because
 all current fixtures leave them unchanged.

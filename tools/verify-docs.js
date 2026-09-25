@@ -127,5 +127,39 @@ assert.deepEqual(layoutRows('docs/SONG.md', '## Layout'), [
   ...songFields.map(field => row(field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()), field, 4))
 ], 'docs/SONG.md Layout differs from Song schema and default fixture size')
 
+function relativeRange ({ from, size }) {
+  const first = `+0x${from.toString(16).padStart(2, '0')}`
+  if (size === 1) return first
+  return `${first}..+0x${(from + size - 1).toString(16).padStart(2, '0')}`
+}
+
+function nestedLayout (doc, heading, schemaPath, typeName, expectedSize) {
+  const owner = load(schemaPath)
+  const [, definition] = resolve(owner, typeName)
+  const fields = sequenceLayout(definition.seq, owner, 0)
+  assert.equal(fields.reduce((total, field) => total + field.size, 0), expectedSize,
+    `${schemaPath} ${typeName} size`)
+  const expected = fields.map((field, index) => {
+    const schemaField = definition.seq[index]
+    let name = field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+    if (schemaField.repeat) name += `[0..${schemaField['repeat-expr'] - 1}]`
+    return [name, relativeRange(field), field.size]
+  })
+  const actual = sectionRows(doc, heading)
+    .filter(([, range]) => /^\+0x[\da-f]+(?:\.\.\+0x[\da-f]+)?$/i.test(range))
+    .map(([name, range, size]) => [name, range, Number(size)])
+  assert.deepEqual(actual, expected, `${doc} ${heading} differs from ${typeName}`)
+}
+
+nestedLayout('docs/FX_COMMANDS.md', '## Storage',
+  'schemas/common/fx_slot.ksy', 'fx_slot', 2)
+nestedLayout('docs/INSTRUMENT.md', '### Instrument Table Row',
+  'schemas/file-versions/6.0.1/instrument/table.ksy', 'table_row', 8)
+nestedLayout('docs/INSTRUMENT.md', '### Modulation Slot',
+  'schemas/file-versions/6.0.1/instrument/modulation.ksy', 'modulation_slot', 6)
+nestedLayout('docs/SONG.md', '### EQ Band',
+  'schemas/file-versions/6.5.0/song/eq.ksy', 'eq_band', 6)
+
 console.log(`documented_enums\tok\t${checks.length} tables`)
 console.log('documented_layouts\tok\tTheme, Scale, Instrument, Song')
+console.log('documented_nested_layouts\tok\tFX slot, Instrument Table row, modulation slot, EQ band')
