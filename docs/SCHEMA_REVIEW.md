@@ -161,7 +161,7 @@ schemas/
       song/
         eq.ksy                 # done: shared EQ settings and bands within Song
         sequencing.ksy         # done: rows, phrases, chains, grooves
-        project.ksy            # Project and MIDI settings
+        project.ksy            # done: Project and MIDI settings
         mixer_effects.ksy      # Mixer, effects, and scope
         midi_mapping.ksy       # MIDI Mapping records
     1.0.2/
@@ -181,7 +181,7 @@ must stay contextual even when their raw storage is shared.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
    types, field names, offsets, and parsed values. The Instrument modulation
-   parameters, modulation, table, Song EQ, and Song sequencing boundaries are split and fixture-verified; review other proposed
+   parameters, modulation, table, Song EQ, sequencing, and Project boundaries are split and fixture-verified; review other proposed
    boundaries individually.
 3. Extend parsed-field assertions as each area changes. Current verification
    checks fixture byte differences, compiles Kaitai, and parses representative

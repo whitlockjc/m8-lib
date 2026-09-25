@@ -14,6 +14,7 @@ const { File65X } = require(path.resolve(compiledDir, 'File65X.js'))
 const { Instrument601 } = require(path.resolve(compiledDir, 'Instrument601.js'))
 const { InstrumentTable601 } = require(path.resolve(compiledDir, 'InstrumentTable601.js'))
 const { SongSequencing650 } = require(path.resolve(compiledDir, 'SongSequencing650.js'))
+const { SongProject650 } = require(path.resolve(compiledDir, 'SongProject650.js'))
 
 function parse (fixture) {
   const bytes = fs.readFileSync(fixture)
@@ -52,6 +53,9 @@ for (const [catalog, expected] of [
 assert.equal(InstrumentTable601.NoneTableFxCommand[0xff], 'UNSET')
 assert.equal(SongSequencing650.PhraseFxCommand[0x4d], 'MICRO_TIME')
 assert.equal(SongSequencing650.PhraseFxCommand[0xff], 'UNSET')
+assert.equal(SongProject650.MidiSyncTransport[0x02], 'TRANSPORT_SPP')
+assert.equal(SongProject650.RecordDelayKill[0x03], 'BOTH')
+assert.equal(SongProject650.MidiInputMode[0x02], 'POLY')
 
 for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_DEFAULT.m8i`)

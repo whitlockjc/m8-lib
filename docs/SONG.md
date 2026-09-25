@@ -14,6 +14,8 @@ defines their file positions.
 Song rows, phrases, chains, and grooves are defined in
 [`song/sequencing.ksy`](../schemas/file-versions/6.5.0/song/sequencing.ksy).
 Bookmarks remain in the Song schema as Song View navigation state.
+Project page and MIDI Settings records are defined in
+[`song/project.ksy`](../schemas/file-versions/6.5.0/song/project.ksy).
 
 ## Schema
 
