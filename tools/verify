@@ -11,6 +11,8 @@ cd "$ROOT"
 tools/inspect-headers.js
 node tools/verify-header-versions.js
 node tools/verify-docs.js
+node tools/generate-docs.js --check
+node --test tools/generate-docs.test.js
 node --test tools/ksy-layout.test.js
 
 tools/map-fixture.js \

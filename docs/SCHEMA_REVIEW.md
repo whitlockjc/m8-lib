@@ -191,6 +191,10 @@ must stay contextual even when their raw storage is shared.
    layouts, and the shared FX slot, Instrument Table row, modulation slot, and
    EQ band layouts. Extend them to other nested layouts and documented catalogs
    without treating authored evidence and interpretation as generated data.
+5. Theme's Layout section is a generation prototype. `npm run docs:generate`
+   updates it from Kaitai; `npm run docs:check` detects drift. Notes and Evidence
+   remain authored, and the Schema table's size values are checked against the
+   Kaitai header and Theme body.
 
 No schema or documentation should mark preserved bytes as unused merely because
 all current fixtures leave them unchanged.

@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const YAML = require('yaml')
-const { load, sequenceLayout, resolve } = require('./ksy-layout')
+const { load, fixedSize, sequenceLayout, resolve } = require('./ksy-layout')
 
 const checks = [
   ['docs/FX_COMMANDS.md', 'Sequencer', 'schemas/file-versions/6.5.0/song/sequencing.ksy', 'phrase_fx_command', false],
@@ -57,10 +57,18 @@ for (const [doc, heading, schemaPath, enumName, complete] of checks) {
 }
 
 const theme = schema('schemas/file-versions/1.0.2/theme.ksy')
+const header = load('schemas/common/file_header.ksy')
+const headerSize = header.data.seq.reduce((size, field) => size + fixedSize(field, header), 0)
 const colorSize = theme.types.color.seq.reduce((size, component) => {
   assert.equal(component.type, 'u1', 'Theme color component type')
   return size + 1
 }, 0)
+const bodySize = theme.seq.length * colorSize
+const themeSizes = sectionRows('docs/THEME.md', '## Schema')
+const sizeValues = new Map(themeSizes.map(([name, value]) => [name, value]))
+assert.equal(sizeValues.get('Total file size'), `${headerSize + bodySize} bytes`)
+assert.equal(sizeValues.get('Header size'), `${headerSize} bytes`)
+assert.equal(sizeValues.get('Body size'), `${bodySize} bytes`)
 const layout = sectionRows('docs/THEME.md', '## Layout')
   .filter(([, range]) => /^0x[\da-f]+\.\.0x[\da-f]+$/i.test(range))
   .map(([name, range, size]) => [name, range, Number(size)])
@@ -68,7 +76,7 @@ const expectedLayout = [['M8 File Header', '0x00..0x0d', 14]]
 theme.seq.forEach((field, index) => {
   assert.equal(field.type, 'color', `Theme field ${field.id} type`)
   const name = field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
-  const from = 14 + index * colorSize
+  const from = headerSize + index * colorSize
   const to = from + colorSize - 1
   expectedLayout.push([name, `0x${from.toString(16).padStart(2, '0')}..0x${to.toString(16).padStart(2, '0')}`, colorSize])
 })

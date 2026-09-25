@@ -36,6 +36,8 @@ function fixedSize (field, context) {
   let size
   if (Number.isInteger(field.size)) {
     size = field.size
+  } else if (typeof field.contents === 'string') {
+    size = Buffer.byteLength(field.contents, 'ascii')
   } else if (typeof field.type === 'object') {
     const sizes = Object.values(field.type.cases).map(name =>
       fixedSize({ type: name }, context))
