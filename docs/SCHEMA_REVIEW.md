@@ -153,7 +153,7 @@ schemas/
     6.0.1/
       instrument.ksy           # standalone body entry; keeps instrument_data
       instrument/
-        parameters.ksy         # per-type params; filter, amp, mixer structures
+        parameters.ksy         # done: per-type params; filter, amp, mixer structures
         modulation.ksy         # done: slot, payloads, and general modulation enums
         table.ksy              # done: table, row, and contextual command catalogs
     6.5.0/
@@ -181,7 +181,7 @@ must stay contextual even when their raw storage is shared.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
    types, field names, offsets, and parsed values. The Instrument modulation
-   and table boundaries are split and fixture-verified; review other proposed
+   parameters, modulation, and table boundaries are split and fixture-verified; review other proposed
    boundaries individually.
 3. Extend parsed-field assertions as each area changes. Current verification
    checks fixture byte differences, compiles Kaitai, and parses representative

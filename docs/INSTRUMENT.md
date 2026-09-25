@@ -18,6 +18,7 @@ classification of preserved bytes are tracked separately.
 | Verified firmware range | `6.5.x` |
 | Verified firmware | `6.5.2C` |
 | Kaitai schema | `schemas/file-versions/6.0.1/instrument.ksy` |
+| Parameter definitions | [`schemas/file-versions/6.0.1/instrument/parameters.ksy`](../schemas/file-versions/6.0.1/instrument/parameters.ksy) |
 | Structural status | Complete for 6.5.x fixture evidence |
 | Total file size | 357 bytes |
 | Header size | 14 bytes |
