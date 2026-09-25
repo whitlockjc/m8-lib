@@ -187,9 +187,9 @@ must stay contextual even when their raw storage is shared.
    checks fixture byte differences, compiles Kaitai, and parses representative
    Instrument and Song fixtures; it does not yet validate Markdown tables
    against schema definitions.
-4. Build schema-derived layout and enum checks for Markdown references after
-   the schema organization settles. Leave evidence and interpretation as
-   authored prose.
+4. Schema-derived checks now cover ten documented enum tables and the Theme
+   layout. Extend them to other fixed layouts and documented catalogs without
+   treating authored evidence and interpretation as generated data.
 
 No schema or documentation should mark preserved bytes as unused merely because
 all current fixtures leave them unchanged.

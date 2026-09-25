@@ -8,6 +8,7 @@
     "verify": "tools/verify"
   },
   "devDependencies": {
-    "kaitai-struct": "^0.11.0"
+    "kaitai-struct": "^0.11.0",
+    "yaml": "^2.9.1"
   }
 }
