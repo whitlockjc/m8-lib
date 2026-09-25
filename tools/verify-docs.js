@@ -3,6 +3,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const YAML = require('yaml')
+const { load, sequenceLayout, resolve } = require('./ksy-layout')
 
 const checks = [
   ['docs/FX_COMMANDS.md', 'Sequencer', 'schemas/file-versions/6.5.0/song/sequencing.ksy', 'phrase_fx_command', false],
@@ -73,5 +74,58 @@ theme.seq.forEach((field, index) => {
 })
 assert.deepEqual(layout, expectedLayout, 'docs/THEME.md Layout differs from Theme schema')
 
+function hexRange ({ from, size }, width = 2) {
+  const first = `0x${from.toString(16).padStart(width, '0')}`
+  if (size === 1) return first
+  return `${first}..0x${(from + size - 1).toString(16).padStart(width, '0')}`
+}
+
+function layoutRows (doc, heading) {
+  return sectionRows(doc, heading)
+    .filter(([, range]) => /^0x[\da-f]+(?:\.\.0x[\da-f]+)?$/i.test(range))
+    .map(([name, range, size]) => [name, range, Number(size)])
+}
+
+function row (name, field, width = 2) {
+  return [name, hexRange(field, width), field.size]
+}
+
+const scale = load('schemas/file-versions/4.0.1/scale.ksy')
+const scaleFields = sequenceLayout(scale.data.seq, scale, 14)
+assert.deepEqual(layoutRows('docs/SCALE.md', '## Layout'), [
+  ['M8 File Header', '0x00..0x0d', 14],
+  ...scaleFields.map(field => row(field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()), field))
+], 'docs/SCALE.md Layout differs from Scale schema')
+
+const instrument = load('schemas/file-versions/6.0.1/instrument.ksy')
+const instrumentFields = sequenceLayout(instrument.data.seq, instrument, 14)
+const instrumentData = instrumentFields[0]
+const [, instrumentType] = resolve(instrument, 'instrument_data')
+const dataFields = sequenceLayout(instrumentType.seq, instrument, instrumentData.from)
+const [, generalType] = resolve(instrument, 'general_instrument_settings')
+const generalFields = sequenceLayout(generalType.seq, instrument, dataFields[0].from)
+assert.deepEqual(layoutRows('docs/INSTRUMENT.md', '## Common Layout'), [
+  ['M8 File Header', '0x00..0x0d', 14],
+  row('instrument_data', instrumentData),
+  row('general_settings', dataFields[0]),
+  row('general_settings.type', generalFields[0]),
+  ...generalFields.slice(1).map(field => row(field.id, field)),
+  ...dataFields.slice(1).map(field => row(field.id, field)),
+  row('table', instrumentFields[1])
+], 'docs/INSTRUMENT.md Common Layout differs from Instrument schema')
+
+const song = load('schemas/file-versions/6.5.0/song.ksy')
+const songFields = sequenceLayout(song.data.seq.slice(0, -1), song, 14)
+const lastEnd = songFields.at(-1).from + songFields.at(-1).size
+const songSize = fs.statSync('fixtures/6.5.x/songs/DEFAULT.m8s').size
+assert.equal(song.data.seq.at(-1).id, 'unknown_after_reverb_eq')
+assert.equal(song.data.seq.at(-1)['size-eos'], true)
+assert.ok(songSize > lastEnd, 'Song final field must have bytes')
+songFields.push({ id: 'unknown_after_reverb_eq', from: lastEnd, size: songSize - lastEnd })
+assert.deepEqual(layoutRows('docs/SONG.md', '## Layout'), [
+  ['M8 File Header', '0x0000..0x000d', 14],
+  ...songFields.map(field => row(field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()), field, 4))
+], 'docs/SONG.md Layout differs from Song schema and default fixture size')
+
 console.log(`documented_enums\tok\t${checks.length} tables`)
-console.log('documented_layouts\tok\tTheme')
+console.log('documented_layouts\tok\tTheme, Scale, Instrument, Song')

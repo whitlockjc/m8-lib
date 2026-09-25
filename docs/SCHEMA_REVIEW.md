@@ -185,11 +185,12 @@ must stay contextual even when their raw storage is shared.
    and MIDI Mapping boundaries are split and fixture-verified.
 3. Extend parsed-field assertions as each area changes. Current verification
    checks fixture byte differences, compiles Kaitai, and parses representative
-   Instrument and Song fixtures; it does not yet validate Markdown tables
+   Instrument and Song fixtures; selected Markdown tables are also checked
    against schema definitions.
-4. Schema-derived checks now cover ten documented enum tables and the Theme
-   layout. Extend them to other fixed layouts and documented catalogs without
-   treating authored evidence and interpretation as generated data.
+4. Schema-derived checks now cover ten documented enum tables and the Theme,
+   Scale, Instrument, and Song top-level layouts. Extend them to nested layouts
+   and documented catalogs without treating authored evidence and
+   interpretation as generated data.
 
 No schema or documentation should mark preserved bytes as unused merely because
 all current fixtures leave them unchanged.
