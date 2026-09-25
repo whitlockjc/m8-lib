@@ -8,6 +8,10 @@ Effects Settings, Mix & Limiter Scope, Mix EQ, ModFX EQ, Delay EQ, Reverb EQ,
 MIDI Mapping, and Scales pages. Remaining unknown Song bytes are preserved
 until additional fixtures map those regions.
 
+The shared Instrument-bank and master/effect EQ record definitions are in
+[`song/eq.ksy`](../schemas/file-versions/6.5.0/song/eq.ksy); the Song schema
+defines their file positions.
+
 ## Schema
 
 | Name | Value |

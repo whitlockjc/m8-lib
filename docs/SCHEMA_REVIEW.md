@@ -131,7 +131,7 @@ Evidence: `*_TABLE.m8i`, `TABLES.m8s`, parsed-fixture checks, [Instrument](INSTR
 | FX slot | Command byte followed by argument byte | Phrase and Table import `common/fx_slot.ksy` | Keep raw storage shared; interpret command labels by context. | Done |
 | FX command labels | Shared families plus instrument-specific commands | Phrase and seven instrument catalogs remain separate | Keep context-aware catalogs; avoid flattening collisions. Revisit a canonical catalog when generating labels and documentation. | Review |
 | Scale body | 46 bytes | Song imports the standalone `scale_4_0_1` body | Keep one body definition; compare the default embedded Chromatic Scale to its standalone file. | Done |
-| EQ settings | Three adjacent six-byte bands, 18 bytes | Song reuses `eq_settings` for 128 Instrument banks and four effect/master EQs | Keep shared type; document bank selection separately. | Done |
+| EQ settings | Three adjacent six-byte bands, 18 bytes | Song imports `song/eq.ksy` for 128 Instrument banks and four effect/master EQs | Keep shared type; document bank selection separately. | Done |
 | Fixed strings | Field-specific length and terminator/fill behavior | Names differ; Sampler path and Song directory share a 128-byte path-field pattern | Keep raw sizes explicit and preserve post-terminator bytes. Share a type only when fixture evidence and maintenance justify it. | Done |
 | Header | 14 bytes | 6.5.x entry imports one shared header | Keep the header shared; validate file-kind-specific schema versions before decoding. | Review |
 
@@ -159,7 +159,7 @@ schemas/
     6.5.0/
       song.ksy                 # Song body entry and placement
       song/
-        eq.ksy                 # shared EQ settings and bands within Song
+        eq.ksy                 # done: shared EQ settings and bands within Song
         sequencing.ksy         # rows, phrases, chains, bookmarks, grooves
         project.ksy            # Project and MIDI settings
         mixer_effects.ksy      # Mixer, effects, and scope
@@ -181,7 +181,7 @@ must stay contextual even when their raw storage is shared.
 2. After those conceptual reviews, split large Kaitai files where a verified
    ownership boundary makes the source easier to maintain. Preserve entry
    types, field names, offsets, and parsed values. The Instrument modulation
-   parameters, modulation, and table boundaries are split and fixture-verified; review other proposed
+   parameters, modulation, table, and Song EQ boundaries are split and fixture-verified; review other proposed
    boundaries individually.
 3. Extend parsed-field assertions as each area changes. Current verification
    checks fixture byte differences, compiles Kaitai, and parses representative

@@ -8,6 +8,7 @@ meta:
     - ../6.0.1/instrument/table
     - ../4.0.1/scale
     - ../../common/fx_slot
+    - song/eq
 doc: |
   Body schema for song files with header schema version 6.5.0.
 
@@ -66,15 +67,15 @@ seq:
   - id: scales
     type: embedded_scales
   - id: instrument_eqs
-    type: instrument_eqs
+    type: song_eq_6_5_0::instrument_eqs
   - id: mix_eq
-    type: eq_settings
+    type: song_eq_6_5_0::eq_settings
   - id: mod_fx_eq
-    type: eq_settings
+    type: song_eq_6_5_0::eq_settings
   - id: delay_eq
-    type: eq_settings
+    type: song_eq_6_5_0::eq_settings
   - id: reverb_eq
-    type: eq_settings
+    type: song_eq_6_5_0::eq_settings
   - id: unknown_after_reverb_eq
     size-eos: true
 types:
@@ -536,46 +537,6 @@ types:
         type: u1
       - id: maximum_value
         type: u1
-  eq_settings:
-    doc: |
-      Three-band EQ storage. Each known EQ uses three adjacent 6-byte band
-      records.
-    seq:
-      - id: low_band
-        type: eq_band
-      - id: mid_band
-        type: eq_band
-      - id: high_band
-        type: eq_band
-  instrument_eqs:
-    doc: 128 assignable Instrument EQ banks, each with the standard 18-byte EQ layout.
-    seq:
-      - id: entries
-        type: eq_settings
-        repeat: expr
-        repeat-expr: 128
-  eq_band:
-    doc: |
-      Six-byte EQ band record. The type and mode are packed into one byte: bits
-      0..4 hold the filter type and bits 5..7 hold the filter mode. Frequency
-      is stored as an unsigned little-endian integer. Gain is stored as signed
-      hundredths, so 10.50 is stored as 1050.
-    seq:
-      - id: type_and_mode
-        type: u1
-      - id: frequency
-        type: u2
-      - id: gain
-        type: s2
-      - id: q
-        type: u1
-    instances:
-      filter_type:
-        value: type_and_mode & 0x1f
-        enum: eq_filter_type
-      filter_mode:
-        value: type_and_mode >> 5
-        enum: eq_filter_mode
 enums:
   phrase_fx_command:
     0x00:
@@ -835,44 +796,6 @@ enums:
     0x02:
       id: bandpass_highpass
       -label: BANDPASS:HIGHPASS
-  eq_filter_type:
-    0x00:
-      id: lowcut
-      -label: LOWCUT
-    0x01:
-      id: lowshelf
-      -label: LOWSHELF
-    0x02:
-      id: bell
-      -label: BELL
-    0x03:
-      id: bandpass
-      -label: BANDPASS
-    0x04:
-      id: hi_shelf
-      -label: HI.SHELF
-    0x05:
-      id: hi_cut
-      -label: HI.CUT
-    0x06:
-      id: allpass
-      -label: ALLPASS
-  eq_filter_mode:
-    0x00:
-      id: stereo
-      -label: STEREO
-    0x01:
-      id: mid
-      -label: MID
-    0x02:
-      id: side
-      -label: SIDE
-    0x03:
-      id: left
-      -label: LEFT
-    0x04:
-      id: right
-      -label: RIGHT
   midi_mapping_destination_type:
     0x05:
       id: instrument
