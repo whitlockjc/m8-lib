@@ -48,7 +48,12 @@ for (const fixture of instrumentFixtures) {
   } else {
     assert.equal(tail.modulators.slots.length, 4, `${fixture} modulator boundary`)
     if (name === 'SAM' || name === 'SAMS' || name === 'SAMB') {
-      assert.deepEqual(Buffer.from(tail.samplePath), bytes.subarray(0x65, 0xe5),
+      const region = bytes.subarray(0x65, 0xe5)
+      const terminator = region.indexOf(0)
+      assert.notEqual(terminator, -1, `${fixture} sample path terminator`)
+      assert.equal(tail.samplePath.path, region.subarray(0, terminator).toString('ascii'),
+        `${fixture} sample path text`)
+      assert.deepEqual(Buffer.from(tail.samplePath.trailing), region.subarray(terminator + 1),
         `${fixture} sample path`)
     } else if (name === 'HYP') {
       assert.equal(tail.chords.length, 16, `${fixture} chord count`)
@@ -149,12 +154,11 @@ for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) 
 }
 
 {
-  const { bytes, file } = parse('fixtures/6.5.x/instruments/SAM_PARAMS.m8i')
-  const pathBytes = Buffer.from(file.body.instrument.tail.samplePath)
-  assert.equal(pathBytes.length, 128)
-  assert.deepEqual(pathBytes, bytes.subarray(0x65, 0xe5))
-  assert.equal(pathBytes.subarray(0, 17).toString('utf8'), '/Samples/Kick.wav')
-  assert.ok(pathBytes.subarray(17).every(byte => byte === 0))
+  const { file } = parse('fixtures/6.5.x/instruments/SAM_PARAMS.m8i')
+  const samplePath = file.body.instrument.tail.samplePath
+  assert.equal(samplePath.path, '/Samples/Kick.wav')
+  assert.equal(samplePath.trailing.length, 110)
+  assert.ok(Buffer.from(samplePath.trailing).every(byte => byte === 0))
 }
 
 for (const [name, firstOffset, count] of [['MID', 0x26, 10], ['EXT', 0x25, 4]]) {

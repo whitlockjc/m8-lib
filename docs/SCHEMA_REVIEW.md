@@ -29,7 +29,7 @@ Evidence: `*_DEFAULT.m8i`, `*_PARAMS.m8i`, and [Instrument](INSTRUMENT.md#genera
 | Item | Verified storage | Agreed treatment | Status |
 | --- | --- | --- | --- |
 | Wavsynth, Macrosynth, FM Synth | Distinct `*_params` types at type-dependent offsets within `0x1d..0x4b` | Keep distinct types and field names; their layouts and meanings differ. | Done |
-| Sampler configuration | Seven control bytes at `0x1f..0x25`; `sample_path` occupies `0x65..0xe4` | Treat `sampler_controls` and `sample_path` together as Sampler's instrument-specific configuration, while preserving both physical locations. One raw `mode_value` means detune, steps, or BPM according to `play_mode`. The manual requires a path under 128 characters; `SAM_PARAMS.m8i` shows 17 ASCII bytes followed by 111 zero bytes. | Done |
+| Sampler configuration | Seven control bytes at `0x1f..0x25`; `sample_path` occupies `0x65..0xe4` | Treat `sampler_controls` and `sample_path` together as Sampler's instrument-specific configuration, while preserving both physical locations. One raw `mode_value` means detune, steps, or BPM according to `play_mode`. The manual requires a path under 128 characters; `SAM_PARAMS.m8i` shows 17 ASCII bytes, a null terminator, and 110 zero bytes. | Done |
 | MIDI Out and External | Distinct parameter layouts; custom CC entries are each `cc` followed by `value` | Keep distinct parameter layouts and counts; reuse one `custom_cc` entry type for both. | Done |
 | Hypersynth | `current_chord` in `hypersynth_params`; persistent 16-chord table in the tail | Keep both locations distinct. Document the observed relationship without treating them as one stored field. | Done |
 | NONE | `0x1d..0x4b` is preserved without editable parameters | Keep bytes explicit and unclassified; do not invent a NONE parameter model. | Done |
@@ -103,7 +103,9 @@ the contextual catalogs and per-fixture evidence boundaries.
 | Sampler and Hypersynth | Sample path at `0x65..0xe4`; 16 seven-byte chords at `0x65..0xd4` | Keep their distinct tail structures; keep Hypersynth's persistent chords separate from `current_chord`. Verify first and last chord values. | Done |
 | Other regions | Unknown bytes are unchanged within each type's available fixtures; MIDI Out and External share a chord-like default pattern | Preserve unknown bytes without assigning chord semantics or calling them unused or reserved. | Done |
 
-Evidence: all 6.5.x instrument fixtures, parsed-fixture tail checks, and [Instrument](INSTRUMENT.md#tail). A stable pattern does not prove a field's meaning; near-limit and non-ASCII sample paths remain untested.
+Evidence: all 6.5.x instrument fixtures, parsed-fixture tail checks, and [Instrument](INSTRUMENT.md#tail). A stable pattern does not prove a field's meaning. Sampler's fixed 128-byte path uses the same null-terminated, trailing-byte-preserving representation as the Song directory.
+
+The [M8 6.5.2 manual](https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699) describes no additional editable Instrument View parameter beyond the mapped general, type-specific, modulation, filter, amplifier, and mixer settings. Its Sample Editor section places loop points and slice markers in the WAV file. Historical [m8-js parsing](https://github.com/whitlockjc/m8-js/blob/main/index.js) treats the Sampler path as 127 string bytes plus one skipped byte in a 128-byte field and skips that field for other instrument types; this agrees with the field boundary, but does not establish meanings for their preserved bytes.
 
 ### Instrument Table
 

@@ -303,11 +303,11 @@ selected `sample_path` is parsed by `sampler_data_tail` after the modulators.
 according to `play_mode`; these are not three separate stored fields.
 
 `SAM_PARAMS.m8i` stores `/Samples/Kick.wav` as 17 ASCII bytes at `0x65`,
-followed by 111 zero bytes. The region runs through `0xe4`, immediately before
-the Instrument Table. The [M8 manual](https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699)
-requires the entire sample path to be under 128 characters. The fixture
-verifies zero padding for this short ASCII path; near-limit and non-ASCII paths
-have not been tested.
+followed by a null terminator and 110 zero bytes. Like the Song directory, the
+path is a null-terminated string inside a fixed 128-byte field; trailing bytes
+are preserved. The region runs through `0xe4`, immediately before the
+Instrument Table. The [M8 manual](https://cdn.shopify.com/s/files/1/0455/0485/6229/files/m8_operation_manual_v20260421.pdf?v=1776791699)
+requires the entire sample path to be under 128 characters.
 
 ### Wavsynth Parameters
 
@@ -587,13 +587,22 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | `modulators` | `0x4d..0x64` | 24 | [Instrument Modulation](#instrument-modulation) |
-| `sample_path` | `0x65..0xe4` | 128 | selected sample path; [Sampler Parameters](#sampler-parameters) |
+| `sample_path` | `0x65..0xe4` | 128 | [Sample Path Region](#sample-path-region) |
 
-`SAM_PARAMS.m8i` verifies that `/Samples/Kick.wav` occupies the first 17 bytes
-and the remaining 111 bytes are zero. The 128-byte storage region is bounded
-by the Table at `0xe5`; the M8 manual requires the entire path to be under 128
-characters. A short ASCII fixture does not establish near-limit or non-ASCII
-encoding behavior.
+`SAM_PARAMS.m8i` verifies that `/Samples/Kick.wav` occupies the first 17 bytes,
+followed by a null terminator and 110 zero bytes. The 128-byte storage region
+is bounded by the Table at `0xe5`; the M8 manual requires the entire path to
+be under 128 characters.
+
+#### Sample Path Region
+
+This uses the same fixed-field layout as the Song directory. Offsets are
+relative to `0x65`.
+
+| Name | Relative Offset | Size | Type |
+| --- | --- | ---: | --- |
+| `path` | `+0x00` | Variable, including terminator | Null-terminated ASCII string |
+| `trailing` | After terminator | Remaining bytes through `0xe4` | Preserved raw bytes |
 
 ### Hypersynth Tail
 
@@ -1566,7 +1575,7 @@ the M8 6.5.2 manual until future fixtures select those values.
 The `NONE` instrument does not expose editable instrument parameters or
 modulators, but it can store an editable table. `NONE_DEFAULT.m8i` verifies the
 `none` instrument type value, the fixed name location, and preservation of
-unused body bytes. `NONE_TABLE.m8i` verifies the table location and row layout.
+unknown body bytes. `NONE_TABLE.m8i` verifies the table location and row layout.
 
 ### Unknown Region Defaults (6.5.x)
 

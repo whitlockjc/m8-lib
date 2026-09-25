@@ -498,13 +498,21 @@ types:
       - id: modulators
         type: instrument_modulators
       - id: sample_path
+        type: sample_path_region
         size: 128
         doc: |
-          Selected sample path. SAM_PARAMS stores /Samples/Kick.wav beginning at
-          standalone offset 0x65: 17 ASCII path bytes followed by 111 zero
-          bytes. The 128-byte region ends at the Instrument Table boundary.
-          The M8 manual requires the entire sample path to be under 128
-          characters. Near-limit and non-ASCII byte encoding remain untested.
+          Selected sample path in a fixed 128-byte field, following the same
+          null-terminated path and preserved trailing-byte convention as the
+          Song directory. SAM_PARAMS stores /Samples/Kick.wav at offset 0x65.
+          The M8 manual requires the entire path to be under 128 characters.
+  sample_path_region:
+    seq:
+      - id: path
+        type: strz
+        encoding: ASCII
+      - id: trailing
+        size: _io.size - _io.pos
+        doc: Remaining path-field bytes after the terminator; preserve stored bytes.
   hypersynth_data_tail:
     seq:
       - id: modulators
