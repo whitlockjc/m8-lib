@@ -119,16 +119,16 @@ Evidence: `*_TABLE.m8i`, `TABLES.m8s`, parsed-fixture checks, [Instrument](INSTR
 
 ## Cross-File Mapping
 
-| Concept | Verified layout | Current duplication / boundary | Proposed treatment |
-| --- | --- | --- | --- |
-| Instrument record | 215 bytes | Song already imports `instrument_data` | Keep import; test standalone and embedded decoding |
-| Instrument Table | 128 bytes | Song already imports `instrument_table` | Keep import; retain different placement and table counts |
-| FX slot | Command byte followed by argument byte | Both locations now import `common/fx_slot.ksy` with raw `command` and `value` bytes | Keep command labels contextual |
-| FX command labels | Shared Sequencer and Mixer/Effects families plus instrument-specific commands | Phrase command enum and seven instrument table enums are maintained separately | Establish a canonical context-aware command catalog before generating labels/docs; do not flatten collisions |
-| Scale body | 46 bytes | Song now imports the standalone `scale_4_0_1` body | Keep one body definition and verify both placements |
-| EQ settings | Three adjacent six-byte bands, 18 bytes | Song already reuses `eq_settings` for 128 Instrument banks and four effect/master EQs | Keep shared type; document bank selection separately |
-| Fixed strings | Fixed byte ranges with field-specific length and observed terminator/fill behavior | Names and paths have different sizes and padding evidence | Keep sizes and raw bytes explicit; share documentation rules, not one parser prematurely |
-| Header | 14 bytes | Already imported by the 6.5.x entry schema | Keep shared header; add version-dispatch validation separately |
+| Concept | Verified layout | Current boundary | Agreed treatment | Status |
+| --- | --- | --- | --- | --- |
+| Instrument record | 215 bytes | Song imports `instrument_data` | Keep one definition; compare embedded Wavsynth and Hypersynth records to standalone defaults, accounting for the Song's unset names. | Done |
+| Instrument Table | 128 bytes | Song imports `instrument_table` but stores 256 separately | Keep one row/table layout with file-specific placement and counts. | Done |
+| FX slot | Command byte followed by argument byte | Phrase and Table import `common/fx_slot.ksy` | Keep raw storage shared; interpret command labels by context. | Done |
+| FX command labels | Shared families plus instrument-specific commands | Phrase and seven instrument catalogs remain separate | Keep context-aware catalogs; avoid flattening collisions. Revisit a canonical catalog when generating labels and documentation. | Review |
+| Scale body | 46 bytes | Song imports the standalone `scale_4_0_1` body | Keep one body definition; compare the default embedded Chromatic Scale to its standalone file. | Done |
+| EQ settings | Three adjacent six-byte bands, 18 bytes | Song reuses `eq_settings` for 128 Instrument banks and four effect/master EQs | Keep shared type; document bank selection separately. | Done |
+| Fixed strings | Field-specific length and terminator/fill behavior | Names differ; Sampler path and Song directory share a 128-byte path-field pattern | Keep raw sizes explicit and preserve post-terminator bytes. Share a type only when fixture evidence and maintenance justify it. | Done |
+| Header | 14 bytes | 6.5.x entry imports one shared header | Keep the header shared; validate file-kind-specific schema versions before decoding. | Review |
 
 ## Proposed File Tree
 

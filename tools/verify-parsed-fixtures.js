@@ -90,6 +90,33 @@ for (const fixture of instrumentFixtures) {
 }
 
 {
+  const { bytes, file } = parse('fixtures/6.5.x/songs/INSTRUMENTS.m8s')
+  assert.equal(file.body.instruments.entries.length, 128, 'Song instrument count')
+  for (const [index, name] of [[0, 'WAV'], [127, 'HYP']]) {
+    const standalone = parse(`fixtures/6.5.x/instruments/${name}_DEFAULT.m8i`)
+    const embedded = file.body.instruments.entries[index]
+    const offset = 0x13a3e + index * 215
+    assert.equal(embedded.generalSettings.type, standalone.file.body.instrument.generalSettings.type)
+    assert.equal(embedded.eq, standalone.file.body.instrument.eq)
+    assert.deepEqual(bytes.subarray(offset, offset + 1), standalone.bytes.subarray(0x0e, 0x0f))
+    assert.deepEqual(bytes.subarray(offset + 13, offset + 215),
+      standalone.bytes.subarray(0x1b, 0xe5), `${name} embedded record except name`)
+  }
+}
+
+{
+  const song = parse('fixtures/6.5.x/songs/DEFAULT.m8s')
+  const standalone = parse('fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n')
+  const embedded = song.file.body.scales.entries[0]
+  const scale = standalone.file.body
+  assert.equal(embedded.enabledNotes, scale.enabledNotes)
+  assert.equal(embedded.tuningOffset, scale.tuningOffset)
+  assert.deepEqual(Buffer.from(embedded.name), Buffer.from(scale.name))
+  assert.deepEqual(song.bytes.subarray(0x1aa7e, 0x1aa7e + 46),
+    standalone.bytes.subarray(14, 60), 'embedded Scale body')
+}
+
+{
   const { bytes, file } = parse('fixtures/6.5.x/songs/TABLES.m8s')
   const tables = file.body.tables.entries
   assert.equal(tables.length, 256, 'Song table count')
