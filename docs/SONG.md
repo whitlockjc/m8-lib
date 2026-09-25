@@ -11,6 +11,9 @@ until additional fixtures map those regions.
 The shared Instrument-bank and master/effect EQ record definitions are in
 [`song/eq.ksy`](../schemas/file-versions/6.5.0/song/eq.ksy); the Song schema
 defines their file positions.
+Song rows, phrases, chains, and grooves are defined in
+[`song/sequencing.ksy`](../schemas/file-versions/6.5.0/song/sequencing.ksy).
+Bookmarks remain in the Song schema as Song View navigation state.
 
 ## Schema
 
