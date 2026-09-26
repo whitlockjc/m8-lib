@@ -2,126 +2,249 @@
 
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
-const { load, fixedSize, sequenceLayout } = require('./ksy-layout')
+const path = require('node:path')
+const { load, resolve } = require('./ksy-layout')
+const targets = require('./doc-targets.json')
 
-const themeDocPath = 'docs/THEME.md'
-const scaleDocPath = 'docs/SCALE.md'
+const root = path.resolve(__dirname, '..')
+const schemaRoot = path.join(root, 'schemas')
+const kinds = ['instrument', 'scale', 'song', 'theme']
+const hex = n => `0x${n.toString(16).padStart(2, '0')}`
+const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;').replaceAll('|', '&#124;').replaceAll('`', '&#96;').replace(/\r?\n/g, ' ')
+const code = value => {
+  const content = String(value).replaceAll('|', '\\|').replace(/\r?\n/g, ' ')
+  const fence = '`'.repeat(Math.max(0, ...(content.match(/`+/g) || []).map(run => run.length)) + 1)
+  return `${fence}${content}${fence}`
+}
+const text = value => typeof value === 'object' ? JSON.stringify(value) : String(value)
+const range = (start, size) => size === 1 ? hex(start) : `${hex(start)}..${hex(start + size - 1)}`
 
-function headerSize () {
-  const header = load('schemas/common/file_header.ksy')
-  return header.data.seq.reduce((sum, field) => sum + fixedSize(field, header), 0)
+function link (from, to, label, anchor = '') {
+  const relative = path.relative(path.dirname(from), to).split(path.sep).join('/')
+  return `[${escape(label)}](${relative || path.basename(to)}${anchor ? `#${anchor}` : ''})`
 }
 
-function range (from, size, relative = false) {
-  const prefix = relative ? '+' : ''
-  const first = `${prefix}0x${from.toString(16).padStart(2, '0')}`
-  if (size === 1) return first
-  const last = `${prefix}0x${(from + size - 1).toString(16).padStart(2, '0')}`
-  return `${first}..${last}`
+function component (entry, kind) {
+  const name = entry.data.seq.find(field => field.id === 'body').type.cases[`file_header::file_kind::${kind}`]
+  assert.ok(name, `missing ${kind} dispatch in ${entry.file}`)
+  return resolve(entry, name)[0]
 }
 
-function renderThemeLayout () {
-  const theme = load('schemas/file-versions/1.0.2/theme.ksy')
-  const headerBytes = headerSize()
-  const color = theme.data.types.color
-  const colorSize = fixedSize({ type: 'color' }, theme)
-  const fields = sequenceLayout(theme.data.seq, theme, headerBytes)
-  const lines = [
-    '## Layout',
-    '',
-    'Offsets are absolute file offsets.',
-    '',
-    '| Name | Offset / Range | Size | Type |',
-    '| --- | --- | ---: | --- |',
-    `| M8 File Header | \`${range(0, headerBytes)}\` | ${headerBytes} | [M8 File Header](FILE_HEADER.md) |`
-  ]
-
-  for (const field of fields) {
-    const name = field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
-    lines.push(`| \`${name}\` | \`${range(field.from, field.size)}\` | ${field.size} | [\`Color\`](#color) |`)
+function graph (entry) {
+  const seen = new Set()
+  const visit = context => {
+    if (seen.has(context)) return
+    seen.add(context)
+    context.imports.forEach(visit)
   }
+  visit(entry)
+  return [...seen].sort((a, b) => a.file.localeCompare(b.file, 'en'))
+}
 
-  lines.push('', '### Color', '', 'Offsets are relative to the start of each `Color`.', '',
-    '| Name | Relative Offset | Size | Type |', '| --- | --- | ---: | --- |')
-  for (const field of sequenceLayout(color.seq, theme, 0)) {
-    const component = color.seq.find(item => item.id === field.id)
-    assert.ok(component, `missing color component ${field.id}`)
-    lines.push(`| \`${field.id}\` | \`${range(field.from, field.size, true)}\` | ${field.size} | \`${component.type}\` |`)
+// Variable lengths propagate instead of producing guessed subsequent offsets.
+function sizeOf (field, context, stack = new Set()) {
+  if (field.if !== undefined || field['size-eos']) return null
+  let size
+  if (field.size !== undefined) size = Number.isInteger(field.size) ? field.size : null
+  else if (field.contents !== undefined) size = typeof field.contents === 'string'
+    ? Buffer.byteLength(field.contents, 'utf8') : field.contents.length
+  else if (field.type === undefined || field.type === 'strz') size = null
+  else if (typeof field.type === 'object') {
+    const sizes = Object.values(field.type.cases).map(type => sizeOf({ type }, context, stack))
+    size = sizes.length && sizes.every(value => value === sizes[0]) ? sizes[0] : null
+  } else if (/^[us][1248](le|be)?$|^f[48](le|be)?$/.test(field.type)) size = Number(field.type[1])
+  else {
+    const [owner, definition] = resolve(context, field.type)
+    if (stack.has(definition)) return null
+    const nested = new Set(stack).add(definition)
+    const sizes = (definition.seq || []).map(child => sizeOf(child, owner, nested))
+    size = sizes.includes(null) ? null : sizes.reduce((a, b) => a + b, 0)
   }
-  return `${lines.join('\n')}\n`
-}
-
-function replaceSection (source, file, startHeading, endHeading, rendered) {
-  const startToken = `\n${startHeading}\n`
-  const endToken = `\n${endHeading}\n`
-  const start = source.indexOf(startToken)
-  const end = source.indexOf(endToken, start + startToken.length)
-  assert.ok(start !== -1 && end > start, `${file}: missing ${startHeading} or ${endHeading} heading`)
-  assert.equal(source.indexOf(startToken, start + 1), -1, `duplicate ${startHeading} heading`)
-  assert.equal(source.indexOf(endToken, end + 1), -1, `duplicate ${endHeading} heading`)
-  return source.slice(0, start + 1) + rendered + source.slice(end)
-}
-
-function generateThemeDoc (source) {
-  return replaceSection(source, themeDocPath, '## Layout', '## Notes', renderThemeLayout())
-}
-
-function renderScaleLayout () {
-  const scale = load('schemas/file-versions/4.0.1/scale.ksy')
-  const headerBytes = headerSize()
-  const fields = sequenceLayout(scale.data.seq, scale, headerBytes)
-  const lines = [
-    '## Layout',
-    '',
-    'Offsets are absolute file offsets.',
-    '',
-    '| Name | Offset / Range | Size | Type |',
-    '| --- | --- | ---: | --- |',
-    `| M8 File Header | \`${range(0, headerBytes)}\` | ${headerBytes} | [M8 File Header](FILE_HEADER.md) |`
-  ]
-  const typeLabels = {
-    enabled_notes: '[Enabled Notes](#enabled-notes)',
-    name: '[Fixed String](#fixed-string)'
+  if (field.repeat) {
+    if (field.repeat !== 'expr' || !Number.isInteger(field['repeat-expr'])) return null
+    if (size !== null) size *= field['repeat-expr']
   }
-  fields.forEach((field, index) => {
-    const schemaField = scale.data.seq[index]
-    const name = field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
-    let type = typeLabels[field.id]
-    if (!type && scale.data.types[schemaField.type]) {
-      const typeName = schemaField.type.replace(/^./, letter => letter.toUpperCase())
-      type = `[${typeName}](#${schemaField.type})`
-      if (schemaField.repeat) type += ` \`[${schemaField['repeat-expr']}]\``
+  return size
+}
+
+function enumOwner (context, name) {
+  const parts = name.split('::')
+  if (parts.length === 2) {
+    const owner = context.imports.find(item => item.data.meta.id === parts[0])
+    assert.ok(owner?.data.enums?.[parts[1]], `unresolved enum ${name}`)
+    return [owner, parts[1]]
+  }
+  assert.ok(context.data.enums?.[name], `unresolved enum ${name}`)
+  return [context, name]
+}
+
+function renderTarget (firmware, target) {
+  const entry = load(path.resolve(root, target.entry))
+  const output = path.join(root, 'docs')
+  const modules = graph(entry)
+  const pages = new Map(modules.map(context => {
+    const relative = path.relative(schemaRoot, context.file)
+    assert.ok(!relative.startsWith('..'), 'schema import outside schemas directory')
+    return [context, path.join(output, relative.replace(/\.ksy$/, '.md'))]
+  }))
+  const index = pages.get(entry)
+  const typeLink = (file, context, type) => {
+    if (/^[us][1248](le|be)?$|^f[48](le|be)?$|^strz?$/.test(type)) return code(type)
+    const [owner, definition] = resolve(context, type)
+    const id = definition === owner.data ? 'layout' : `type-${type.split('::').at(-1)}`
+    return link(file, pages.get(owner), type, id)
+  }
+  const fieldType = (file, context, field) => {
+    let result = field.type === undefined ? 'bytes' : typeof field.type === 'object'
+      ? `switch on ${code(field.type['switch-on'])}: ` + Object.entries(field.type.cases)
+        .map(([value, type]) => `${code(value)}: ${typeLink(file, context, type)}`).join('; ')
+      : typeLink(file, context, field.type)
+    if (field.enum) {
+      const [owner, name] = enumOwner(context, field.enum)
+      result += `; ${link(file, pages.get(owner), name, `enum-${name}`)}`
     }
-    if (!type) type = `\`${schemaField.type}\``
-    lines.push(`| \`${name}\` | \`${range(field.from, field.size)}\` | ${field.size} | ${type} |`)
-  })
-  return `${lines.join('\n')}\n`
+    return result
+  }
+  const attributes = field => Object.entries(field)
+    .filter(([key]) => !['id', 'doc', 'type', 'enum'].includes(key))
+    .map(([key, value]) => `${code(key)}: ${code(text(value))}`).join('; ') || '-'
+  const layout = (file, context, seq, start = 0) => {
+    let offset = start
+    const lines = ['| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |',
+      '| --- | --- | ---: | --- | --- | --- |']
+    for (const field of seq) {
+      const size = sizeOf(field, context)
+      const position = offset === null ? 'dynamic' : size === null ? `${hex(offset)} onward` : range(offset, size)
+      lines.push(`| ${code(field.id)} | ${code(position)} | ${size === null ? 'variable' : size} | ${fieldType(file, context, field)} | ${attributes(field)} | ${escape(field.doc || '')} |`)
+      offset = size === null || offset === null ? null : offset + size
+    }
+    return lines
+  }
+  const preamble = (file, heading) => [`# ${heading}`, '',
+    'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
+    link(file, path.join(output, 'README.md'), 'Documentation index'), '']
+  const outputs = new Map()
+  for (const context of modules) {
+    const file = pages.get(context)
+    const data = context.data
+    const lines = [...preamble(file, data.meta.id),
+      `Source: ${link(file, context.file, path.relative(root, context.file))}.`, '',
+      `Byte order: ${code(data.meta.endian || 'unspecified')}.`, '', data.doc || '', '']
+    const version = path.relative(schemaRoot, context.file).match(/^file-versions[/\\]([^/\\]+)/)?.[1]
+    if (version) lines.push(`File schema version: ${code(version)}.`, '')
+    if (context.imports.length) lines.push('## Imports', '', ...context.imports.map(imported =>
+      `- ${link(file, pages.get(imported), imported.data.meta.id)}`), '')
+    lines.push('## Contents', '', `- ${link(file, file, 'Layout', 'layout')}`,
+      ...Object.keys(data.types || {}).map(name => `- ${link(file, file, name, `type-${name}`)}`),
+      ...Object.keys(data.enums || {}).map(name => `- ${link(file, file, `${name} (enum)`, `enum-${name}`)}`), '')
+    const renderDefinition = (definition, heading, anchor) => {
+      const sectionTitle = anchor === 'layout' ? 'Layout' : `Type: ${anchor.slice(5)}`
+      lines.push(`## ${sectionTitle}`, '', heading, '', definition.doc || '', '')
+      if (definition.seq) lines.push('Offsets are relative to the start of this record. Repeated-field sizes include all entries.', '',
+        ...layout(file, context, definition.seq), '')
+      if (definition.instances) {
+        lines.push('### Instances', '', 'Value expressions do not consume bytes. Positioned instances read the specified location.', '',
+          '| Name | Type | Expression / Position / Rules | Description |', '| --- | --- | --- | --- |')
+        for (const [name, instance] of Object.entries(definition.instances)) lines.push(
+          `| ${code(name)} | ${instance.type || instance.enum ? fieldType(file, context, instance).replace(/^bytes;/, 'derived;') : 'derived'} | ${attributes(instance)} | ${escape(instance.doc || '')} |`)
+        lines.push('')
+      }
+      const extras = Object.fromEntries(Object.entries(definition).filter(([key]) =>
+        !['meta', 'seq', 'instances', 'types', 'enums', 'doc'].includes(key)))
+      if (Object.keys(extras).length) lines.push('Additional schema attributes:', '', '```json', JSON.stringify(extras, null, 2), '```', '')
+    }
+    renderDefinition({ ...data, doc: undefined }, 'Root record.', 'layout')
+    for (const [name, definition] of Object.entries(data.types || {})) renderDefinition(definition, code(name), `type-${name}`)
+    for (const [name, entries] of Object.entries(data.enums || {})) {
+      lines.push(`## Enum: ${name}`, '', code(name), '', '| Stored Value | Identifier | M8 Label | Description |', '| --- | --- | --- | --- |')
+      for (const [value, entry] of Object.entries(entries).sort(([a], [b]) => Number(a) - Number(b))) {
+        const item = typeof entry === 'object' ? entry : { id: entry }
+        lines.push(`| ${code(hex(Number(value)))} | ${code(item.id)} | ${escape(item['-label'] || '')} | ${escape(item.doc || '')} |`)
+      }
+      lines.push('')
+    }
+    outputs.set(file, lines.join('\n').trimEnd() + '\n')
+  }
+  const headerField = entry.data.seq.find(field => field.id === 'header')
+  const headerSize = sizeOf(headerField, entry)
+  assert.ok(Number.isInteger(headerSize), 'file header must have fixed size')
+  const indexLines = [...preamble(index, `M8 ${firmware} File Reference`),
+    `Firmware range: **${firmware}**. Verified release: **${target.verifiedFirmware}**.`, '',
+    `Entry schema: ${link(index, entry.file, target.entry)}.`, '',
+    '## Files', '', '| File Kind | File Schema Version | Schema |', '| --- | --- | --- |']
+  for (const kind of kinds) {
+    const context = component(entry, kind)
+    const version = path.relative(schemaRoot, context.file).split(path.sep)[1]
+    indexLines.push(`| ${link(index, index, kind, kind)} | ${code(version)} | ${link(index, pages.get(context), context.data.meta.id)} |`)
+  }
+  for (const kind of kinds) {
+    const context = component(entry, kind)
+    const bodySize = sizeOf({ type: context.data.meta.id }, entry)
+    indexLines.push('', `## ${kind}`, '',
+      `Header: ${headerSize} bytes. Body: ${bodySize === null ? 'variable' : `${bodySize} bytes`}.`, '',
+      `Definition: ${link(index, pages.get(context), context.data.meta.id)}.`, '',
+      'Offsets are absolute file offsets. Follow type links for relative record layouts.', '',
+      ...layout(index, entry, [headerField]), ...layout(index, context, context.data.seq, headerSize).slice(2), '')
+    if (target.research?.[kind]) indexLines.push(link(index, path.resolve(root, target.research[kind]), 'Fixture observations and research history'), '')
+  }
+  indexLines.push('', '## Layout', '', 'Entry dispatch; offsets are absolute file offsets.', '', ...layout(index, entry, entry.data.seq), '',
+    '## Components', '', ...modules.filter(context => context !== entry).map(context => `- ${link(index, pages.get(context), context.data.meta.id)}`), '',
+    'Component links follow schema imports. Unchanged schemas and their documentation are shared across firmware entries.', '',
+    'Unknown byte ranges retain their schema names. Stable fixture values do not establish that bytes are unused.', '')
+  outputs.set(index, indexLines.join('\n'))
+  return outputs
 }
 
-function generateScaleDoc (source) {
-  return replaceSection(source, scaleDocPath, '## Layout', '### Enabled Notes', renderScaleLayout())
+function validateTargets (catalog) {
+  for (const [firmware, target] of Object.entries(catalog)) {
+    assert.match(firmware, /^\d+\.\d+\.x$/)
+    assert.ok(target.verifiedFirmware.startsWith(firmware.slice(0, -1)), 'firmware provenance mismatch')
+    assert.equal(path.resolve(root, target.entry), path.join(schemaRoot, `${firmware}.ksy`), 'entry must be schemas/<firmware-range>.ksy')
+  }
+}
+
+function generate (catalog = targets, { check = false, firmware } = {}) {
+  validateTargets(catalog)
+  assert.ok(!firmware || catalog[firmware], `unsupported firmware target: ${firmware}`)
+  const selected = firmware ? [[firmware, catalog[firmware]]] : Object.entries(catalog)
+  const outputs = new Map()
+  for (const [name, target] of selected) {
+    for (const [file, content] of renderTarget(name, target)) {
+      if (outputs.has(file)) assert.equal(outputs.get(file), content, `conflicting shared documentation: ${file}`)
+      outputs.set(file, content)
+    }
+  }
+  const existingMarkdown = directory => fs.existsSync(directory)
+    ? fs.readdirSync(directory, { withFileTypes: true }).flatMap(item => {
+      const file = path.join(directory, item.name)
+      return item.isDirectory() ? existingMarkdown(file) : item.name.endsWith('.md') ? [file] : []
+    }) : []
+  // Only a full run can classify shared outputs as obsolete.
+  if (!firmware) for (const directory of ['common', 'file-versions']) {
+    for (const file of existingMarkdown(path.join(root, 'docs', directory))) {
+      assert.ok(outputs.has(file), `unexpected generated page ${file}; review obsolete outputs before removing them`)
+    }
+  }
+  for (const [file, content] of outputs) {
+    if (check) assert.equal(fs.readFileSync(file, 'utf8'), content, `${file} is stale; run npm run docs:generate`)
+    else {
+      fs.mkdirSync(path.dirname(file), { recursive: true })
+      fs.writeFileSync(file, content)
+    }
+  }
+  return outputs
 }
 
 if (require.main === module) {
-  const check = process.argv.includes('--check')
-  assert.ok(process.argv.length === 2 || (process.argv.length === 3 && check),
-    'usage: node tools/generate-docs.js [--check]')
-  for (const [file, generate] of [
-    [themeDocPath, generateThemeDoc],
-    [scaleDocPath, generateScaleDoc]
-  ]) {
-    const current = fs.readFileSync(file, 'utf8')
-    const generated = generate(current)
-    if (check) {
-      assert.equal(current, generated, `${file} is stale; run npm run docs:generate`)
-    } else if (current !== generated) {
-      fs.writeFileSync(file, generated)
-      console.log(`updated\t${file}`)
-    } else {
-      console.log(`unchanged\t${file}`)
-    }
+  const options = {}
+  const args = process.argv.slice(2)
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--check') options.check = true
+    else if (args[i] === '--firmware' && args[i + 1] && !options.firmware) options.firmware = args[++i]
+    else throw new Error('usage: generate-docs.js [--check] [--firmware 6.5.x]')
   }
-  if (check) console.log('generated_docs\tok\t2 files')
+  console.log(`generated_docs\tok\t${generate(targets, options).size} files`)
 }
 
-module.exports = { generateThemeDoc, generateScaleDoc }
+module.exports = { renderTarget, generate, validateTargets, sizeOf, graph }

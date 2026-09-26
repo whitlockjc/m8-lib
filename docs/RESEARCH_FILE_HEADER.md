@@ -1,5 +1,11 @@
 # M8 File Header
 
+Historical 6.5.x research reference, retained to preserve fixture evidence and
+interpretation. Tables here are research snapshots, not the maintained schema
+reference. Use the [generated firmware reference](6.5.x.md) for current
+field layouts, types, and enum catalogs.
+
+
 Human-readable schema reference for the shared M8 file header.
 
 ## Schema

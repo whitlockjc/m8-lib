@@ -1,5 +1,11 @@
 # Song
 
+Historical 6.5.x research reference, retained to preserve fixture evidence and
+interpretation. Tables here are research snapshots, not the maintained schema
+reference. Use the [generated firmware reference](6.5.x.md) for current
+field layouts, types, and enum catalogs.
+
+
 Human-readable schema reference for M8 Song files.
 
 This document starts with fields mapped from the Project, MIDI Settings, Song
@@ -41,7 +47,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| M8 File Header | `0x0000..0x000d` | 14 | [M8 File Header](FILE_HEADER.md) |
+| M8 File Header | `0x0000..0x000d` | 14 | [M8 File Header](RESEARCH_FILE_HEADER.md) |
 | `directoryRegion` | `0x000e..0x008d` | 128 | [Directory Region](#directory-region) |
 | `project` | `0x008e..0x00be` | 49 | [Project Settings](#project-settings) |
 | `unknownBetweenProjectAndMixer` | `0x00bf..0x00cd` | 15 | unknown bytes |
@@ -269,15 +275,15 @@ Offsets are relative to the start of a Phrase step.
 | `note` | `+0x00` | 1 | `u1` |
 | `volume` | `+0x01` | 1 | `u1` |
 | `instrument` | `+0x02` | 1 | `u1` |
-| `fx[0..2]` | `+0x03..+0x08` | 6 | [FX Slot](FX_COMMANDS.md#storage) `[3]` |
+| `fx[0..2]` | `+0x03..+0x08` | 6 | [FX Slot](RESEARCH_FX_COMMANDS.md#storage) `[3]` |
 
 The default step bytes are `ff ff ff ff 00 ff 00 ff 00`. The observed unset
 value for `note`, `volume`, `instrument`, and FX command bytes is `0xff`. The
 FX value bytes default to `0x00`.
 
 The `PHRASES.m8s` fixture verifies Sequencer and Mixer/Effects command byte
-values in the shared two-byte [FX Slot](FX_COMMANDS.md#storage) layout. See
-[FX Commands](FX_COMMANDS.md) for contextual labels and values.
+values in the shared two-byte [FX Slot](RESEARCH_FX_COMMANDS.md#storage) layout. See
+[FX Commands](RESEARCH_FX_COMMANDS.md) for contextual labels and values.
 
 ### Bookmarks
 
@@ -374,7 +380,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `entries[0..255]` | `0xba3e..0x13a3d` | 32768 | [Instrument Table](INSTRUMENT.md#instrument-table) |
+| `entries[0..255]` | `0xba3e..0x13a3d` | 32768 | [Instrument Table](RESEARCH_INSTRUMENT.md#instrument-table) |
 
 Every Table in `INSTRUMENTS.m8s` has the standalone default Table bytes. This
 verifies the record shape and region boundaries. The M8's documented indexing
@@ -406,7 +412,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `entries[0..127]` | `0x13a3e..0x1a5bd` | 27520 | [Instrument Data](INSTRUMENT.md#common-layout) |
+| `entries[0..127]` | `0x13a3e..0x1a5bd` | 27520 | [Instrument Data](RESEARCH_INSTRUMENT.md#common-layout) |
 
 The `INSTRUMENTS.m8s` fixture verifies both boundaries:
 
@@ -427,7 +433,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| `entries[0..15]` | `0x1aa7e..0x1ad5d` | 736 | [Scale Body](SCALE.md#layout) `[16]` |
+| `entries[0..15]` | `0x1aa7e..0x1ad5d` | 736 | [Scale Body](RESEARCH_SCALE.md#layout) `[16]` |
 
 The `SCALES.m8s` fixture verifies:
 
@@ -439,7 +445,7 @@ The `SCALES.m8s` fixture verifies:
 Although the test note originally named Scale `0x04`, byte evidence from the
 fixture stores `IWATO` in slot `0x0f`.
 
-Song entries import the same 46-byte [Scale body](SCALE.md#layout) as a
+Song entries import the same 46-byte [Scale body](RESEARCH_SCALE.md#layout) as a
 standalone `.m8n` file, without its 14-byte file header. The standalone Scale
 reference defines the interval and tuning offset layout for both contexts.
 

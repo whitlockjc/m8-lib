@@ -6,6 +6,12 @@ Dirtywave M8 file schemas.
 This is a rough draft. It is expected to change as fixture-based research
 reveals how M8 files are actually structured.
 
+Firmware-specific documentation targets and the process for adding 6.6.x are
+defined in [Documentation Generation](DOCUMENTATION_GENERATION.md). Existing
+6.5.x references remain stable; new targets get separate firmware entry pages
+and reuse component documents according to their schema imports. Generated
+Markdown mirrors the schema paths directly beneath `docs/`.
+
 ## Goal
 
 Create canonical M8 file schemas that are human-readable, computer-parseable,
@@ -249,8 +255,8 @@ Defer broad schema reorganization until after the Song file is structurally
 mapped. Song is expected to expose the final reuse boundaries because it embeds
 or references many structures that also appear in standalone files.
 
-The [6.5.x schema review](SCHEMA_REVIEW.md) catalogs manual-aligned concepts,
-fixture-backed storage boundaries, and a proposed incremental file split.
+The manual-aligned schema split is implemented. The generated
+[6.5.x reference](6.5.x.md) follows those reusable component boundaries.
 
 After Song research, review the schemas and documentation for shared components:
 

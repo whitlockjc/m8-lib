@@ -10,7 +10,7 @@ function load (file) {
   if (cache.has(absolute)) return cache.get(absolute)
 
   const data = YAML.parse(fs.readFileSync(absolute, 'utf8'))
-  const context = { data, imports: [] }
+  const context = { data, imports: [], file: absolute }
   cache.set(absolute, context)
   context.imports = (data.meta.imports || []).map(name =>
     load(path.resolve(path.dirname(absolute), `${name}.ksy`)))

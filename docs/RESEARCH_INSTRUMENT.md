@@ -1,5 +1,11 @@
 # Instrument
 
+Historical 6.5.x research reference, retained to preserve fixture evidence and
+interpretation. Tables here are research snapshots, not the maintained schema
+reference. Use the [generated firmware reference](6.5.x.md) for current
+field layouts, types, and enum catalogs.
+
+
 Human-readable schema reference for M8 Instrument files.
 
 This document describes the structurally complete 6.5.x Instrument file schema.
@@ -43,7 +49,7 @@ Completed structural coverage:
 Remaining work is semantic rather than container-structural:
 
 - finish FX command-family labels, byte values, availability, and amount
-  semantics in [FX Commands](FX_COMMANDS.md),
+  semantics in [FX Commands](RESEARCH_FX_COMMANDS.md),
 - classify preserved bytes as `field`, `state`, `cache`, `reserved`,
   `padding`, or `unknown` when targeted fixtures provide evidence.
 
@@ -53,7 +59,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| M8 File Header | `0x00..0x0d` | 14 | [M8 File Header](FILE_HEADER.md) |
+| M8 File Header | `0x00..0x0d` | 14 | [M8 File Header](RESEARCH_FILE_HEADER.md) |
 | `instrument_data` | `0x0e..0xe4` | 215 | instrument record |
 | `general_settings` | `0x0e..0x1c` | 15 | [General Instrument Settings](#general-instrument-settings) |
 | `general_settings.type` | `0x0e` | 1 | [Instrument Type](#instrument-type) |
@@ -84,7 +90,7 @@ the same offsets in the 215-byte record. The first four form the
 type-specific body. NONE does not expose all of these settings for editing.
 
 The `eq` value selects an EQ bank. The 128 bank definitions are stored
-separately in a [Song](SONG.md#instrument-eqs); the Instrument record stores
+separately in a [Song](RESEARCH_SONG.md#instrument-eqs); the Instrument record stores
 the assignment, not the EQ's three-band definition.
 
 ### Instrument Type
@@ -544,7 +550,7 @@ The M8 manual groups `dry`, `mod_fx`, `delay`, and `reverb` as instrument Mixer
 Parameters. Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External
 use the same four-byte `mixer_params` layout immediately after their Amplifier
 Settings, at the type-dependent offsets shown above. This is not the Song's
-master [Mixer](SONG.md#mixer). MIDI Out and NONE do not expose this group;
+master [Mixer](RESEARCH_SONG.md#mixer). MIDI Out and NONE do not expose this group;
 their preserved bytes are not assigned instrument mixer semantics.
 
 Offsets are relative to the start of `mixer`.
@@ -760,7 +766,7 @@ Offsets are relative to the start of a table row.
 | --- | --- | ---: | --- |
 | `transpose` | `+0x00` | 1 | `u1` |
 | `volume` | `+0x01` | 1 | `u1` |
-| `fx[0..2]` | `+0x02..+0x07` | 6 | [FX Slot](FX_COMMANDS.md#storage) `[3]` |
+| `fx[0..2]` | `+0x02..+0x07` | 6 | [FX Slot](RESEARCH_FX_COMMANDS.md#storage) `[3]` |
 
 The `WAV_TABLE.m8i`, `MAC_TABLE.m8i`, `SAM_TABLE.m8i`, `MID_TABLE.m8i`,
 `FM_TABLE.m8i`, `HYP_TABLE.m8i`, `EXT_TABLE.m8i`, and `NONE_TABLE.m8i`
@@ -770,10 +776,10 @@ provided, then leave the remaining FX slots at their baseline values.
 `NONE_TABLE.m8i` leaves every FX slot unset, so it verifies the FX slot layout
 but not the available command-family values for NONE tables.
 
-Each slot uses the shared two-byte [FX Slot](FX_COMMANDS.md#storage) layout.
+Each slot uses the shared two-byte [FX Slot](RESEARCH_FX_COMMANDS.md#storage) layout.
 Its second byte is named `value` in the raw schema; the M8 table UI may call
 that value an amount. Command labels and availability depend on the active
-instrument and command family. See [FX Commands](FX_COMMANDS.md) for the
+instrument and command family. See [FX Commands](RESEARCH_FX_COMMANDS.md) for the
 contextual model and verification plan.
 Parsed-fixture checks compare every row and FX slot of every standalone
 Instrument fixture with the corresponding raw bytes.
@@ -1030,7 +1036,7 @@ verifies `TRACK 8 = 0x87`.
 
 The `WAV_TABLE.m8i` fixture verifies the following Wavsynth table command
 values. This fixture focuses on instrument table command storage and does not
-exhaustively cover every [FX command family](FX_COMMANDS.md). `SNC` and `ERR`
+exhaustively cover every [FX command family](RESEARCH_FX_COMMANDS.md). `SNC` and `ERR`
 are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
@@ -1061,7 +1067,7 @@ are non-contiguous with the surrounding verified command range.
 
 The `MAC_TABLE.m8i` fixture verifies the following Macrosynth table command
 values. This fixture focuses on instrument table command storage and does not
-exhaustively cover every [FX command family](FX_COMMANDS.md). `TRG` and `ERR`
+exhaustively cover every [FX command family](RESEARCH_FX_COMMANDS.md). `TRG` and `ERR`
 are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
@@ -1092,7 +1098,7 @@ are non-contiguous with the surrounding verified command range.
 
 The `SAM_TABLE.m8i` fixture verifies the following Sampler table command
 values. This fixture focuses on instrument table command storage and does not
-exhaustively cover every [FX command family](FX_COMMANDS.md). `SLI` and `ERR`
+exhaustively cover every [FX command family](RESEARCH_FX_COMMANDS.md). `SLI` and `ERR`
 are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
@@ -1123,7 +1129,7 @@ are non-contiguous with the surrounding verified command range.
 
 The `FM_TABLE.m8i` fixture verifies the following FM Synth table command
 values. This fixture focuses on instrument table command storage and does not
-exhaustively cover every [FX command family](FX_COMMANDS.md). `SNC` and `ERR`
+exhaustively cover every [FX command family](RESEARCH_FX_COMMANDS.md). `SNC` and `ERR`
 are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
@@ -1154,7 +1160,7 @@ are non-contiguous with the surrounding verified command range.
 
 The `MID_TABLE.m8i` fixture verifies the following MIDI Out table command
 values. This fixture focuses on instrument table command storage and does not
-exhaustively cover every [FX command family](FX_COMMANDS.md).
+exhaustively cover every [FX command family](RESEARCH_FX_COMMANDS.md).
 
 | Name | Stored Value |
 | --- | --- |
@@ -1180,7 +1186,7 @@ exhaustively cover every [FX command family](FX_COMMANDS.md).
 
 The `HYP_TABLE.m8i` fixture verifies the following Hypersynth table command
 values. This fixture focuses on instrument table command storage and does not
-exhaustively cover every [FX command family](FX_COMMANDS.md). `SNC` and `ERR`
+exhaustively cover every [FX command family](RESEARCH_FX_COMMANDS.md). `SNC` and `ERR`
 are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
@@ -1211,7 +1217,7 @@ are non-contiguous with the surrounding verified command range.
 
 The `EXT_TABLE.m8i` fixture verifies the following External table command
 values. This fixture focuses on instrument table command storage and does not
-exhaustively cover every [FX command family](FX_COMMANDS.md). `ADD` and `CHD`
+exhaustively cover every [FX command family](RESEARCH_FX_COMMANDS.md). `ADD` and `CHD`
 are non-contiguous with the surrounding verified command range.
 
 | Name | Stored Value |
@@ -1242,7 +1248,7 @@ are non-contiguous with the surrounding verified command range.
 
 The `NONE_TABLE.m8i` fixture leaves every table FX command unset. This verifies
 that the NONE table uses the standard FX slot layout, but it does not identify
-available command values from any [FX command family](FX_COMMANDS.md).
+available command values from any [FX command family](RESEARCH_FX_COMMANDS.md).
 
 | Name | Stored Value |
 | --- | --- |

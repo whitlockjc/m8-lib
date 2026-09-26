@@ -1,5 +1,11 @@
 # Theme
 
+Historical 6.5.x research reference, retained to preserve fixture evidence and
+interpretation. Tables here are research snapshots, not the maintained schema
+reference. Use the [generated firmware reference](6.5.x.md) for current
+field layouts, types, and enum catalogs.
+
+
 Human-readable schema reference for M8 Theme files.
 
 ## Schema
@@ -22,7 +28,7 @@ Offsets are absolute file offsets.
 
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
-| M8 File Header | `0x00..0x0d` | 14 | [M8 File Header](FILE_HEADER.md) |
+| M8 File Header | `0x00..0x0d` | 14 | [M8 File Header](RESEARCH_FILE_HEADER.md) |
 | `background` | `0x0e..0x10` | 3 | [`Color`](#color) |
 | `textEmpty` | `0x11..0x13` | 3 | [`Color`](#color) |
 | `textInfo` | `0x14..0x16` | 3 | [`Color`](#color) |

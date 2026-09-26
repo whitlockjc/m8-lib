@@ -1,5 +1,11 @@
 # FX Commands
 
+Historical 6.5.x research reference, retained to preserve fixture evidence and
+interpretation. Tables here are research snapshots, not the maintained schema
+reference. Use the [generated firmware reference](6.5.x.md) for current
+field layouts, types, and enum catalogs.
+
+
 This document describes how M8 FX commands should be organized while the stored
 byte values are being researched.
 
@@ -152,7 +158,7 @@ schemas.
 
 The Current Instrument group also includes command labels that map to the active
 instrument's parameters. The currently verified command subsets live in
-[INSTRUMENT.md](INSTRUMENT.md):
+[INSTRUMENT.md](RESEARCH_INSTRUMENT.md):
 
 | Instrument | Verified Table Fixture |
 | --- | --- |

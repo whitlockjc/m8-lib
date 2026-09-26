@@ -1,0 +1,12 @@
+{
+  "6.5.x": {
+    "entry": "schemas/6.5.x.ksy",
+    "verifiedFirmware": "6.5.2C",
+    "research": {
+      "theme": "docs/RESEARCH_THEME.md",
+      "scale": "docs/RESEARCH_SCALE.md",
+      "instrument": "docs/RESEARCH_INSTRUMENT.md",
+      "song": "docs/RESEARCH_SONG.md"
+    }
+  }
+}

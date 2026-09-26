@@ -89,6 +89,11 @@ Use these top-level directories as the project grows:
   in document names or contents when a note is version-specific. Use
   `docs/RESEARCH_BACKLOG.md` for observed behavior that still needs targeted
   fixtures or schema evidence.
+  Generated references mirror `schemas/` directly: `docs/6.5.x.md` links to
+  shared `docs/common/` and `docs/file-versions/` components. Keep
+  developer-facing design and research notes at the top
+  level. Edit schemas, then run `npm run docs:generate`; do not edit generated
+  references by hand. See `docs/DOCUMENTATION_GENERATION.md` for target setup.
 - `schemas/`: canonical language-agnostic schemas. Use top-level
   `{MAJOR}.{MINOR}.x` entry schemas for M8 firmware ranges, and organize
   reusable component schemas by M8 file header schema version.

@@ -1,0 +1,187 @@
+# song_mixer_effects_6_5_0
+
+Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
+
+[Documentation index](../../../README.md)
+
+Source: [schemas/file-versions/6.5.0/song/mixer_effects.ksy](../../../../schemas/file-versions/6.5.0/song/mixer_effects.ksy).
+
+Byte order: `le`.
+
+Mixer, Effects Settings, and Mix & Limiter Scope layouts for Song file
+schema version 6.5.0. The Song body determines their positions.
+
+
+File schema version: `6.5.0`.
+
+## Contents
+
+- [Layout](mixer_effects.md#layout)
+- [mixer_settings](mixer_effects.md#type-mixer_settings)
+- [effects_and_scope_settings](mixer_effects.md#type-effects_and_scope_settings)
+- [mod_fx_settings](mixer_effects.md#type-mod_fx_settings)
+- [delay_settings](mixer_effects.md#type-delay_settings)
+- [reverb_settings](mixer_effects.md#type-reverb_settings)
+- [mix_limiter_scope_settings](mixer_effects.md#type-mix_limiter_scope_settings)
+- [mixer_sends](mixer_effects.md#type-mixer_sends)
+- [mod_fx_type (enum)](mixer_effects.md#enum-mod_fx_type)
+- [dj_filter_type (enum)](mixer_effects.md#enum-dj_filter_type)
+
+## Layout
+
+Root record.
+
+
+
+## Type: mixer_settings
+
+`mixer_settings`
+
+Mixer and Mix & Limiter Scope storage. Offsets are relative to absolute
+file offset 0x00ce in 6.5.x fixtures.
+
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `mix` | `0x00` | 1 | `u1` | - |  |
+| `limiter` | `0x01` | 1 | `u1` | - |  |
+| `track_volumes` | `0x02..0x09` | 8 | `u1` | `repeat`: `expr`; `repeat-expr`: `8` |  |
+| `sends` | `0x0a..0x0c` | 3 | [mixer_sends](mixer_effects.md#type-mixer_sends) | - |  |
+| `analog_input_volume` | `0x0d` | 1 | `u1` | - |  |
+| `analog_dual_mono_input_volume` | `0x0e` | 1 | `u1` | - | Default fixture stores 0xff. The M8 UI displays this as unset until dual mono input is enabled.  |
+| `usb_input_volume` | `0x0f` | 1 | `u1` | - |  |
+| `analog_input_sends` | `0x10..0x12` | 3 | [mixer_sends](mixer_effects.md#type-mixer_sends) | - |  |
+| `analog_dual_mono_input_sends` | `0x13..0x15` | 3 | [mixer_sends](mixer_effects.md#type-mixer_sends) | - |  |
+| `usb_input_sends` | `0x16..0x18` | 3 | [mixer_sends](mixer_effects.md#type-mixer_sends) | - |  |
+| `dj_filter` | `0x19` | 1 | `u1` | - |  |
+| `dj_filter_resonance` | `0x1a` | 1 | `u1` | - |  |
+| `dj_filter_type` | `0x1b` | 1 | `u1`; [dj_filter_type](mixer_effects.md#enum-dj_filter_type) | - |  |
+| `limiter_attack` | `0x1c` | 1 | `u1` | - |  |
+| `limiter_release` | `0x1d` | 1 | `u1` | - |  |
+| `soft_clip` | `0x1e` | 1 | `u1` | - | Observed values: 0x00 means OFF, 0x01 means ON.  |
+| `ott` | `0x1f` | 1 | `u1` | - |  |
+
+## Type: effects_and_scope_settings
+
+`effects_and_scope_settings`
+
+Shared storage region for the Effects Settings and Mix & Limiter Scope
+views. Offsets are relative to absolute file offset 0x1a5be in 6.5.x
+fixtures. Storage order does not fully match the UI grouping; the Mod FX
+type byte is stored after the Mix & Limiter Scope OTT detail bytes.
+
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `unknown_before_mod_fx` | `0x00..0x02` | 3 | bytes | `size`: `3` | Preserved bytes before the mapped Mod FX parameter bytes. |
+| `mod_fx` | `0x03..0x06` | 4 | [mod_fx_settings](mixer_effects.md#type-mod_fx_settings) | - |  |
+| `unknown_between_mod_fx_and_delay` | `0x07..0x0b` | 5 | bytes | `size`: `5` | Preserved bytes between Mod FX and Delay parameters. Historical &lt;https://github.com/whitlockjc/m8-js&gt; reference code treats part of this region as delay filter storage, but this fixture does not change those controls.  |
+| `delay` | `0x0c..0x10` | 5 | [delay_settings](mixer_effects.md#type-delay_settings) | - |  |
+| `unknown_between_delay_and_reverb` | `0x11..0x13` | 3 | bytes | `size`: `3` | Preserved bytes between Delay and Reverb parameters. Historical &lt;https://github.com/whitlockjc/m8-js&gt; reference code treats part of this region as reverb filter storage, but this fixture does not change those controls.  |
+| `reverb` | `0x14..0x19` | 6 | [reverb_settings](mixer_effects.md#type-reverb_settings) | - |  |
+| `mix_limiter_scope` | `0x1a..0x1b` | 2 | [mix_limiter_scope_settings](mixer_effects.md#type-mix_limiter_scope_settings) | - |  |
+| `mod_fx_type` | `0x1c` | 1 | `u1`; [mod_fx_type](mixer_effects.md#enum-mod_fx_type) | - |  |
+
+## Type: mod_fx_settings
+
+`mod_fx_settings`
+
+Mod FX parameter storage from the Effects Settings View. The Mod FX type
+byte is stored later in the shared Effects/Mix & Limiter Scope region.
+
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `depth` | `0x00` | 1 | `u1` | - |  |
+| `frequency` | `0x01` | 1 | `u1` | - |  |
+| `width` | `0x02` | 1 | `u1` | - |  |
+| `reverb_send` | `0x03` | 1 | `u1` | - |  |
+
+## Type: delay_settings
+
+`delay_settings`
+
+Delay parameter storage from the Effects Settings View.
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `time_left` | `0x00` | 1 | `u1` | - |  |
+| `time_right` | `0x01` | 1 | `u1` | - |  |
+| `feedback` | `0x02` | 1 | `u1` | - |  |
+| `width` | `0x03` | 1 | `u1` | - |  |
+| `reverb_send` | `0x04` | 1 | `u1` | - |  |
+
+## Type: reverb_settings
+
+`reverb_settings`
+
+Reverb parameter storage from the Effects Settings View.
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `room_size` | `0x00` | 1 | `u1` | - |  |
+| `decay` | `0x01` | 1 | `u1` | - |  |
+| `depth` | `0x02` | 1 | `u1` | - |  |
+| `frequency` | `0x03` | 1 | `u1` | - |  |
+| `width` | `0x04` | 1 | `u1` | - |  |
+| `shimmer` | `0x05` | 1 | `u1` | - |  |
+
+## Type: mix_limiter_scope_settings
+
+`mix_limiter_scope_settings`
+
+Mix & Limiter Scope storage for OTT detail controls from the Mix &
+Limiter Scope View. Offsets are relative to absolute file offset
+0x1a5d8 in 6.5.x fixtures.
+
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `ott_time` | `0x00` | 1 | `u1` | - |  |
+| `ott_color` | `0x01` | 1 | `u1` | - |  |
+
+## Type: mixer_sends
+
+`mixer_sends`
+
+
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `mod_fx` | `0x00` | 1 | `u1` | - |  |
+| `delay` | `0x01` | 1 | `u1` | - |  |
+| `reverb` | `0x02` | 1 | `u1` | - |  |
+
+## Enum: mod_fx_type
+
+`mod_fx_type`
+
+| Stored Value | Identifier | M8 Label | Description |
+| --- | --- | --- | --- |
+| `0x00` | `chorus` | CHORUS |  |
+| `0x01` | `phaser` | PHASER |  |
+| `0x02` | `flanger` | FLANGER |  |
+
+## Enum: dj_filter_type
+
+`dj_filter_type`
+
+| Stored Value | Identifier | M8 Label | Description |
+| --- | --- | --- | --- |
+| `0x00` | `lowpass_highpass` | LOWPASS:HIGHPASS |  |
+| `0x01` | `lowpass_bandstop` | LOWPASS:BANDSTOP |  |
+| `0x02` | `bandpass_highpass` | BANDPASS:HIGHPASS |  |
