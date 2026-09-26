@@ -100,6 +100,12 @@ function row (name, field, width = 2) {
 
 const scale = load('schemas/file-versions/4.0.1/scale.ksy')
 const scaleFields = sequenceLayout(scale.data.seq, scale, 14)
+const scaleBodySize = scaleFields.reduce((total, field) => total + field.size, 0)
+const scaleSizes = new Map(sectionRows('docs/SCALE.md', '## Schema')
+  .map(([name, value]) => [name, value]))
+assert.equal(scaleSizes.get('Total file size'), `${headerSize + scaleBodySize} bytes`)
+assert.equal(scaleSizes.get('Header size'), `${headerSize} bytes`)
+assert.equal(scaleSizes.get('Body size'), `${scaleBodySize} bytes`)
 assert.deepEqual(layoutRows('docs/SCALE.md', '## Layout'), [
   ['M8 File Header', '0x00..0x0d', 14],
   ...scaleFields.map(field => row(field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()), field))

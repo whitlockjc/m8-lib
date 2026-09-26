@@ -5,6 +5,12 @@ const fs = require('node:fs')
 const { load, fixedSize, sequenceLayout } = require('./ksy-layout')
 
 const themeDocPath = 'docs/THEME.md'
+const scaleDocPath = 'docs/SCALE.md'
+
+function headerSize () {
+  const header = load('schemas/common/file_header.ksy')
+  return header.data.seq.reduce((sum, field) => sum + fixedSize(field, header), 0)
+}
 
 function range (from, size, relative = false) {
   const prefix = relative ? '+' : ''
@@ -15,12 +21,11 @@ function range (from, size, relative = false) {
 }
 
 function renderThemeLayout () {
-  const header = load('schemas/common/file_header.ksy')
   const theme = load('schemas/file-versions/1.0.2/theme.ksy')
-  const headerSize = header.data.seq.reduce((sum, field) => sum + fixedSize(field, header), 0)
+  const headerBytes = headerSize()
   const color = theme.data.types.color
   const colorSize = fixedSize({ type: 'color' }, theme)
-  const fields = sequenceLayout(theme.data.seq, theme, headerSize)
+  const fields = sequenceLayout(theme.data.seq, theme, headerBytes)
   const lines = [
     '## Layout',
     '',
@@ -28,7 +33,7 @@ function renderThemeLayout () {
     '',
     '| Name | Offset / Range | Size | Type |',
     '| --- | --- | ---: | --- |',
-    `| M8 File Header | \`${range(0, headerSize)}\` | ${headerSize} | [M8 File Header](FILE_HEADER.md) |`
+    `| M8 File Header | \`${range(0, headerBytes)}\` | ${headerBytes} | [M8 File Header](FILE_HEADER.md) |`
   ]
 
   for (const field of fields) {
@@ -46,32 +51,77 @@ function renderThemeLayout () {
   return `${lines.join('\n')}\n`
 }
 
+function replaceSection (source, file, startHeading, endHeading, rendered) {
+  const startToken = `\n${startHeading}\n`
+  const endToken = `\n${endHeading}\n`
+  const start = source.indexOf(startToken)
+  const end = source.indexOf(endToken, start + startToken.length)
+  assert.ok(start !== -1 && end > start, `${file}: missing ${startHeading} or ${endHeading} heading`)
+  assert.equal(source.indexOf(startToken, start + 1), -1, `duplicate ${startHeading} heading`)
+  assert.equal(source.indexOf(endToken, end + 1), -1, `duplicate ${endHeading} heading`)
+  return source.slice(0, start + 1) + rendered + source.slice(end)
+}
+
 function generateThemeDoc (source) {
-  const layoutHeading = '\n## Layout\n'
-  const notesHeading = '\n## Notes\n'
-  const start = source.indexOf(layoutHeading)
-  const end = source.indexOf(notesHeading, start + layoutHeading.length)
-  assert.ok(start !== -1 && end > start, `${themeDocPath}: missing Layout or Notes heading`)
-  assert.equal(source.indexOf(layoutHeading, start + 1), -1, 'duplicate Layout heading')
-  assert.equal(source.indexOf(notesHeading, end + 1), -1, 'duplicate Notes heading')
-  return source.slice(0, start + 1) + renderThemeLayout() + source.slice(end)
+  return replaceSection(source, themeDocPath, '## Layout', '## Notes', renderThemeLayout())
+}
+
+function renderScaleLayout () {
+  const scale = load('schemas/file-versions/4.0.1/scale.ksy')
+  const headerBytes = headerSize()
+  const fields = sequenceLayout(scale.data.seq, scale, headerBytes)
+  const lines = [
+    '## Layout',
+    '',
+    'Offsets are absolute file offsets.',
+    '',
+    '| Name | Offset / Range | Size | Type |',
+    '| --- | --- | ---: | --- |',
+    `| M8 File Header | \`${range(0, headerBytes)}\` | ${headerBytes} | [M8 File Header](FILE_HEADER.md) |`
+  ]
+  const typeLabels = {
+    enabled_notes: '[Enabled Notes](#enabled-notes)',
+    name: '[Fixed String](#fixed-string)'
+  }
+  fields.forEach((field, index) => {
+    const schemaField = scale.data.seq[index]
+    const name = field.id.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+    let type = typeLabels[field.id]
+    if (!type && scale.data.types[schemaField.type]) {
+      const typeName = schemaField.type.replace(/^./, letter => letter.toUpperCase())
+      type = `[${typeName}](#${schemaField.type})`
+      if (schemaField.repeat) type += ` \`[${schemaField['repeat-expr']}]\``
+    }
+    if (!type) type = `\`${schemaField.type}\``
+    lines.push(`| \`${name}\` | \`${range(field.from, field.size)}\` | ${field.size} | ${type} |`)
+  })
+  return `${lines.join('\n')}\n`
+}
+
+function generateScaleDoc (source) {
+  return replaceSection(source, scaleDocPath, '## Layout', '### Enabled Notes', renderScaleLayout())
 }
 
 if (require.main === module) {
   const check = process.argv.includes('--check')
   assert.ok(process.argv.length === 2 || (process.argv.length === 3 && check),
     'usage: node tools/generate-docs.js [--check]')
-  const current = fs.readFileSync(themeDocPath, 'utf8')
-  const generated = generateThemeDoc(current)
-  if (check) {
-    assert.equal(current, generated, `${themeDocPath} is stale; run npm run docs:generate`)
-    console.log('generated_docs\tok')
-  } else if (current !== generated) {
-    fs.writeFileSync(themeDocPath, generated)
-    console.log(`updated\t${themeDocPath}`)
-  } else {
-    console.log(`unchanged\t${themeDocPath}`)
+  for (const [file, generate] of [
+    [themeDocPath, generateThemeDoc],
+    [scaleDocPath, generateScaleDoc]
+  ]) {
+    const current = fs.readFileSync(file, 'utf8')
+    const generated = generate(current)
+    if (check) {
+      assert.equal(current, generated, `${file} is stale; run npm run docs:generate`)
+    } else if (current !== generated) {
+      fs.writeFileSync(file, generated)
+      console.log(`updated\t${file}`)
+    } else {
+      console.log(`unchanged\t${file}`)
+    }
   }
+  if (check) console.log('generated_docs\tok\t2 files')
 }
 
-module.exports = { generateThemeDoc }
+module.exports = { generateThemeDoc, generateScaleDoc }
