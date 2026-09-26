@@ -10,8 +10,9 @@ record offsets. Type, enum, import, and source links follow schema ownership.
 Shared component pages are generated once, independent of firmware provenance;
 their schema descriptions may still cite firmware-specific research evidence.
 
-Design, workflow, and research documents stay directly under `docs/`.
-The `RESEARCH_*.md` files retain the prior hand-written references as historical
+Design and workflow documents stay directly under `docs/`. Research notes and
+the active research backlog live in `docs/research/`.
+The file-specific `RESEARCH_*.md` files retain the prior hand-written references as historical
 6.5.x evidence and interpretation. Their tables are snapshots, not maintained
 schema definitions; use generated references for current structural facts.
 `SCHEMA_REVIEW.md` has been removed; its completed review is not a maintained

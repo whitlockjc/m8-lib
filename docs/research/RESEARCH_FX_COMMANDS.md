@@ -2,7 +2,7 @@
 
 Historical 6.5.x research reference, retained to preserve fixture evidence and
 interpretation. Tables here are research snapshots, not the maintained schema
-reference. Use the [generated firmware reference](6.5.x.md) for current
+reference. Use the [generated firmware reference](../6.5.x.md) for current
 field layouts, types, and enum catalogs.
 
 
@@ -32,7 +32,7 @@ depending on where they are used.
 ## Storage
 
 Phrase steps and Instrument Tables use the same two-byte raw FX slot. The
-canonical layout is [fx_slot.ksy](../schemas/common/fx_slot.ksy):
+canonical layout is [fx_slot.ksy](../../schemas/common/fx_slot.ksy):
 
 | Name | Relative Offset | Size | Type |
 | --- | --- | ---: | --- |

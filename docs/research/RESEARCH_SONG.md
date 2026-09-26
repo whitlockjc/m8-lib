@@ -2,7 +2,7 @@
 
 Historical 6.5.x research reference, retained to preserve fixture evidence and
 interpretation. Tables here are research snapshots, not the maintained schema
-reference. Use the [generated firmware reference](6.5.x.md) for current
+reference. Use the [generated firmware reference](../6.5.x.md) for current
 field layouts, types, and enum catalogs.
 
 
@@ -15,17 +15,17 @@ MIDI Mapping, and Scales pages. Remaining unknown Song bytes are preserved
 until additional fixtures map those regions.
 
 The shared Instrument-bank and master/effect EQ record definitions are in
-[`song/eq.ksy`](../schemas/file-versions/6.5.0/song/eq.ksy); the Song schema
+[`song/eq.ksy`](../../schemas/file-versions/6.5.0/song/eq.ksy); the Song schema
 defines their file positions.
 Song rows, phrases, chains, and grooves are defined in
-[`song/sequencing.ksy`](../schemas/file-versions/6.5.0/song/sequencing.ksy).
+[`song/sequencing.ksy`](../../schemas/file-versions/6.5.0/song/sequencing.ksy).
 Bookmarks remain in the Song schema as Song View navigation state.
 Project page and MIDI Settings records are defined in
-[`song/project.ksy`](../schemas/file-versions/6.5.0/song/project.ksy).
+[`song/project.ksy`](../../schemas/file-versions/6.5.0/song/project.ksy).
 Mixer, Effects Settings, and Mix & Limiter Scope records are defined in
-[`song/mixer_effects.ksy`](../schemas/file-versions/6.5.0/song/mixer_effects.ksy).
+[`song/mixer_effects.ksy`](../../schemas/file-versions/6.5.0/song/mixer_effects.ksy).
 MIDI Mapping records and destination groups are defined in
-[`song/midi_mapping.ksy`](../schemas/file-versions/6.5.0/song/midi_mapping.ksy).
+[`song/midi_mapping.ksy`](../../schemas/file-versions/6.5.0/song/midi_mapping.ksy).
 
 ## Schema
 
@@ -372,7 +372,7 @@ stored Chain records.
 
 The Song stores 256 adjacent 128-byte Table records. Each record uses the same
 layout as the Table appended to a standalone Instrument file, imported from
-[table.ksy](../schemas/file-versions/6.0.1/instrument/table.ksy).
+[table.ksy](../../schemas/file-versions/6.0.1/instrument/table.ksy).
 Parsed-fixture checks compare every row and FX slot in `TABLES.m8s` with its
 raw bytes; `TABLES.m8s` provides distinct values at both ends of the region.
 

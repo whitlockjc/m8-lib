@@ -2,7 +2,7 @@
 
 Historical 6.5.x research reference, retained to preserve fixture evidence and
 interpretation. Tables here are research snapshots, not the maintained schema
-reference. Use the [generated firmware reference](6.5.x.md) for current
+reference. Use the [generated firmware reference](../6.5.x.md) for current
 field layouts, types, and enum catalogs.
 
 
@@ -24,7 +24,7 @@ classification of preserved bytes are tracked separately.
 | Verified firmware range | `6.5.x` |
 | Verified firmware | `6.5.2C` |
 | Kaitai schema | `schemas/file-versions/6.0.1/instrument.ksy` |
-| Parameter definitions | [`schemas/file-versions/6.0.1/instrument/parameters.ksy`](../schemas/file-versions/6.0.1/instrument/parameters.ksy) |
+| Parameter definitions | [`schemas/file-versions/6.0.1/instrument/parameters.ksy`](../../schemas/file-versions/6.0.1/instrument/parameters.ksy) |
 | Structural status | Complete for 6.5.x fixture evidence |
 | Total file size | 357 bytes |
 | Header size | 14 bytes |
@@ -653,7 +653,7 @@ Out, FM Synth, Hypersynth, and External.
 
 This is the shared Common Modulation Settings structure for those seven
 editable instrument types. The slot and its type-dependent payloads are
-defined in [modulation.ksy](../schemas/file-versions/6.0.1/instrument/modulation.ksy);
+defined in [modulation.ksy](../../schemas/file-versions/6.0.1/instrument/modulation.ksy);
 instrument-specific destination labels stay in the parent Instrument schema.
 `slots[0]` corresponds to the M8 UI's first modulation slot, and `slots[3]`
 to its fourth. NONE's bytes at `0x4d..0x64`
@@ -750,7 +750,7 @@ The Wavsynth, Macrosynth, Sampler, MIDI Out, FM Synth, Hypersynth, External,
 and NONE instrument tables are stored as 16 eight-byte rows at `0xe5..0x164`.
 Row labels are displayed as hexadecimal values `0..F` in the M8 UI.
 The shared row layout and contextual command catalogs are defined in
-[table.ksy](../schemas/file-versions/6.0.1/instrument/table.ksy).
+[table.ksy](../../schemas/file-versions/6.0.1/instrument/table.ksy).
 
 The row offset is:
 

@@ -2,7 +2,7 @@
 
 Historical 6.5.x research reference, retained to preserve fixture evidence and
 interpretation. Tables here are research snapshots, not the maintained schema
-reference. Use the [generated firmware reference](6.5.x.md) for current
+reference. Use the [generated firmware reference](../6.5.x.md) for current
 field layouts, types, and enum catalogs.
 
 

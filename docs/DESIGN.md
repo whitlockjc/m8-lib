@@ -240,7 +240,7 @@ Kaitai enums should use verbose enum entries with `id` for the Kaitai-safe
 identifier and `-label` for the raw M8 UI label.
 
 Research findings that are not yet schema fields should be tracked in
-`docs/RESEARCH_BACKLOG.md`. This includes settings observed in the UI but not
+`docs/research/RESEARCH_BACKLOG.md`. This includes settings observed in the UI but not
 found in the expected file type.
 
 Known finding:
