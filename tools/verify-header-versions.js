@@ -5,24 +5,27 @@ const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 const { readHeader, verifyHeader } = require('./inspect-headers')
+const { targetFor, fixtureFiles } = require('./firmware-targets')
 
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'm8-header-'))
+if (process.argv.length !== 4 || process.argv[2] !== '--firmware') {
+  throw new Error('usage: verify-header-versions.js --firmware <range>')
+}
+const firmware = process.argv[3]
+const target = targetFor(firmware)
 
 try {
-  for (const fixture of [
-    'fixtures/6.5.x/instruments/NONE_DEFAULT.m8i',
-    'fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n',
-    'fixtures/6.5.x/songs/DEFAULT.m8s',
-    'fixtures/6.5.x/themes/DEFAULT.m8t'
-  ]) {
-    assert.doesNotThrow(() => verifyHeader(readHeader(fixture)), fixture)
+  const fixtures = fixtureFiles(target)
+  assert.deepEqual(new Set(fixtures.map(file => path.extname(file))), new Set(['.m8i', '.m8n', '.m8s', '.m8t']))
+  for (const fixture of fixtures) {
+    assert.doesNotThrow(() => verifyHeader(readHeader(fixture), target), fixture)
 
     const changed = fs.readFileSync(fixture)
     changed.writeUInt16LE(0, 10)
     const tempFixture = path.join(tempDir, path.basename(fixture))
     fs.writeFileSync(tempFixture, changed)
     assert.throws(
-      () => verifyHeader(readHeader(tempFixture)),
+      () => verifyHeader(readHeader(tempFixture), target),
       /expected .* schema version .* got 0\.0\.0/,
       `${fixture} rejects a mismatched schema version`
     )

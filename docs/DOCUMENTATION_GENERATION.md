@@ -59,10 +59,14 @@ documents at the top level are not treated as generated outputs.
    `docs/6.6.x.md`; unchanged imports link to the existing shared documentation.
    Changed components receive pages matching their new schema paths. Generate
    and check all targets together to verify shared output consistency.
-5. Extend header inspection, compiler selection, and parsed-fixture tests for
-   the new firmware. Those fixture tools currently target 6.5.x; generated docs
-   alone do not establish firmware support. Run both fixture suites before
-   claiming compatibility.
+5. Register a `fixtureRoot`, `fixtureChecks`, and `parsedFixtures` in
+   `tools/doc-targets.json`. The verification runner selects the entry schema,
+   header expectations, fixture suite, and compiled parser for each target.
+   Its existing 6.5.x suite is isolated in `tools/verify-6.5.x`. Write distinct
+   6.6.x suites rather than modifying 6.5.x expectations. Run `npm run verify`
+   to check all registered firmware lines; `npm run verify -- --firmware 6.5.x`
+   runs one. Kaitai compilation is required for a full pass.
+   Generated docs alone do not establish firmware support.
 
 Patch/letter releases normally refresh fixtures and provenance within a line.
 If evidence shows incompatible layouts inside one line, introduce explicit

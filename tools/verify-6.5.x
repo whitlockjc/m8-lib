@@ -3,17 +3,7 @@
 set -eu
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-OUT_DIR="${TMPDIR:-/tmp}/m8-lib-kaitai-check"
-SCHEMA_CHECK_DIR="$OUT_DIR/schemas"
-
 cd "$ROOT"
-
-tools/inspect-headers.js
-node tools/verify-header-versions.js
-node tools/verify-docs.js
-node tools/generate-docs.js --check
-node --test tools/generate-docs.test.js
-node --test tools/ksy-layout.test.js
 
 tools/map-fixture.js \
   fixtures/6.5.x/instruments/NONE_DEFAULT.m8i \
@@ -286,17 +276,3 @@ tools/map-fixture.js \
   fixtures/6.5.x/themes/DEFAULT.m8t \
   fixtures/6.5.x/themes/MODIFIED.m8t \
   fixtures/6.5.x/themes/MODIFIED.yaml
-
-if command -v kaitai-struct-compiler >/dev/null 2>&1; then
-  rm -rf "$OUT_DIR"
-  mkdir -p "$SCHEMA_CHECK_DIR"
-  cp -R schemas/. "$SCHEMA_CHECK_DIR"
-  (
-    cd "$SCHEMA_CHECK_DIR"
-    kaitai-struct-compiler -t javascript 6.5.x.ksy
-  )
-  NODE_PATH="$ROOT/node_modules${NODE_PATH:+:$NODE_PATH}" \
-    node tools/verify-parsed-fixtures.js "$SCHEMA_CHECK_DIR"
-else
-  echo "warning: kaitai-struct-compiler not found; skipping schema compilation" >&2
-fi

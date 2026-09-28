@@ -2,6 +2,9 @@
   "6.5.x": {
     "entry": "schemas/6.5.x.ksy",
     "verifiedFirmware": "6.5.2C",
+    "fixtureRoot": "fixtures/6.5.x",
+    "fixtureChecks": "tools/verify-6.5.x",
+    "parsedFixtures": "tools/verify-parsed-fixtures.js",
     "research": {
       "theme": "docs/research/RESEARCH_THEME.md",
       "scale": "docs/research/RESEARCH_SCALE.md",

@@ -8,6 +8,7 @@
 
 - [Design](DESIGN.md)
 - [Documentation generation and firmware versioning](DOCUMENTATION_GENERATION.md)
+- [6.6.x research plan](6.6.x-PLAN.md)
 - [Research backlog](research/RESEARCH_BACKLOG.md)
 - Historical 6.5.x research: [header](research/RESEARCH_FILE_HEADER.md),
   [Theme](research/RESEARCH_THEME.md), [Scale](research/RESEARCH_SCALE.md),
