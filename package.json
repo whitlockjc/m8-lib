@@ -1,6 +1,7 @@
 {
   "name": "m8-lib",
   "private": true,
+  "license": "Apache-2.0",
   "type": "commonjs",
   "scripts": {
     "docs:generate": "node tools/generate-docs.js",
