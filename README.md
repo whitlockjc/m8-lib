@@ -1,10 +1,14 @@
 # m8-lib
 
-Language-agnostic schemas for Dirtywave M8 Instrument, Scale, Song, and Theme
-files. This repository documents the binary file layouts through
-[Kaitai Struct](https://kaitai.io/) schemas, firmware-versioned fixtures, and
-human-readable references generated from the schemas. It does not provide a
-user-facing M8 library or production reader/writer.
+Language-agnostic schemas for [Dirtywave M8](https://dirtywave.com/)
+Instrument, Scale, Song, and Theme files. This repository documents the binary
+file layouts through [Kaitai Struct](https://kaitai.io/) schemas,
+firmware-versioned fixtures, and human-readable references generated from the
+schemas. It does not provide a user-facing M8 library or production
+reader/writer.
+
+My hopes are that this information helps others to build tooling for the M8
+community.
 
 ## Supported firmware ranges
 
@@ -16,8 +20,7 @@ user-facing M8 library or production reader/writer.
 The firmware range selects an entry schema. Each M8 file also carries its own
 file-schema version, which may differ from the firmware version. Verification
 covers the committed fixtures; it does not establish every possible M8 file
-or setting for a range. The [6.6.x research plan](docs/6.6.x-PLAN.md) records
-remaining confidence checks for layouts reused from 6.5.x.
+or setting for a range.
 
 ## Repository contents
 
