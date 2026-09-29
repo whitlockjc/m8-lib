@@ -1,0 +1,21 @@
+fileType: song
+firmware: 6.6.3C
+screen: project.effects.modFx
+ignoredRanges:
+  - name: directory.postTerminator
+    offset: 0x001b
+    size: 0x0073
+    reason: directory bytes changed during save and are preserved verbatim
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: unrelated Project state changed during save
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 4d 4f 44 46 58 5f 43 4f 4d 42 00 00
+  - name: effects.modFx.type
+    offset: 0x1a5da
+    original: 0x00
+    new: 0x03

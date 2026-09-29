@@ -72,7 +72,7 @@ test('reused components are independent of firmware provenance', () => {
   verifyLinks(outputs)
   assert.deepEqual(renderTarget('6.5.x', target), rendered)
   assert.throws(() => validateTargets({ '6.6.x': next }), /entry must/)
-  assert.throws(() => generate(undefined, { firmware: '6.6.x' }), /unsupported firmware/)
+  assert.throws(() => generate(undefined, { firmware: '6.7.x' }), /unsupported firmware/)
 })
 
 test('a new firmware entry can replace a component without modifying the earlier reference', () => {

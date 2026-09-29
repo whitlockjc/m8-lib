@@ -3,6 +3,8 @@
 ## Generated References
 
 - [M8 6.5.x](6.5.x.md): file layouts, reusable records, and enum catalogs.
+- [M8 6.6.x](6.6.x.md): 6.6.3C layouts and enums; reused fields still need
+  additional controlled fixtures for broader compatibility confidence.
 
 ## Development And Research
 

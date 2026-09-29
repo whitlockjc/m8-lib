@@ -11,5 +11,12 @@
       "instrument": "docs/research/RESEARCH_INSTRUMENT.md",
       "song": "docs/research/RESEARCH_SONG.md"
     }
+  },
+  "6.6.x": {
+    "entry": "schemas/6.6.x.ksy",
+    "verifiedFirmware": "6.6.3C",
+    "fixtureRoot": "fixtures/6.6.x",
+    "fixtureChecks": "tools/verify-6.6.x",
+    "parsedFixtures": "tools/verify-parsed-6.6.x.js"
   }
 }

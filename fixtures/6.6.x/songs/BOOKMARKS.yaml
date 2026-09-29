@@ -1,0 +1,41 @@
+fileType: song
+firmware: 6.6.3C
+screen: song.bookmarks
+ignoredRanges:
+  - name: directory.postTerminator
+    offset: 0x001b
+    size: 0x0073
+    reason: directory bytes changed during save and are preserved verbatim
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 0x0002
+    reason: unrelated Project state changed during save
+changes:
+  - name: project.name
+    offset: 0x0094
+    originalBytes: 44 45 46 41 55 4c 54 00 00 00 00 00
+    newBytes: 42 4f 4f 4b 4d 41 52 4b 53 00 00 00
+  - name: bookmarks.rows[0].trackMask
+    offset: 0x1a97e
+    original: 0x00
+    new: 0x55
+  - name: bookmarks.rows[1].trackMask
+    offset: 0x1a97f
+    original: 0x00
+    new: 0xaa
+  - name: bookmarks.rows[254].trackMask
+    offset: 0x1aa7c
+    original: 0x00
+    new: 0x55
+  - name: bookmarks.rows[255].trackMask
+    offset: 0x1aa7d
+    original: 0x00
+    new: 0xaa
+  - name: rowBookmarkColors.rows[1..12]
+    offset: 0x1b6c7
+    originalBytes: 00 00 00 00 00 00 00 00 00 00 00 00
+    newBytes: 05 06 07 08 09 0a 0b 0c 04 03 02 01
+  - name: rowBookmarkColors.rows[243..254]
+    offset: 0x1b7b9
+    originalBytes: 00 00 00 00 00 00 00 00 00 00 00 00
+    newBytes: 15 16 17 18 19 1a 1b 1c 14 13 12 11
