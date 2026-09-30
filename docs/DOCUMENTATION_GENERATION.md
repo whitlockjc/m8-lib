@@ -9,10 +9,12 @@ offsets. Component pages under `common/` and `file-versions/` use relative
 record offsets. Type, enum, import, and source links follow schema ownership.
 Shared component pages are generated once, independent of firmware provenance;
 their schema descriptions may still cite firmware-specific research evidence.
-The generated [FX command reference](fx_commands.md) is an additional page:
-it groups command enums from the schemas selected by each registered firmware
-entry. Phrase and Instrument Table pages link to it instead of repeating their
-FX enum values. Other enum definitions remain on their owning component pages.
+The generated [FX command reference](common/fx_commands.md) lives alongside
+other shared components while the command catalogs selected by each firmware
+entry are identical. Generation fails on conflicting shared output, so a
+future divergence requires a version-specific reference. Phrase and Instrument
+Table pages link to this reference instead of repeating FX enum values. Other
+enum definitions remain on their owning component pages.
 
 Design and workflow documents stay directly under `docs/`. Research notes and
 the active research backlog live in `docs/research/`.

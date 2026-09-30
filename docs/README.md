@@ -4,7 +4,7 @@
 
 - [M8 6.5.x](6.5.x.md): file structures based on firmware 6.5.2C.
 - [M8 6.6.x](6.6.x.md): file structures based on firmware 6.6.3C.
-- [FX commands](fx_commands.md): versioned command values used by Phrase steps and Instrument Tables.
+- [FX commands](common/fx_commands.md): shared command values used by Phrase steps and Instrument Tables.
 
 ## Development And Research
 

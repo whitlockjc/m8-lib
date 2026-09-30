@@ -71,19 +71,23 @@ test('dynamic strings, switches, processing expressions, and raw labels survive'
   assert.match(page('/common/file_header.md'), /schema_version_patch/)
 })
 
-test('FX values are generated once and linked from phrase and table references', () => {
-  const catalog = page('/fx_commands.md')
-  for (const firmware of ['6.5.x', '6.6.x']) assert.ok(catalog.includes(`## ${firmware}\n`))
-  for (const heading of ['Instrument (Current Instrument)', 'Instrument Mods', 'Mixer & Effects', 'Sequencer']) {
-    assert.ok(catalog.includes(`### ${heading}\n`))
+test('FX values are shared while firmware catalogs agree and linked from phrase and table references', () => {
+  const catalog = page('/common/fx_commands.md')
+  for (const firmware of ['6.5.x', '6.6.x']) {
+    const pages = renderTarget(firmware, targets[firmware])
+    assert.equal(pages.get(path.resolve('docs/common/fx_commands.md')), catalog)
+    for (const heading of ['Instrument (Current Instrument)', 'Instrument Mods', 'Mixer & Effects', 'Sequencer']) {
+      assert.ok(catalog.includes(`## ${heading}\n`))
+    }
+    assert.match(catalog, /\| `0x00` \| ARP \|/)
+    assert.match(catalog, /\| `0x1b` \| VMV \|/)
+    assert.match(catalog, /\| `0x83` \| OSC \|/)
+    assert.match(catalog, /No verified command-value enum is available yet/)
+    assert.match(pages.get(path.resolve('docs', `${firmware}.md`)), /\[command reference\]\(common\/fx_commands\.md\)/)
   }
-  assert.match(catalog, /\| `0x00` \| ARP \|/)
-  assert.match(catalog, /\| `0x1b` \| VMV \|/)
-  assert.match(catalog, /\| `0x83` \| OSC \|/)
-  assert.match(catalog, /No verified command-value enum is available yet/)
   for (const suffix of ['/instrument/table.md', '/song/sequencing.md']) {
     const source = page(suffix)
-    assert.match(source, /\[FX command reference\]\([^)]*fx_commands\.md\)/)
+    assert.match(source, /\[FX command reference\]\([^)]*common\/fx_commands\.md\)/)
     assert.doesNotMatch(source, /\| `0x83` \| OSC \|/)
     assert.doesNotMatch(source, /^## Enum: .*fx_command$/m)
   }

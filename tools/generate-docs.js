@@ -50,19 +50,20 @@ const fxInstrumentNames = [
 ]
 const isFxEnum = name => name === 'phrase_fx_command' || name.endsWith('_table_fx_command')
 
-function renderFxCommands (catalog) {
-  const file = path.join(root, 'docs', 'fx_commands.md')
+function fxFile () {
+  return path.join(root, 'docs', 'common', 'fx_commands.md')
+}
+
+function renderFxCommands (firmware, target) {
+  const file = fxFile()
   const lines = ['# M8 FX Commands', '',
     'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
-    '[Documentation index](README.md)', '',
-    'Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type. Each firmware section below uses the enums selected by its entry schema.', '',
-    '## Firmware Ranges', '',
-    ...Object.keys(catalog).map(firmware => `- ${link(file, file, firmware, firmware.replaceAll('.', ''))}`), '']
+    link(file, path.join(root, 'docs', 'README.md'), 'Documentation index'), '',
+    'Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type. This page is shared only while the selected command catalogs are identical across firmware targets.', '']
   const rows = entries => [
     '| Stored Value | M8 Label | Identifier |', '| --- | --- | --- |',
     ...entries.map(([value, entry]) => `| ${code(hex(Number(value)))} | ${escape(entry['-label'] || '')} | ${code(entry.id)} |`), ''
   ]
-  for (const [firmware, target] of Object.entries(catalog)) {
     const modules = graph(load(path.resolve(root, target.entry)))
     const sequencing = modules.find(context => context.data.meta['-fx-sequencer-ranges'])
     const table = modules.find(context => context.data.enums?.wavsynth_table_fx_command)
@@ -71,23 +72,21 @@ function renderFxCommands (catalog) {
     const entries = Object.entries(sequencing.data.enums.phrase_fx_command)
       .sort(([a], [b]) => Number(a) - Number(b))
     const isSequencer = value => ranges.some(([first, last]) => value >= first && value <= last)
-    lines.push(`## ${firmware}`, '',
-      `Based on firmware ${code(target.verifiedFirmware)}. Values come from ${link(file, sequencing.file, path.relative(root, sequencing.file))} and ${link(file, table.file, path.relative(root, table.file))}. Shared schemas may be carried forward provisionally rather than independently retested for every firmware range.`, '',
-      '### Instrument (Current Instrument)', '',
+    lines.push(`Values come from ${link(file, sequencing.file, path.relative(root, sequencing.file))} and ${link(file, table.file, path.relative(root, table.file))}.`, '',
+      '## Instrument (Current Instrument)', '',
       'These enums contain fixture-verified command subsets for each instrument, not every command available in an FX slot.', '')
     for (const [name, label] of fxInstrumentNames) {
       const enumName = `${name}_table_fx_command`
       const values = table.data.enums[enumName]
       assert.ok(values, `missing ${enumName} for ${firmware}`)
-      lines.push(`#### ${label}`, '', ...rows(Object.entries(values).sort(([a], [b]) => Number(a) - Number(b))))
+      lines.push(`### ${label}`, '', ...rows(Object.entries(values).sort(([a], [b]) => Number(a) - Number(b))))
     }
-    lines.push('### Instrument Mods', '',
+    lines.push('## Instrument Mods', '',
       'No verified command-value enum is available yet. Labels depend on the selected modulation slot and modulation type; targeted fixtures are needed before listing byte values.', '',
-      '### Mixer & Effects', '',
+      '## Mixer & Effects', '',
       ...rows(entries.filter(([value]) => Number(value) !== 0xff && !isSequencer(Number(value)))),
-      '### Sequencer', '',
+      '## Sequencer', '',
       ...rows(entries.filter(([value]) => isSequencer(Number(value)))))
-  }
   return lines.join('\n').trimEnd() + '\n'
 }
 
@@ -153,7 +152,7 @@ function renderTarget (firmware, target, catalog = targets) {
       const [owner, name] = enumOwner(context, field.enum)
       result += `; ${link(file, pages.get(owner), name, `enum-${name}`)}`
     }
-    if (field.type === 'fx_slot') result += `; ${link(file, path.join(output, 'fx_commands.md'), 'FX commands')}`
+    if (field.type === 'fx_slot' && file === index) result += `; ${link(file, fxFile(), 'FX commands')}`
     return result
   }
   const attributes = (field, context) => {
@@ -190,7 +189,7 @@ function renderTarget (firmware, target, catalog = targets) {
   const preamble = (file, heading) => [`# ${heading}`, '',
     'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
     link(file, path.join(output, 'README.md'), 'Documentation index'), '']
-  const outputs = new Map([[path.join(output, 'fx_commands.md'), renderFxCommands(catalog)]])
+  const outputs = new Map([[fxFile(), renderFxCommands(firmware, target)]])
   for (const context of modules) {
     const file = pages.get(context)
     const data = context.data
@@ -206,7 +205,7 @@ function renderTarget (firmware, target, catalog = targets) {
       ...Object.keys(data.enums || {}).filter(name => !isFxEnum(name))
         .map(name => `- ${link(file, file, `${name} (enum)`, `enum-${name}`)}`), '')
     if (context.data.meta.id === 'fx_slot' || Object.keys(data.enums || {}).some(isFxEnum)) {
-      lines.push(`FX command values: ${link(file, path.join(output, 'fx_commands.md'), 'FX command reference')}.`, '')
+      lines.push(`FX command values: ${link(file, fxFile(), 'FX command reference')}.`, '')
     }
     const renderDefinition = (definition, heading, anchor) => {
       const sectionTitle = anchor === 'layout' ? 'Layout' : `Type: ${anchor.slice(5)}`
@@ -243,7 +242,7 @@ function renderTarget (firmware, target, catalog = targets) {
   const indexLines = [...preamble(index, `M8 ${firmware} File Reference`),
     `Documentation for M8 **${firmware}** file structures (based on firmware **${target.verifiedFirmware}**).`, '',
     `Entry schema: ${link(index, entry.file, target.entry)}.`, '',
-    `FX commands: ${link(index, path.join(output, 'fx_commands.md'), 'versioned command reference', firmware.replaceAll('.', ''))}.`, '',
+    `FX commands: ${link(index, fxFile(), 'command reference')}.`, '',
     '## Files', '', '| File Kind | File Schema Version | Schema |', '| --- | --- | --- |']
   for (const kind of kinds) {
     const context = component(entry, kind)

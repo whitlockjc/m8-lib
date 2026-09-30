@@ -29,7 +29,7 @@ File schema version: `6.0.1`.
 - [Layout](#layout)
 - [table_row](#type-table_row)
 
-FX command values: [FX command reference](../../../fx_commands.md).
+FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
@@ -55,4 +55,4 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `transpose` | `0x00` | 1 | `u1` | - | Row transpose value. |
 | `volume` | `0x01` | 1 | `u1` | - | Observed value 0xff displays as --. |
-| `fx` | `0x02..0x07` | 6 | [fx_slot](../../../common/fx_slot.md#layout); [FX commands](../../../fx_commands.md) | `repeat`: `expr`; `repeat-expr`: `3` | Three shared FX slots. The UI groups commands as Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods. Available labels depend on the surrounding instrument and modulation type.  |
+| `fx` | `0x02..0x07` | 6 | [fx_slot](../../../common/fx_slot.md#layout) | `repeat`: `expr`; `repeat-expr`: `3` | Three shared FX slots. The UI groups commands as Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods. Available labels depend on the surrounding instrument and modulation type.  |

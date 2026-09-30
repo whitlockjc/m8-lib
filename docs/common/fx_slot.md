@@ -23,7 +23,7 @@ Instrument Mods command values still need fixture evidence.
 
 - [Layout](#layout)
 
-FX command values: [FX command reference](../fx_commands.md).
+FX command values: [FX command reference](fx_commands.md).
 
 ## Layout
 

@@ -32,7 +32,7 @@ File schema version: `6.5.0`.
 - [chain](#type-chain)
 - [chain_row](#type-chain_row)
 
-FX command values: [FX command reference](../../../fx_commands.md).
+FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
@@ -110,7 +110,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `note` | `0x00` | 1 | `u1` | - | Note value; 0xff is unset. |
 | `volume` | `0x01` | 1 | `u1` | - | Step volume; 0xff is unset. |
 | `instrument` | `0x02` | 1 | `u1` | - | Instrument index; 0xff is unset. |
-| `fx` | `0x03..0x08` | 6 | [fx_slot](../../../common/fx_slot.md#layout); [FX commands](../../../fx_commands.md) | `repeat`: `expr`; `repeat-expr`: `3` | Three shared FX slots. The UI groups commands as Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods. Available labels depend on the surrounding instrument and modulation type.  |
+| `fx` | `0x03..0x08` | 6 | [fx_slot](../../../common/fx_slot.md#layout) | `repeat`: `expr`; `repeat-expr`: `3` | Three shared FX slots. The UI groups commands as Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods. Available labels depend on the surrounding instrument and modulation type.  |
 
 ## Type: song_rows
 
