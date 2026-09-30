@@ -60,18 +60,18 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `directory` | `0x00..0x7f` | 128 | [directory](#type-directory) | `size`: `128` | Fixed 128-byte directory field. The null-terminated path is followed by the remaining reserved bytes in this field. Post-terminator bytes vary between saves and must be preserved verbatim, not assumed to be zero-filled padding.  |
 | `project_settings` | `0x80..0xb0` | 49 | [song_project_6_5_0::project_settings](../6.5.0/song/project.md#type-project_settings) | - | Project settings, including tempo, scale selection, and MIDI input settings. |
 | `unknown_0` | `0xb1..0xbf` | 15 | bytes | `size`: `15` | Preserved bytes between the Project settings record and Mixer settings. The preceding two unknown bytes remain inside project_settings to retain that record boundary and the existing fixture attribution.  |
-| `mixer` | `0xc0..0xdf` | 32 | [song_mixer_effects_6_6_2::mixer_settings](song/mixer_effects.md#type-mixer_settings) | - | Mixer and Mix &amp; Limiter Scope storage. Offsets are relative to absolute file offset 0x00ce in 6.5.x fixtures; the 6.6.x baseline parses with the same field boundaries, but controlled Mixer edits are still pending.  |
-| `grooves` | `0xe0..0x2df` | 512 | [song_sequencing_6_5_0::grooves](../6.5.0/song/sequencing.md#type-grooves) | `repeat`: `32` via `entries` | Groove storage. Offsets are relative to absolute file offset 0x00ee in 6.5.x fixtures. The M8 stores 32 grooves, and each groove stores 16 one byte step values.  |
-| `rows` | `0x2e0..0xadf` | 2048 | [song_sequencing_6_5_0::song_rows](../6.5.0/song/sequencing.md#type-song_rows) | `repeat`: `256` via `entries` | Song View row storage. Offsets are relative to absolute file offset 0x02ee in 6.5.x fixtures. The M8 stores 256 rows, and each row stores one chain index per track.  |
-| `phrases` | `0xae0..0x9a4f` | 36720 | [song_sequencing_6_5_0::phrases](../6.5.0/song/sequencing.md#type-phrases) | `repeat`: `255` via `entries` | Phrase View storage. Offsets are relative to absolute file offset 0x0aee in 6.5.x fixtures. The M8 stores phrase indexes 0x00 through 0xfe. Value 0xff is observed as an unset phrase reference rather than a stored phrase record.  |
-| `chains` | `0x9a50..0xba2f` | 8160 | [song_sequencing_6_5_0::chains](../6.5.0/song/sequencing.md#type-chains) | `repeat`: `255` via `entries` | Chain View storage. Offsets are relative to absolute file offset 0x9a5e in 6.5.x fixtures. The M8 stores chain indexes 0x00 through 0xfe; 0xff is the unset reference sentinel. Each chain stores 16 rows.  |
+| `mixer` | `0xc0..0xdf` | 32 | [song_mixer_effects_6_6_2::mixer_settings](song/mixer_effects.md#type-mixer_settings) | - |  |
+| `grooves` | `0xe0..0x2df` | 512 | [song_sequencing_6_5_0::grooves](../6.5.0/song/sequencing.md#type-grooves) | `repeat`: `32` via `entries` |  |
+| `rows` | `0x2e0..0xadf` | 2048 | [song_sequencing_6_5_0::song_rows](../6.5.0/song/sequencing.md#type-song_rows) | `repeat`: `256` via `entries` |  |
+| `phrases` | `0xae0..0x9a4f` | 36720 | [song_sequencing_6_5_0::phrases](../6.5.0/song/sequencing.md#type-phrases) | `repeat`: `255` via `entries` |  |
+| `chains` | `0x9a50..0xba2f` | 8160 | [song_sequencing_6_5_0::chains](../6.5.0/song/sequencing.md#type-chains) | `repeat`: `255` via `entries` |  |
 | `tables` | `0xba30..0x13a2f` | 32768 | [tables](#type-tables) | `repeat`: `256` via `entries` | Song table storage. Record boundaries and default bytes are verified by INSTRUMENTS.m8s. Tables 0x00 through 0x7f are associated by matching index with Instruments 0x00 through 0x7f.  |
-| `instruments` | `0x13a30..0x1a5af` | 27520 | [instruments](#type-instruments) | `repeat`: `128` via `entries` | Song instrument storage at absolute offsets 0x13a3e..0x1a5bd. The region contains 128 fixed 215-byte instrument records using the same structure as the instrument portion of a standalone Instrument file.  |
-| `effects_and_scope` | `0x1a5b0..0x1a5cc` | 29 | [song_mixer_effects_6_6_2::effects_and_scope_settings](song/mixer_effects.md#type-effects_and_scope_settings) | - | Shared storage region for the Effects Settings and Mix &amp; Limiter Scope views. Offsets are relative to absolute file offset 0x1a5be in 6.5.x and 6.6.x fixtures. Storage order does not fully match the UI grouping; the Mod FX type byte is stored after the Mix &amp; Limiter Scope OTT detail bytes.  |
+| `instruments` | `0x13a30..0x1a5af` | 27520 | [instruments](#type-instruments) | `repeat`: `128` via `entries` |  |
+| `effects_and_scope` | `0x1a5b0..0x1a5cc` | 29 | [song_mixer_effects_6_6_2::effects_and_scope_settings](song/mixer_effects.md#type-effects_and_scope_settings) | - |  |
 | `unknown_1` | `0x1a5cd..0x1a5ef` | 35 | bytes | `size`: `35` | Preserved bytes between Effects/Mix &amp; Limiter Scope storage and the MIDI Mapping table.  |
-| `midi_mappings` | `0x1a5f0..0x1a96f` | 896 | [song_midi_mapping_6_5_0::midi_mappings](../6.5.0/song/midi_mapping.md#type-midi_mappings) | `repeat`: `128` via `entries` | MIDI Mapping page storage. Offsets are relative to absolute file offset 0x1a5fe in 6.5.x fixtures. M8 supports 128 mapping records.  |
-| `bookmarks` | `0x1a970..0x1aa6f` | 256 | [bookmarks](#type-bookmarks) | `repeat`: `256` via `entries` | Song View bookmark storage. Offsets are relative to absolute file offset 0x1a97e in 6.5.x and 6.6.x fixtures. The M8 stores one bitmask byte per Song row.  |
-| `scales` | `0x1aa70..0x1ad4f` | 736 | [embedded_scales](#type-embedded_scales) | `repeat`: `16` via `entries` | Embedded Scale storage. Offsets are relative to absolute file offset 0x1aa7e in 6.5.x fixtures. The M8 stores 16 Scale body records without standalone Scale file headers.  |
+| `midi_mappings` | `0x1a5f0..0x1a96f` | 896 | [song_midi_mapping_6_5_0::midi_mappings](../6.5.0/song/midi_mapping.md#type-midi_mappings) | `repeat`: `128` via `entries` |  |
+| `bookmarks` | `0x1a970..0x1aa6f` | 256 | [bookmarks](#type-bookmarks) | `repeat`: `256` via `entries` |  |
+| `scales` | `0x1aa70..0x1ad4f` | 736 | [embedded_scales](#type-embedded_scales) | `repeat`: `16` via `entries` |  |
 | `eqs` | `0x1ad50..0x1b697` | 2376 | [eqs](#type-eqs) | - | Instrument and global effect EQ settings. |
 | `unknown_2` | `0x1b698..0x1b6b7` | 32 | bytes | `size`: `32` | Preserved 32-byte region present in both 6.5.0 and 6.6.2 Songs. |
 | `row_bookmark_colors` | `0x1b6b8..0x1b7b7` | 256 | [row_bookmark_colors](#type-row_bookmark_colors) | `repeat`: `256` via `entries` | Added in 6.6.2 at absolute offset 0x1b6c6. One color code per Song row, independent of chain-cell bookmark bitmasks.  |
@@ -128,7 +128,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0xff` | 256 | [bookmark_row](#type-bookmark_row) | `repeat`: `expr`; `repeat-expr`: `256` | Bookmark state for one Song row. Bits 0..7 correspond to tracks 1..8. |
+| `entries` | `0x00..0xff` | 256 | [bookmark_row](#type-bookmark_row) | `repeat`: `expr`; `repeat-expr`: `256` |  |
 
 ## Type: bookmark_row
 
@@ -186,7 +186,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x7fff` | 32768 | [instrument_table_6_0_1](../6.0.1/instrument/table.md#layout) | `repeat`: `expr`; `repeat-expr`: `256` | Sixteen eight-byte Instrument Table rows for file schema 6.0.1. Standalone Instruments append one table; Songs store 256 tables separately. FX slots can use the M8 UI's Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods command groups. The FX command reference generated from the schemas documents verified Current Instrument command subsets by type; it is not a complete catalog of commands available in a table. Instrument Mods labels depend on the selected modulation type and still need fixture evidence.  |
+| `entries` | `0x00..0x7fff` | 32768 | [instrument_table_6_0_1](../6.0.1/instrument/table.md#layout) | `repeat`: `expr`; `repeat-expr`: `256` |  |
 
 ## Type: instruments
 
@@ -201,7 +201,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x6b7f` | 27520 | [instrument_6_0_2::instrument_data](../6.0.2/instrument.md#type-instrument_data) | `repeat`: `expr`; `repeat-expr`: `128` | Fixed 215-byte instrument record. This record is stored directly in Song files; standalone Instrument files append one 128-byte instrument table. The M8 manual groups general_settings and eq as General Instrument Settings. EQ is stored after the type-specific region, so it remains a separate field in the raw storage sequence.  |
+| `entries` | `0x00..0x6b7f` | 27520 | [instrument_6_0_2::data](../6.0.2/instrument.md#type-data) | `repeat`: `expr`; `repeat-expr`: `128` |  |
 
 ## Type: embedded_scales
 
@@ -216,7 +216,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x2df` | 736 | [scale_4_0_1](../4.0.1/scale.md#layout) | `repeat`: `expr`; `repeat-expr`: `16` | Body schema for scale files with header schema version 4.0.1.  Verified against M8 6.5.2C scale fixtures. The body contains an enabled-note bitmask, 12 interval offsets, a fixed-size name byte range, and a tuning offset. No unaccounted bytes remain in the verified fixture pair.  |
+| `entries` | `0x00..0x2df` | 736 | [scale_4_0_1](../4.0.1/scale.md#layout) | `repeat`: `expr`; `repeat-expr`: `16` |  |
 
 ## Enum: row_bookmark_color_value
 

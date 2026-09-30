@@ -78,12 +78,12 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` | Preserved bytes before the mapped Mod FX parameter bytes. |
-| `mod_fx` | `0x03..0x06` | 4 | [mod_fx_settings](#type-mod_fx_settings) | - | Mod FX parameter storage from the Effects Settings View. The Mod FX type byte is stored later in the shared Effects/Mix &amp; Limiter Scope region.  |
+| `mod_fx` | `0x03..0x06` | 4 | [mod_fx_settings](#type-mod_fx_settings) | - |  |
 | `unknown_1` | `0x07..0x0b` | 5 | bytes | `size`: `5` | Preserved bytes between Mod FX and Delay parameters. Historical &lt;https://github.com/whitlockjc/m8-js&gt; reference code treats part of this region as delay filter storage, but this fixture does not change those controls.  |
-| `delay` | `0x0c..0x10` | 5 | [delay_settings](#type-delay_settings) | - | Delay parameter storage from the Effects Settings View. |
+| `delay` | `0x0c..0x10` | 5 | [delay_settings](#type-delay_settings) | - |  |
 | `unknown_2` | `0x11..0x13` | 3 | bytes | `size`: `3` | Preserved bytes between Delay and Reverb parameters. Historical &lt;https://github.com/whitlockjc/m8-js&gt; reference code treats part of this region as reverb filter storage, but this fixture does not change those controls.  |
-| `reverb` | `0x14..0x19` | 6 | [reverb_settings](#type-reverb_settings) | - | Reverb parameter storage from the Effects Settings View. |
-| `mix_limiter_scope` | `0x1a..0x1b` | 2 | [mix_limiter_scope_settings](#type-mix_limiter_scope_settings) | - | Mix &amp; Limiter Scope storage for OTT detail controls from the Mix &amp; Limiter Scope View. Offsets are relative to absolute file offset 0x1a5d8 in 6.5.x fixtures.  |
+| `reverb` | `0x14..0x19` | 6 | [reverb_settings](#type-reverb_settings) | - |  |
+| `mix_limiter_scope` | `0x1a..0x1b` | 2 | [mix_limiter_scope_settings](#type-mix_limiter_scope_settings) | - |  |
 | `mod_fx_type` | `0x1c` | 1 | `u1`; [mod_fx_type](#enum-mod_fx_type) | - | ModFX type selected in Effects Settings. |
 
 ## Type: mod_fx_settings

@@ -168,20 +168,20 @@ function renderTarget (firmware, target, catalog = targets) {
     }
     return values.join('; ') || '-'
   }
-  const description = (field, context) => {
-    if (field.doc) return field.doc
-    if (typeof field.type !== 'string' ||
-        /^[us][1248](le|be)?$|^f[48](le|be)?$|^strz?$/.test(field.type)) return ''
-    return resolve(context, field.type)[1].doc || ''
+  const description = field => field.doc || ''
+  const summaryDescription = field => {
+    const prose = description(field).trim().replace(/\s+/g, ' ')
+    return prose.match(/^.*?[.!?](?=\s|$)/)?.[0] || prose
   }
-  const layout = (file, context, seq, start = 0) => {
+  const layout = (file, context, seq, start = 0, { summary = false } = {}) => {
     let offset = start
     const lines = ['| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |',
       '| --- | --- | ---: | --- | --- | --- |']
     for (const field of seq) {
       const size = sizeOf(field, context)
       const position = offset === null ? 'dynamic' : size === null ? `${hex(offset)} onward` : range(offset, size)
-      lines.push(`| ${code(field.id)} | ${code(position)} | ${size === null ? 'variable' : size} | ${fieldType(file, context, field)} | ${attributes(field, context)} | ${escape(description(field, context))} |`)
+      const detail = summary ? summaryDescription(field) : description(field)
+      lines.push(`| ${code(field.id)} | ${code(position)} | ${size === null ? 'variable' : size} | ${fieldType(file, context, field)} | ${attributes(field, context)} | ${escape(detail)} |`)
       offset = size === null || offset === null ? null : offset + size
     }
     return lines
@@ -256,10 +256,10 @@ function renderTarget (firmware, target, catalog = targets) {
       `Header: ${headerSize} bytes. Body: ${bodySize === null ? 'variable' : `${bodySize} bytes`}.`, '',
       `Definition: ${link(index, pages.get(context), context.data.meta.id)}.`, '',
       'Offsets are absolute file offsets. Follow type links for relative record layouts.', '',
-      ...layout(index, entry, [headerField]), ...layout(index, context, context.data.seq, headerSize).slice(2), '')
-    if (target.research?.[kind]) indexLines.push(link(index, path.resolve(root, target.research[kind]), 'Fixture observations and research history'), '')
+      ...layout(index, entry, [headerField], 0, { summary: true }),
+      ...layout(index, context, context.data.seq, headerSize, { summary: true }).slice(2), '')
   }
-  indexLines.push('', '## Layout', '', 'Entry dispatch; offsets are absolute file offsets.', '', ...layout(index, entry, entry.data.seq), '',
+  indexLines.push('', '## Layout', '', 'Entry dispatch; offsets are absolute file offsets.', '', ...layout(index, entry, entry.data.seq, 0, { summary: true }), '',
     '## Components', '', ...modules.filter(context => context !== entry).map(context => `- ${link(index, pages.get(context), context.data.meta.id)}`), '',
     'Component links follow schema imports. Unchanged schemas and their documentation are shared across firmware entries.', '',
     'Unknown byte ranges retain their schema names. Stable fixture values do not establish that bytes are unused.', '')

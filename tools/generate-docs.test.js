@@ -62,6 +62,17 @@ test('absolute file offsets and relative repeated layouts are correct', () => {
   assert.match(page('/instrument/table.md'), /`fx` \| `0x02\.\.0x07` \| 6/)
 })
 
+test('firmware indexes summarize fields without repeating linked type details or research links', () => {
+  for (const firmware of ['6.5.x', '6.6.x']) {
+    const source = renderTarget(firmware, targets[firmware]).get(path.resolve(`docs/${firmware}.md`))
+    assert.match(source, /\[data\]\(file-versions\/6\.0\.[12]\/instrument\.md#type-data\)/)
+    assert.match(source, /\| `background` \|[^\n]*Background color\./)
+    assert.match(source, /\| `tuning_offset` \|[^\n]*Scale tuning offset from A440, stored as a 32-bit float\./)
+    assert.doesNotMatch(source, /instrument_data|Fixture observations and research history/)
+    assert.doesNotMatch(source, /The encoded version appears|The M8 manual groups general_settings|FX slots can use/)
+  }
+})
+
 test('dynamic strings, switches, processing expressions, and raw labels survive', () => {
   assert.match(page('/6.0.1/instrument.md'), /_io.size - _io.pos/)
   assert.match(page('/6.0.1/instrument.md'), /switch on/)

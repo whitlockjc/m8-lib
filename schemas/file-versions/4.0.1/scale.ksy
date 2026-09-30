@@ -26,7 +26,7 @@ seq:
   - id: tuning_offset
     type: f4
     doc: |
-      Verified 32-bit float storage for Scale Editor tuning. The M8 UI defaults
+      Scale tuning offset from A440, stored as a 32-bit float. The M8 UI defaults
       to 440.00 Hz and stores 0.0 here. A UI change from 440.00 to 439.97
       stored approximately -0.03, so this appears to be an offset from the
       standard A440 tuning reference rather than an absolute tuning value.

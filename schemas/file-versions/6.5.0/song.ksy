@@ -159,7 +159,7 @@ types:
       the instrument portion of a standalone Instrument file.
     seq:
       - id: entries
-        type: instrument_6_0_1::instrument_data
+        type: instrument_6_0_1::data
         repeat: expr
         repeat-expr: 128
   embedded_scales:

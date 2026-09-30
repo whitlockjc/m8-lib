@@ -55,7 +55,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x8ff` | 2304 | [eq_settings](#type-eq_settings) | `repeat`: `expr`; `repeat-expr`: `128` | Three-band EQ storage. Each known EQ uses three adjacent 6-byte band records.  |
+| `entries` | `0x00..0x8ff` | 2304 | [eq_settings](#type-eq_settings) | `repeat`: `expr`; `repeat-expr`: `128` |  |
 
 ## Type: eq_band
 

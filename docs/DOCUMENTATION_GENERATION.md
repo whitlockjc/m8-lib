@@ -36,6 +36,11 @@ fields, switch cases, enum values and original labels, schema descriptions,
 validation/storage attributes, and calculated instances. Edit Kaitai to change
 these facts, then regenerate. Do not edit generated Markdown.
 
+Firmware entry pages use the first sentence of a field's own schema description
+for compact layout tables. Linked type descriptions stay on their component
+pages rather than being repeated in field rows. Research notes are indexed
+separately from generated references.
+
 Unknown lengths stay variable. In particular, Song's `size-eos` remainder is
 not converted to a fixed size just because current fixtures have a fixed length.
 Null-terminated strings keep their dynamic inner positions while their outer
@@ -43,8 +48,8 @@ fixed-capacity fields retain schema-defined sizes. Instances with value
 expressions consume no storage. No new storage semantics are inferred during
 documentation generation.
 
-`tools/doc-targets.json` contains the entry schema, exact
-verified firmware, and research links. It does not duplicate component version
+`tools/doc-targets.json` contains the entry schema and exact
+verified firmware. It does not duplicate component version
 dispatch, fields, or enum catalogs. All selected targets render before writes
 begin. Conflicting content for a shared output fails instead of overwriting it.
 An unknown target fails rather than silently using the latest schema.

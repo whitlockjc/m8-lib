@@ -60,7 +60,7 @@ Offsets are absolute file offsets.
 | Name | Offset / Range | Size | Type |
 | --- | --- | ---: | --- |
 | M8 File Header | `0x00..0x0d` | 14 | [M8 File Header](RESEARCH_FILE_HEADER.md) |
-| `instrument_data` | `0x0e..0xe4` | 215 | instrument record |
+| `data` | `0x0e..0xe4` | 215 | instrument record |
 | `general_settings` | `0x0e..0x1c` | 15 | [General Instrument Settings](#general-instrument-settings) |
 | `general_settings.type` | `0x0e` | 1 | [Instrument Type](#instrument-type) |
 | `name` | `0x0f..0x1a` | 12 | [Fixed String](#fixed-strings) |
@@ -75,7 +75,7 @@ The `body_before_eq` layout depends on `general_settings.type`. For `none`, this
 is preserved but not documented as meaningful fields, because the M8 UI does
 not expose editable `NONE` instrument parameters.
 
-`INSTRUMENTS.m8s` verifies that Song files reuse `instrument_data` exactly. Its
+`INSTRUMENTS.m8s` verifies that Song files reuse `data` exactly. Its
 embedded Wavsynth and Hypersynth records match the first 215 body bytes of
 `WAV_DEFAULT.m8i` and `HYP_DEFAULT.m8i`, respectively, except that the embedded
 12-byte names are unset (`0xff`). Song Tables are stored separately from the
@@ -564,10 +564,10 @@ Offsets are relative to the start of `mixer`.
 
 ## Tail
 
-The 152-byte tail is the final portion of `instrument_data`, and its layout
+The 152-byte tail is the final portion of `data`, and its layout
 depends on `general_settings.type`. Verified editable instruments start with a shared
 24-byte modulation block. The standalone Instrument Table follows the tail at
-`0xe5`; Song files store the same 215-byte `instrument_data` records and keep
+`0xe5`; Song files store the same 215-byte `data` records and keep
 their Tables in a separate region.
 
 ### Standard Tail
@@ -1616,7 +1616,7 @@ the tested fixtures only, not proof of reserved or unused storage.
 ## Notes
 
 - `INSTRUMENTS.m8s` verifies that standalone Instrument files and instruments
-  embedded in Song files share the same 215-byte `instrument_data`
+  embedded in Song files share the same 215-byte `data`
   representation. Standalone files append one 128-byte Table, while Songs
   store Tables in a separate region.
 - Enumerated values should document both stored representation and UI label.

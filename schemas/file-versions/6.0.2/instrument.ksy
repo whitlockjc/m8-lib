@@ -20,11 +20,11 @@ doc: |
   Unknown ranges remain preserved.
 seq:
   - id: instrument
-    type: instrument_data
+    type: data
   - id: table
     type: instrument_table_6_0_1
 types:
-  instrument_data:
+  data:
     doc: |
       Fixed 215-byte instrument record. This record is stored directly in Song
       files; standalone Instrument files append one 128-byte instrument table.
