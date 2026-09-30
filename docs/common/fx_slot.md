@@ -1,7 +1,5 @@
 # fx_slot
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../README.md)
 
 Source: [schemas/common/fx_slot.ksy](../../schemas/common/fx_slot.ksy).

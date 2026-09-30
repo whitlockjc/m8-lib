@@ -1,7 +1,5 @@
 # theme_1_0_2
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../../README.md)
 
 Source: [schemas/file-versions/1.0.2/theme.ksy](../../../schemas/file-versions/1.0.2/theme.ksy).

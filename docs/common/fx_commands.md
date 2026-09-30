@@ -1,7 +1,5 @@
 # M8 FX Commands
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../README.md)
 
 Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type.

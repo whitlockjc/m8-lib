@@ -1,7 +1,5 @@
 # scale_4_0_1
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../../README.md)
 
 Source: [schemas/file-versions/4.0.1/scale.ksy](../../../schemas/file-versions/4.0.1/scale.ksy).

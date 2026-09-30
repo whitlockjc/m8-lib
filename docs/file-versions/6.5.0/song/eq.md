@@ -1,7 +1,5 @@
 # eq_6_5_0
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../../../README.md)
 
 Source: [schemas/file-versions/6.5.0/song/eq.ksy](../../../../schemas/file-versions/6.5.0/song/eq.ksy).

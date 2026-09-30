@@ -1,7 +1,5 @@
 # mixer_effects_6_6_2
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../../../README.md)
 
 Source: [schemas/file-versions/6.6.2/song/mixer_effects.ksy](../../../../schemas/file-versions/6.6.2/song/mixer_effects.ksy).

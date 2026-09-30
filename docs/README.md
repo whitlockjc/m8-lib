@@ -2,6 +2,9 @@
 
 ## Generated References
 
+These documents are generated from the Kaitai schemas. Do not modify them
+directly; update the schemas and run `npm run docs:generate` instead.
+
 - [M8 6.5.x](6.5.x.md): file structures based on firmware 6.5.2C.
 - [M8 6.6.x](6.6.x.md): file structures based on firmware 6.6.3C.
 

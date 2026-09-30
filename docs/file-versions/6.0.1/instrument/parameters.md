@@ -1,7 +1,5 @@
 # parameters_6_0_1
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../../../README.md)
 
 Source: [schemas/file-versions/6.0.1/instrument/parameters.ksy](../../../../schemas/file-versions/6.0.1/instrument/parameters.ksy).

@@ -78,7 +78,7 @@ for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   assert.deepEqual(Buffer.from(settings.name), bytes.subarray(0x0f, 0x1b), `${name} name`)
   assert.equal(settings.transpose, bytes[0x1b], `${name} transpose`)
   assert.equal(settings.tableTic, bytes[0x1c], `${name} table TIC`)
-  assert.equal(instrument.body.eq, bytes[0x4c], `${name} EQ assignment`)
+  if (name !== 'NONE') assert.equal(instrument.body.eq, bytes[0x4c], `${name} EQ assignment`)
   assert.equal(file.body.table.rows.length, 16, `${name} table rows`)
   assert.equal(file.body.table.rows[0].fx.length, 3, `${name} table FX slots`)
 }
@@ -95,7 +95,7 @@ for (const fixture of instrumentFixtures) {
   assert.equal(bytes.length, 0x165, `${fixture} standalone length`)
   verifyTable(table, bytes, 0xe5, fixture)
   if (name === 'NONE') {
-    assert.deepEqual(Buffer.from(body.unknown1), bytes.subarray(0x4d, 0xe5), `${fixture} NONE tail`)
+    assert.deepEqual(Buffer.from(body.unknown), bytes.subarray(0x1d, 0xe5), `${fixture} NONE body`)
   } else {
     assert.equal(body.modulators.slots.length, 4, `${fixture} modulator boundary`)
     if (name === 'SAM' || name === 'SAMS' || name === 'SAMB') {
@@ -235,8 +235,9 @@ assert.equal(MidiOut601.Destination[0x03], 'CC_C')
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')
   assert.equal(file.body.instrument.body.modulators, undefined)
-  assert.deepEqual(Buffer.from(file.body.instrument.body.unknown1),
-    bytes.subarray(0x4d, 0xe5))
+  assert.equal(file.body.instrument.body.eq, undefined)
+  assert.deepEqual(Buffer.from(file.body.instrument.body.unknown),
+    bytes.subarray(0x1d, 0xe5))
 }
 
 for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) {

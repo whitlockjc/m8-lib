@@ -1,7 +1,5 @@
 # file_header
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../README.md)
 
 Source: [schemas/common/file_header.ksy](../../schemas/common/file_header.ksy).

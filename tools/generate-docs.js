@@ -57,7 +57,6 @@ function fxFile () {
 function renderFxCommands (firmware, target) {
   const file = fxFile()
   const lines = ['# M8 FX Commands', '',
-    'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
     link(file, path.join(root, 'docs', 'README.md'), 'Documentation index'), '',
     'Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type.', '']
   const rows = entries => [
@@ -209,7 +208,6 @@ function renderTarget (firmware, target, catalog = targets) {
     return lines
   }
   const preamble = (file, heading) => [`# ${heading}`, '',
-    'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
     link(file, path.join(output, 'README.md'), 'Documentation index'), '']
   const outputs = new Map([[fxFile(), renderFxCommands(firmware, target)]])
   for (const context of modules) {

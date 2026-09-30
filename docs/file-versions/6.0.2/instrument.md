@@ -1,7 +1,5 @@
 # instrument_6_0_2
 
-Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
-
 [Documentation index](../../README.md)
 
 Source: [schemas/file-versions/6.0.2/instrument.ksy](../../../schemas/file-versions/6.0.2/instrument.ksy).
@@ -64,7 +62,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 Fixed 215-byte instrument record. This record is stored directly in Song
 files; standalone Instrument files append one 128-byte instrument table.
-The EQ assignment follows the type-specific region.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -78,8 +75,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `general_settings`
 
-General Instrument Settings prefix. The EQ assignment follows in the body.
-
+General Instrument Settings prefix.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -94,17 +90,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `none_body`
 
-Preserved bytes between the common instrument prefix and common EQ field
-for NONE.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `unknown_0` | `0x00..0x2e` | 47 | bytes | `size`: `47` |  |
-| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
-| `unknown_1` | `0x30..0xc7` | 152 | bytes | `size`: `152` |  |
+| `unknown` | `0x00..0xc7` | 200 | bytes | `size`: `200` |  |
 
 ## Type: wavsynth_body
 

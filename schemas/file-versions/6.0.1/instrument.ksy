@@ -28,7 +28,6 @@ types:
     doc: |
       Fixed 215-byte instrument record. This record is stored directly in Song
       files; standalone Instrument files append one 128-byte instrument table.
-      The EQ assignment follows the type-specific region.
     seq:
       - id: general_settings
         type: general_settings
@@ -46,8 +45,7 @@ types:
             'type::none': none_body
         doc: Instrument body selected by type.
   general_settings:
-    doc: |
-      General Instrument Settings prefix. The EQ assignment follows in the body.
+    doc: General Instrument Settings prefix.
     seq:
       - id: type
         type: u1
@@ -66,17 +64,9 @@ types:
         type: u1
         doc: Common instrument table TIC setting.
   none_body:
-    doc: |
-      Preserved bytes between the common instrument prefix and common EQ field
-      for NONE.
     seq:
-      - id: unknown_0
-        size: 47
-      - id: eq
-        type: u1
-        doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
-      - id: unknown_1
-        size: 152
+      - id: unknown
+        size: 200
   wavsynth_body:
     seq:
       - id: unknown_0
