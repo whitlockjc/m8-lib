@@ -109,6 +109,33 @@ component schemas. This provides one obvious schema file for tools to use for a
 firmware range while keeping large file-type definitions focused and
 reviewable.
 
+### Schema Authoring Conventions
+
+- Use `snake_case` for Kaitai IDs. Keep the file kind in top-level body IDs
+  (`instrument_6_0_1`, `song_6_5_0`), but omit redundant `instrument_` or
+  `song_` prefixes from imported component IDs and local type/enum names. For
+  example, `instrument/table.ksy` defines `table_6_0_1`, and
+  `song/project.ksy` defines `project_6_5_0`. Retain the version suffix so
+  imports identify the intended layout.
+- Keep raw byte order in the schema even when M8 UI concepts span noncontiguous
+  fields. Reuse types for fixture-proven common layouts; keep instrument-specific
+  parameters, helper types, and contextual enum labels in that instrument's
+  schema. Shared filter, amplifier, mixer, and modulation layouts remain shared.
+- Name repeated values as sequences with a count rather than separate numbered
+  fields when their storage and meaning are uniform. Give distinct fields names
+  when their meanings differ, even if they are adjacent bytes.
+- Name unexplained regions `unknown` (or `unknown_0`, `unknown_1`, etc. within
+  one type), and combine adjacent unknown bytes into one field. Do not infer
+  semantics from a stable value or another file's layout alone.
+- Keep schema `doc` text concise and user-facing: describe stored data, not
+  research history, verification status, or why a type was placed in a file.
+  Avoid repeating a containing file's description on `instrument_params`.
+- Keep FX command catalogs with their owning schemas. Phrase and table schemas
+  use the shared FX slot layout; generated pages link to the FX command
+  reference instead of duplicating contextual command lists.
+- Edit canonical `.ksy` files first, then regenerate Markdown. Generated
+  reference pages mirror schema imports and are never edited by hand.
+
 Patch and letter firmware releases should normally be treated as verification
 events for the firmware `{MAJOR}.{MINOR}.x` entry schema, not as new entry
 schema targets. When a new patch release is available, update the fixtures to

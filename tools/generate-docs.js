@@ -75,7 +75,7 @@ function renderFxCommands (firmware, target) {
       '## Instrument (Current Instrument)', '',
       'Current Instrument command labels vary by instrument type.', '')
     for (const [name, label] of fxInstrumentNames) {
-      const owner = modules.find(context => context.data.meta.id === `instrument_${name}_6_0_1`)
+      const owner = modules.find(context => context.data.meta.id === `${name}_6_0_1`)
       const values = owner?.data.enums?.fx_command
       assert.ok(values, `missing ${name} FX commands for ${firmware}`)
       lines.push(`### ${label}`, '', `Source: ${link(file, owner.file, path.relative(root, owner.file))}.`, '',
@@ -226,7 +226,7 @@ function renderTarget (firmware, target, catalog = targets) {
       ...Object.keys(data.types || {}).map(name => `- ${link(file, file, name, `type-${name}`)}`),
       ...Object.keys(data.enums || {}).filter(name => !isFxEnum(name))
         .map(name => `- ${link(file, file, `${name} (enum)`, `enum-${name}`)}`), '')
-    if (context.data.meta.id === 'fx_slot' || context.data.meta.id.startsWith('instrument_table_') ||
+    if (context.data.meta.id === 'fx_slot' || context.data.meta.id.startsWith('table_') ||
         Object.keys(data.enums || {}).some(isFxEnum)) {
       lines.push(`FX command values: ${link(file, fxFile(), 'FX command reference')}.`, '')
     }

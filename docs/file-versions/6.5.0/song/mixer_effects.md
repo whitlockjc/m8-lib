@@ -1,4 +1,4 @@
-# song_mixer_effects_6_5_0
+# mixer_effects_6_5_0
 
 Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 

@@ -1,4 +1,4 @@
-# instrument_hypersynth_6_0_1
+# hypersynth_6_0_1
 
 Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 

@@ -26,7 +26,7 @@ seq:
       the remaining reserved bytes in this field. Post-terminator bytes vary between saves
       and must be preserved verbatim, not assumed to be zero-filled padding.
   - id: project_settings
-    type: song_project_6_5_0::settings
+    type: project_6_5_0::settings
     doc: Project settings, including tempo, scale selection, and MIDI input settings.
   - id: unknown_0
     size: 15
@@ -34,15 +34,15 @@ seq:
       Preserved bytes between the Project settings record and Mixer settings.
       The preceding two unknown bytes belong to the Project settings record.
   - id: mixer
-    type: song_mixer_effects_6_5_0::mixer
+    type: mixer_effects_6_5_0::mixer
   - id: grooves
-    type: song_sequencing_6_5_0::grooves
+    type: sequencing_6_5_0::grooves
   - id: rows
-    type: song_sequencing_6_5_0::rows
+    type: sequencing_6_5_0::rows
   - id: phrases
-    type: song_sequencing_6_5_0::phrases
+    type: sequencing_6_5_0::phrases
   - id: chains
-    type: song_sequencing_6_5_0::chains
+    type: sequencing_6_5_0::chains
   - id: tables
     type: tables
     doc: |
@@ -51,14 +51,14 @@ seq:
   - id: instruments
     type: instruments
   - id: effects_and_scope
-    type: song_mixer_effects_6_5_0::effects_and_scope
+    type: mixer_effects_6_5_0::effects_and_scope
   - id: unknown_1
     size: 35
     doc: |
       Preserved bytes between Effects/Mix & Limiter Scope storage and the MIDI
       Mapping table.
   - id: midi_mappings
-    type: song_midi_mapping_6_5_0::mappings
+    type: midi_mapping_6_5_0::mappings
   - id: bookmarks
     type: bookmarks
   - id: scales
@@ -73,21 +73,21 @@ types:
     doc: Contiguous bank of 128 Instrument EQs followed by four global EQs.
     seq:
       - id: instrument
-        type: song_eq_6_5_0::settings
+        type: eq_6_5_0::settings
         repeat: expr
         repeat-expr: 128
         doc: One EQ for each of the 128 Song Instruments.
       - id: mix
-        type: song_eq_6_5_0::settings
+        type: eq_6_5_0::settings
         doc: Master Mix EQ.
       - id: mod_fx
-        type: song_eq_6_5_0::settings
+        type: eq_6_5_0::settings
         doc: ModFX EQ.
       - id: delay
-        type: song_eq_6_5_0::settings
+        type: eq_6_5_0::settings
         doc: Delay EQ.
       - id: reverb
-        type: song_eq_6_5_0::settings
+        type: eq_6_5_0::settings
         doc: Reverb EQ.
   bookmarks:
     doc: |
@@ -136,7 +136,7 @@ types:
       Instruments 0x00 through 0x7f by matching index.
     seq:
       - id: entries
-        type: instrument_table_6_0_1
+        type: table_6_0_1
         repeat: expr
         repeat-expr: 256
   instruments:

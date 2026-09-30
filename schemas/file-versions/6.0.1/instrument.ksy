@@ -22,7 +22,7 @@ seq:
   - id: instrument
     type: data
   - id: table
-    type: instrument_table_6_0_1
+    type: table_6_0_1
 types:
   data:
     doc: |
@@ -95,13 +95,13 @@ types:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_wavsynth_6_0_1::instrument_params
+        type: wavsynth_6_0_1::instrument_params
       - id: filter
-        type: instrument_parameters_6_0_1::filter_params
+        type: parameters_6_0_1::filter_params
       - id: amp
-        type: instrument_parameters_6_0_1::amp_params
+        type: parameters_6_0_1::amp_params
       - id: mixer
-        type: instrument_parameters_6_0_1::mixer_params
+        type: parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 29
   macrosynth_params:
@@ -109,13 +109,13 @@ types:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_macrosynth_6_0_1::instrument_params
+        type: macrosynth_6_0_1::instrument_params
       - id: filter
-        type: instrument_parameters_6_0_1::filter_params
+        type: parameters_6_0_1::filter_params
       - id: amp
-        type: instrument_parameters_6_0_1::amp_params
+        type: parameters_6_0_1::amp_params
       - id: mixer
-        type: instrument_parameters_6_0_1::mixer_params
+        type: parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 29
   sampler_params:
@@ -126,19 +126,19 @@ types:
       - id: unknown_0
         size: 2
       - id: controls
-        type: instrument_sampler_6_0_1::instrument_params
+        type: sampler_6_0_1::instrument_params
       - id: filter
-        type: instrument_parameters_6_0_1::filter_params
+        type: parameters_6_0_1::filter_params
       - id: amp
-        type: instrument_parameters_6_0_1::amp_params
+        type: parameters_6_0_1::amp_params
       - id: mixer
-        type: instrument_parameters_6_0_1::mixer_params
+        type: parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 28
   midi_out_params:
     seq:
       - id: params
-        type: instrument_midi_out_6_0_1::instrument_params
+        type: midi_out_6_0_1::instrument_params
       - id: unknown
         size: 18
   fm_synth_params:
@@ -146,13 +146,13 @@ types:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_fm_synth_6_0_1::instrument_params
+        type: fm_synth_6_0_1::instrument_params
       - id: filter
-        type: instrument_parameters_6_0_1::filter_params
+        type: parameters_6_0_1::filter_params
       - id: amp
-        type: instrument_parameters_6_0_1::amp_params
+        type: parameters_6_0_1::amp_params
       - id: mixer
-        type: instrument_parameters_6_0_1::mixer_params
+        type: parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 1
   hypersynth_params:
@@ -160,13 +160,13 @@ types:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_hypersynth_6_0_1::instrument_params
+        type: hypersynth_6_0_1::instrument_params
       - id: filter
-        type: instrument_parameters_6_0_1::filter_params
+        type: parameters_6_0_1::filter_params
       - id: amp
-        type: instrument_parameters_6_0_1::amp_params
+        type: parameters_6_0_1::amp_params
       - id: mixer
-        type: instrument_parameters_6_0_1::mixer_params
+        type: parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 22
   external_params:
@@ -174,13 +174,13 @@ types:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_external_6_0_1::instrument_params
+        type: external_6_0_1::instrument_params
       - id: filter
-        type: instrument_parameters_6_0_1::filter_params
+        type: parameters_6_0_1::filter_params
       - id: amp
-        type: instrument_parameters_6_0_1::amp_params
+        type: parameters_6_0_1::amp_params
       - id: mixer
-        type: instrument_parameters_6_0_1::mixer_params
+        type: parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 21
   standard_tail:
@@ -202,7 +202,7 @@ types:
       - id: modulators
         type: modulators
       - id: sample_path
-        type: instrument_sampler_6_0_1::sample_path
+        type: sampler_6_0_1::sample_path
         size: 128
         doc: |
           Selected sample path in a fixed 128-byte field, following the same
@@ -213,7 +213,7 @@ types:
       - id: modulators
         type: modulators
       - id: chords
-        type: instrument_hypersynth_6_0_1::chord
+        type: hypersynth_6_0_1::chord
         repeat: expr
         repeat-expr: 16
       - id: unknown
@@ -226,7 +226,7 @@ types:
       bytes as unknown, without assigning modulation semantics.
     seq:
       - id: slots
-        type: instrument_modulation_6_0_1::slot
+        type: modulation_6_0_1::slot
         repeat: expr
         repeat-expr: 4
 enums:

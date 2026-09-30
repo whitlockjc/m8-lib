@@ -1,5 +1,5 @@
 meta:
-  id: instrument_hypersynth_6_0_2
+  id: hypersynth_6_0_2
   endian: le
   license: Apache-2.0
   ks-version: 0.11

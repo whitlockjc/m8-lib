@@ -1,5 +1,5 @@
 meta:
-  id: instrument_external_6_0_1
+  id: external_6_0_1
   endian: le
   license: Apache-2.0
   ks-version: 0.11
@@ -28,7 +28,7 @@ types:
         doc: |
           Program change, displayed in decimal; program 126 is stored as 0x7e.
       - id: custom_ccs
-        type: instrument_parameters_6_0_1::custom_cc
+        type: parameters_6_0_1::custom_cc
         repeat: expr
         repeat-expr: 4
         doc: Four configurable MIDI controller number and value pairs.

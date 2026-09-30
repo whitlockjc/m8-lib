@@ -1,4 +1,4 @@
-# instrument_external_6_0_1
+# external_6_0_1
 
 Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 
@@ -14,7 +14,7 @@ File schema version: `6.0.1`.
 
 ## Imports
 
-- [instrument_parameters_6_0_1](parameters.md)
+- [parameters_6_0_1](parameters.md)
 
 ## Contents
 
@@ -47,7 +47,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `channel` | `0x02` | 1 | `u1` | - | MIDI channel, displayed in decimal; channel 16 is stored as 0x10.  |
 | `bank` | `0x03` | 1 | `u1` | - | MIDI bank, displayed in decimal; bank 127 is stored as 0x7f.  |
 | `program_change` | `0x04` | 1 | `u1` | - | Program change, displayed in decimal; program 126 is stored as 0x7e.  |
-| `custom_ccs` | `0x05..0x0c` | 8 | [instrument_parameters_6_0_1::custom_cc](parameters.md#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `4` | Four configurable MIDI controller number and value pairs. |
+| `custom_ccs` | `0x05..0x0c` | 8 | [parameters_6_0_1::custom_cc](parameters.md#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `4` | Four configurable MIDI controller number and value pairs. |
 
 ## Enum: input
 

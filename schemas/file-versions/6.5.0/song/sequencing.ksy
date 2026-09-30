@@ -1,5 +1,5 @@
 meta:
-  id: song_sequencing_6_5_0
+  id: sequencing_6_5_0
   endian: le
   license: Apache-2.0
   ks-version: 0.11

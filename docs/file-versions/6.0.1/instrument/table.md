@@ -1,4 +1,4 @@
-# instrument_table_6_0_1
+# table_6_0_1
 
 Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 

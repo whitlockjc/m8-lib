@@ -1,5 +1,5 @@
 meta:
-  id: instrument_midi_out_6_0_1
+  id: midi_out_6_0_1
   endian: le
   license: Apache-2.0
   ks-version: 0.11
@@ -29,7 +29,7 @@ types:
       - id: unknown_1
         size: 3
       - id: custom_ccs
-        type: instrument_parameters_6_0_1::custom_cc
+        type: parameters_6_0_1::custom_cc
         repeat: expr
         repeat-expr: 10
         doc: Ten configurable MIDI controller number and value pairs.

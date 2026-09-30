@@ -1,5 +1,5 @@
 meta:
-  id: instrument_wavsynth_6_0_1
+  id: wavsynth_6_0_1
   endian: le
   license: Apache-2.0
   ks-version: 0.11

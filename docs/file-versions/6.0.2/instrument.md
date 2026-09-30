@@ -16,18 +16,18 @@ File schema version: `6.0.2`.
 
 ## Imports
 
-- [instrument_modulation_6_0_1](../6.0.1/instrument/modulation.md)
-- [instrument_parameters_6_0_1](../6.0.1/instrument/parameters.md)
-- [instrument_table_6_0_1](../6.0.1/instrument/table.md)
-- [instrument_wavsynth_6_0_1](../6.0.1/instrument/wavsynth.md)
-- [instrument_macrosynth_6_0_1](../6.0.1/instrument/macrosynth.md)
-- [instrument_sampler_6_0_1](../6.0.1/instrument/sampler.md)
-- [instrument_midi_out_6_0_1](../6.0.1/instrument/midi_out.md)
-- [instrument_fm_synth_6_0_1](../6.0.1/instrument/fm_synth.md)
-- [instrument_hypersynth_6_0_1](../6.0.1/instrument/hypersynth.md)
-- [instrument_external_6_0_1](../6.0.1/instrument/external.md)
-- [instrument_none_6_0_1](../6.0.1/instrument/none.md)
-- [instrument_hypersynth_6_0_2](instrument/hypersynth.md)
+- [modulation_6_0_1](../6.0.1/instrument/modulation.md)
+- [parameters_6_0_1](../6.0.1/instrument/parameters.md)
+- [table_6_0_1](../6.0.1/instrument/table.md)
+- [wavsynth_6_0_1](../6.0.1/instrument/wavsynth.md)
+- [macrosynth_6_0_1](../6.0.1/instrument/macrosynth.md)
+- [sampler_6_0_1](../6.0.1/instrument/sampler.md)
+- [midi_out_6_0_1](../6.0.1/instrument/midi_out.md)
+- [fm_synth_6_0_1](../6.0.1/instrument/fm_synth.md)
+- [hypersynth_6_0_1](../6.0.1/instrument/hypersynth.md)
+- [external_6_0_1](../6.0.1/instrument/external.md)
+- [none_6_0_1](../6.0.1/instrument/none.md)
+- [hypersynth_6_0_2](instrument/hypersynth.md)
 
 ## Contents
 
@@ -60,7 +60,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `instrument` | `0x00..0xd6` | 215 | [data](#type-data) | - |  |
-| `table` | `0xd7..0x156` | 128 | [instrument_table_6_0_1](../6.0.1/instrument/table.md#layout) | `repeat`: `16` via `rows` |  |
+| `table` | `0xd7..0x156` | 128 | [table_6_0_1](../6.0.1/instrument/table.md#layout) | `repeat`: `16` via `rows` |  |
 
 ## Type: data
 
@@ -121,10 +121,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` |  |
-| `params` | `0x03..0x07` | 5 | [instrument_wavsynth_6_0_1::instrument_params](../6.0.1/instrument/wavsynth.md#type-instrument_params) | - |  |
-| `filter` | `0x08..0x0a` | 3 | [instrument_parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
-| `amp` | `0x0b..0x0d` | 3 | [instrument_parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
-| `mixer` | `0x0e..0x11` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
+| `params` | `0x03..0x07` | 5 | [wavsynth_6_0_1::instrument_params](../6.0.1/instrument/wavsynth.md#type-instrument_params) | - |  |
+| `filter` | `0x08..0x0a` | 3 | [parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
+| `amp` | `0x0b..0x0d` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
+| `mixer` | `0x0e..0x11` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x12..0x2e` | 29 | bytes | `size`: `29` |  |
 
 ## Type: macrosynth_params
@@ -138,10 +138,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` |  |
-| `params` | `0x03..0x07` | 5 | [instrument_macrosynth_6_0_1::instrument_params](../6.0.1/instrument/macrosynth.md#type-instrument_params) | - |  |
-| `filter` | `0x08..0x0a` | 3 | [instrument_parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
-| `amp` | `0x0b..0x0d` | 3 | [instrument_parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
-| `mixer` | `0x0e..0x11` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
+| `params` | `0x03..0x07` | 5 | [macrosynth_6_0_1::instrument_params](../6.0.1/instrument/macrosynth.md#type-instrument_params) | - |  |
+| `filter` | `0x08..0x0a` | 3 | [parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
+| `amp` | `0x0b..0x0d` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
+| `mixer` | `0x0e..0x11` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x12..0x2e` | 29 | bytes | `size`: `29` |  |
 
 ## Type: sampler_params
@@ -157,10 +157,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x01` | 2 | bytes | `size`: `2` |  |
-| `controls` | `0x02..0x08` | 7 | [instrument_sampler_6_0_1::instrument_params](../6.0.1/instrument/sampler.md#type-instrument_params) | - |  |
-| `filter` | `0x09..0x0b` | 3 | [instrument_parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
-| `amp` | `0x0c..0x0e` | 3 | [instrument_parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
-| `mixer` | `0x0f..0x12` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
+| `controls` | `0x02..0x08` | 7 | [sampler_6_0_1::instrument_params](../6.0.1/instrument/sampler.md#type-instrument_params) | - |  |
+| `filter` | `0x09..0x0b` | 3 | [parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
+| `amp` | `0x0c..0x0e` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
+| `mixer` | `0x0f..0x12` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x13..0x2e` | 28 | bytes | `size`: `28` |  |
 
 ## Type: midi_out_params
@@ -173,7 +173,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `params` | `0x00..0x1c` | 29 | [instrument_midi_out_6_0_1::instrument_params](../6.0.1/instrument/midi_out.md#type-instrument_params) | - |  |
+| `params` | `0x00..0x1c` | 29 | [midi_out_6_0_1::instrument_params](../6.0.1/instrument/midi_out.md#type-instrument_params) | - |  |
 | `unknown` | `0x1d..0x2e` | 18 | bytes | `size`: `18` |  |
 
 ## Type: fm_synth_params
@@ -187,10 +187,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` |  |
-| `params` | `0x03..0x23` | 33 | [instrument_fm_synth_6_0_1::instrument_params](../6.0.1/instrument/fm_synth.md#type-instrument_params) | - |  |
-| `filter` | `0x24..0x26` | 3 | [instrument_parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
-| `amp` | `0x27..0x29` | 3 | [instrument_parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
-| `mixer` | `0x2a..0x2d` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
+| `params` | `0x03..0x23` | 33 | [fm_synth_6_0_1::instrument_params](../6.0.1/instrument/fm_synth.md#type-instrument_params) | - |  |
+| `filter` | `0x24..0x26` | 3 | [parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
+| `amp` | `0x27..0x29` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
+| `mixer` | `0x2a..0x2d` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x2e` | 1 | bytes | `size`: `1` |  |
 
 ## Type: hypersynth_params
@@ -204,10 +204,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` |  |
-| `params` | `0x03..0x0e` | 12 | [instrument_hypersynth_6_0_1::instrument_params](../6.0.1/instrument/hypersynth.md#type-instrument_params) | - |  |
-| `filter` | `0x0f..0x11` | 3 | [instrument_parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
-| `amp` | `0x12..0x14` | 3 | [instrument_parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
-| `mixer` | `0x15..0x18` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
+| `params` | `0x03..0x0e` | 12 | [hypersynth_6_0_1::instrument_params](../6.0.1/instrument/hypersynth.md#type-instrument_params) | - |  |
+| `filter` | `0x0f..0x11` | 3 | [parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
+| `amp` | `0x12..0x14` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
+| `mixer` | `0x15..0x18` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x19..0x1b` | 3 | bytes | `size`: `3` |  |
 | `shape` | `0x1c` | 1 | `u1`; [shape](instrument/hypersynth.md#enum-shape) | - | Hypersynth waveform shape. |
 | `unknown_2` | `0x1d..0x2e` | 18 | bytes | `size`: `18` |  |
@@ -223,10 +223,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` |  |
-| `params` | `0x03..0x0f` | 13 | [instrument_external_6_0_1::instrument_params](../6.0.1/instrument/external.md#type-instrument_params) | - |  |
-| `filter` | `0x10..0x12` | 3 | [instrument_parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
-| `amp` | `0x13..0x15` | 3 | [instrument_parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
-| `mixer` | `0x16..0x19` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
+| `params` | `0x03..0x0f` | 13 | [external_6_0_1::instrument_params](../6.0.1/instrument/external.md#type-instrument_params) | - |  |
+| `filter` | `0x10..0x12` | 3 | [parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
+| `amp` | `0x13..0x15` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
+| `mixer` | `0x16..0x19` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x1a..0x2e` | 21 | bytes | `size`: `21` |  |
 
 ## Type: standard_tail
@@ -268,7 +268,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
-| `sample_path` | `0x18..0x97` | 128 | [instrument_sampler_6_0_1::sample_path](../6.0.1/instrument/sampler.md#type-sample_path) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. The full sample path must be under 128 characters.  |
+| `sample_path` | `0x18..0x97` | 128 | [sampler_6_0_1::sample_path](../6.0.1/instrument/sampler.md#type-sample_path) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. The full sample path must be under 128 characters.  |
 
 ## Type: hypersynth_tail
 
@@ -281,7 +281,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
-| `chords` | `0x18..0x87` | 112 | [instrument_hypersynth_6_0_1::chord](../6.0.1/instrument/hypersynth.md#type-chord) | `repeat`: `expr`; `repeat-expr`: `16` |  |
+| `chords` | `0x18..0x87` | 112 | [hypersynth_6_0_1::chord](../6.0.1/instrument/hypersynth.md#type-chord) | `repeat`: `expr`; `repeat-expr`: `16` |  |
 | `unknown` | `0x88..0x97` | 16 | bytes | `size`: `16` |  |
 
 ## Type: modulators
@@ -298,7 +298,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `slots` | `0x00..0x17` | 24 | [instrument_modulation_6_0_1::slot](../6.0.1/instrument/modulation.md#type-slot) | `repeat`: `expr`; `repeat-expr`: `4` |  |
+| `slots` | `0x00..0x17` | 24 | [modulation_6_0_1::slot](../6.0.1/instrument/modulation.md#type-slot) | `repeat`: `expr`; `repeat-expr`: `4` |  |
 
 ## Enum: type
 

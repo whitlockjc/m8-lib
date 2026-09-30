@@ -1,4 +1,4 @@
-# instrument_fm_synth_6_0_1
+# fm_synth_6_0_1
 
 Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 

@@ -1,5 +1,5 @@
 meta:
-  id: instrument_macrosynth_6_0_1
+  id: macrosynth_6_0_1
   endian: le
   license: Apache-2.0
   ks-version: 0.11

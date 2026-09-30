@@ -11,18 +11,18 @@ if (!compiledDir) {
 }
 
 const { File65X } = require(path.resolve(compiledDir, 'File65X.js'))
-const { InstrumentWavsynth601 } = require(path.resolve(compiledDir, 'InstrumentWavsynth601.js'))
-const { InstrumentMacrosynth601 } = require(path.resolve(compiledDir, 'InstrumentMacrosynth601.js'))
-const { InstrumentSampler601 } = require(path.resolve(compiledDir, 'InstrumentSampler601.js'))
-const { InstrumentMidiOut601 } = require(path.resolve(compiledDir, 'InstrumentMidiOut601.js'))
-const { InstrumentFmSynth601 } = require(path.resolve(compiledDir, 'InstrumentFmSynth601.js'))
-const { InstrumentHypersynth601 } = require(path.resolve(compiledDir, 'InstrumentHypersynth601.js'))
-const { InstrumentExternal601 } = require(path.resolve(compiledDir, 'InstrumentExternal601.js'))
-const { InstrumentNone601 } = require(path.resolve(compiledDir, 'InstrumentNone601.js'))
-const { SongSequencing650 } = require(path.resolve(compiledDir, 'SongSequencing650.js'))
-const { SongProject650 } = require(path.resolve(compiledDir, 'SongProject650.js'))
-const { SongMixerEffects650 } = require(path.resolve(compiledDir, 'SongMixerEffects650.js'))
-const { SongMidiMapping650 } = require(path.resolve(compiledDir, 'SongMidiMapping650.js'))
+const { Wavsynth601 } = require(path.resolve(compiledDir, 'Wavsynth601.js'))
+const { Macrosynth601 } = require(path.resolve(compiledDir, 'Macrosynth601.js'))
+const { Sampler601 } = require(path.resolve(compiledDir, 'Sampler601.js'))
+const { MidiOut601 } = require(path.resolve(compiledDir, 'MidiOut601.js'))
+const { FmSynth601 } = require(path.resolve(compiledDir, 'FmSynth601.js'))
+const { Hypersynth601 } = require(path.resolve(compiledDir, 'Hypersynth601.js'))
+const { External601 } = require(path.resolve(compiledDir, 'External601.js'))
+const { None601 } = require(path.resolve(compiledDir, 'None601.js'))
+const { Sequencing650 } = require(path.resolve(compiledDir, 'Sequencing650.js'))
+const { Project650 } = require(path.resolve(compiledDir, 'Project650.js'))
+const { MixerEffects650 } = require(path.resolve(compiledDir, 'MixerEffects650.js'))
+const { MidiMapping650 } = require(path.resolve(compiledDir, 'MidiMapping650.js'))
 
 function parse (fixture) {
   const bytes = fs.readFileSync(fixture)
@@ -46,28 +46,28 @@ function verifyTable (table, bytes, offset, label) {
 }
 
 for (const [catalog, expected] of [
-  [InstrumentWavsynth601.FxCommand, 'OSCILLATOR'],
-  [InstrumentMacrosynth601.FxCommand, 'OSCILLATOR'],
-  [InstrumentSampler601.FxCommand, 'PLAY'],
-  [InstrumentFmSynth601.FxCommand, 'ALGORITHM'],
-  [InstrumentMidiOut601.FxCommand, 'MIDI_PROGRAM_BANK'],
-  [InstrumentHypersynth601.FxCommand, 'CHORD'],
-  [InstrumentExternal601.FxCommand, 'MIDI_PROGRAM']
+  [Wavsynth601.FxCommand, 'OSCILLATOR'],
+  [Macrosynth601.FxCommand, 'OSCILLATOR'],
+  [Sampler601.FxCommand, 'PLAY'],
+  [FmSynth601.FxCommand, 'ALGORITHM'],
+  [MidiOut601.FxCommand, 'MIDI_PROGRAM_BANK'],
+  [Hypersynth601.FxCommand, 'CHORD'],
+  [External601.FxCommand, 'MIDI_PROGRAM']
 ]) {
   assert.equal(catalog[0x80], 'VOLUME')
   assert.equal(catalog[0x83], expected)
   assert.equal(catalog[0xff], 'UNSET')
 }
-assert.equal(InstrumentNone601.FxCommand[0xff], 'UNSET')
-assert.equal(SongSequencing650.FxCommand[0x4d], 'MICRO_TIME')
-assert.equal(SongSequencing650.FxCommand[0xff], 'UNSET')
-assert.equal(SongProject650.SyncTransport[0x02], 'TRANSPORT_SPP')
-assert.equal(SongProject650.RecordDelayKill[0x03], 'BOTH')
-assert.equal(SongProject650.InputMode[0x02], 'POLY')
-assert.equal(SongMixerEffects650.ModFxType[0x02], 'FLANGER')
-assert.equal(SongMixerEffects650.DjFilterType[0x02], 'BANDPASS_HIGHPASS')
-assert.equal(SongMidiMapping650.DestinationType[0x05], 'INSTRUMENT')
-assert.equal(SongMidiMapping650.DestinationType[0x19], 'EQ')
+assert.equal(None601.FxCommand[0xff], 'UNSET')
+assert.equal(Sequencing650.FxCommand[0x4d], 'MICRO_TIME')
+assert.equal(Sequencing650.FxCommand[0xff], 'UNSET')
+assert.equal(Project650.SyncTransport[0x02], 'TRANSPORT_SPP')
+assert.equal(Project650.RecordDelayKill[0x03], 'BOTH')
+assert.equal(Project650.InputMode[0x02], 'POLY')
+assert.equal(MixerEffects650.ModFxType[0x02], 'FLANGER')
+assert.equal(MixerEffects650.DjFilterType[0x02], 'BANDPASS_HIGHPASS')
+assert.equal(MidiMapping650.DestinationType[0x05], 'INSTRUMENT')
+assert.equal(MidiMapping650.DestinationType[0x19], 'EQ')
 
 for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_DEFAULT.m8i`)
@@ -180,13 +180,13 @@ const modulationFields = [
 ]
 const observedModulationTypes = new Set()
 const destinationCatalogs = {
-  WAV: [InstrumentWavsynth601.Destination, 0x0b],
-  MAC: [InstrumentMacrosynth601.Destination, 0x0b],
-  SAM: [InstrumentSampler601.Destination, 0x0a],
-  MID: [InstrumentMidiOut601.Destination, 0x0b],
-  FM: [InstrumentFmSynth601.Destination, 0x0b],
-  HYP: [InstrumentHypersynth601.Destination, 0x0b],
-  EXT: [InstrumentExternal601.Destination, 0x0a]
+  WAV: [Wavsynth601.Destination, 0x0b],
+  MAC: [Macrosynth601.Destination, 0x0b],
+  SAM: [Sampler601.Destination, 0x0a],
+  MID: [MidiOut601.Destination, 0x0b],
+  FM: [FmSynth601.Destination, 0x0b],
+  HYP: [Hypersynth601.Destination, 0x0b],
+  EXT: [External601.Destination, 0x0a]
 }
 const modulationDestinationLabels = ['MOD_AMOUNT', 'MOD_RATE', 'MOD_BOTH', 'MOD_BINV']
 const observedDestinations = new Map()
@@ -228,9 +228,9 @@ for (const [name, [, firstModDestination]] of Object.entries(destinationCatalogs
     [0, 1, 2, 3].map(index => firstModDestination + index),
     `${name} high destinations covered by fixtures`)
 }
-assert.equal(InstrumentWavsynth601.Destination[0x03], 'SIZE')
-assert.equal(InstrumentMacrosynth601.Destination[0x03], 'TIMBRE')
-assert.equal(InstrumentMidiOut601.Destination[0x03], 'CC_C')
+assert.equal(Wavsynth601.Destination[0x03], 'SIZE')
+assert.equal(Macrosynth601.Destination[0x03], 'TIMBRE')
+assert.equal(MidiOut601.Destination[0x03], 'CC_C')
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')

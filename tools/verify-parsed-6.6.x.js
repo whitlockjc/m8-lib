@@ -9,17 +9,17 @@ const compiledDir = process.argv[2]
 if (!compiledDir) throw new Error('usage: node tools/verify-parsed-6.6.x.js <compiled-schema-dir>')
 
 const { File66X } = require(path.resolve(compiledDir, 'File66X.js'))
-const { InstrumentHypersynth602 } = require(path.resolve(compiledDir, 'InstrumentHypersynth602.js'))
+const { Hypersynth602 } = require(path.resolve(compiledDir, 'Hypersynth602.js'))
 const { Song662 } = require(path.resolve(compiledDir, 'Song662.js'))
-const { SongMixerEffects662 } = require(path.resolve(compiledDir, 'SongMixerEffects662.js'))
+const { MixerEffects662 } = require(path.resolve(compiledDir, 'MixerEffects662.js'))
 
 function parse (fixture) {
   const bytes = fs.readFileSync(fixture)
   return { bytes, file: new File66X(new KaitaiStream(bytes)) }
 }
 
-assert.equal(InstrumentHypersynth602.Shape[0x0b], 'SINE_ORGAN')
-assert.equal(SongMixerEffects662.ModFxType[0x03], 'COMB')
+assert.equal(Hypersynth602.Shape[0x0b], 'SINE_ORGAN')
+assert.equal(MixerEffects662.ModFxType[0x03], 'COMB')
 assert.equal(Song662.RowBookmarkColorValue[0x05], 'TEXT_TITLES')
 assert.equal(Song662.RowBookmarkColorValue[0x15], 'TEXT_TITLES_ARROWS')
 

@@ -1,4 +1,4 @@
-# song_midi_mapping_6_5_0
+# midi_mapping_6_5_0
 
 Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 

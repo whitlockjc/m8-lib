@@ -1,4 +1,4 @@
-# instrument_midi_out_6_0_1
+# midi_out_6_0_1
 
 Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 
@@ -14,7 +14,7 @@ File schema version: `6.0.1`.
 
 ## Imports
 
-- [instrument_parameters_6_0_1](parameters.md)
+- [parameters_6_0_1](parameters.md)
 
 ## Contents
 
@@ -47,7 +47,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `unknown_0` | `0x03..0x04` | 2 | bytes | `size`: `2` |  |
 | `program_change` | `0x05` | 1 | `u1` | - | Program change, displayed in decimal; program 126 is stored as 0x7e.  |
 | `unknown_1` | `0x06..0x08` | 3 | bytes | `size`: `3` |  |
-| `custom_ccs` | `0x09..0x1c` | 20 | [instrument_parameters_6_0_1::custom_cc](parameters.md#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `10` | Ten configurable MIDI controller number and value pairs. |
+| `custom_ccs` | `0x09..0x1c` | 20 | [parameters_6_0_1::custom_cc](parameters.md#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `10` | Ten configurable MIDI controller number and value pairs. |
 
 ## Enum: port
 
