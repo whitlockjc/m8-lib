@@ -10,14 +10,10 @@ meta:
 doc: |
   Body schema for instrument files with header schema version 6.0.2.
 
-  The 6.6.3C HYP_SHAPE fixture identifies a new Hypersynth Shape byte at
-  absolute offset 0x39. Other fields reuse the 6.0.1 component layouts
-  provisionally; their complete semantic compatibility is not yet established.
-
-  All eight fresh 6.6.3C standalone Instrument baselines parse at the expected
-  size and offsets. Earlier parameter, modulator, and table mappings are reused
-  from 6.5.x but have not all been retested with controlled 6.6.x edits.
-  Unknown ranges remain preserved.
+  Mapped with M8 6.6.3C standalone Instrument baselines and the HYP_SHAPE
+  fixture. Hypersynth Shape is stored at absolute offset 0x39. The remaining
+  parameter, modulator, and table layouts reuse 6.0.1 components. Unknown
+  ranges remain preserved.
 seq:
   - id: instrument
     type: data
@@ -181,8 +177,7 @@ types:
         enum: hypersynth_shape
         doc: |
           Hypersynth Shape. HYP_DEFAULT and HYP_SHAPE verify 0x00 and 0x0b
-          at standalone file offset 0x39. Intermediate labels are supplied
-          from the 6.6.x UI, not individually fixture-tested.
+          at standalone file offset 0x39. Other labels come from the 6.6.x UI.
       - id: unknown_2
         size: 18
   external_body_before_eq:

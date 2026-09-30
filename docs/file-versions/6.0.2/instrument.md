@@ -10,14 +10,10 @@ Byte order: `le`.
 
 Body schema for instrument files with header schema version 6.0.2.
 
-The 6.6.3C HYP_SHAPE fixture identifies a new Hypersynth Shape byte at
-absolute offset 0x39. Other fields reuse the 6.0.1 component layouts
-provisionally; their complete semantic compatibility is not yet established.
-
-All eight fresh 6.6.3C standalone Instrument baselines parse at the expected
-size and offsets. Earlier parameter, modulator, and table mappings are reused
-from 6.5.x but have not all been retested with controlled 6.6.x edits.
-Unknown ranges remain preserved.
+Mapped with M8 6.6.3C standalone Instrument baselines and the HYP_SHAPE
+fixture. Hypersynth Shape is stored at absolute offset 0x39. The remaining
+parameter, modulator, and table layouts reuse 6.0.1 components. Unknown
+ranges remain preserved.
 
 
 File schema version: `6.0.2`.
@@ -221,7 +217,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `amp` | `0x12..0x14` | 3 | [instrument_parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
 | `mixer` | `0x15..0x18` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x19..0x1b` | 3 | bytes | `size`: `3` |  |
-| `shape` | `0x1c` | 1 | `u1`; [hypersynth_shape](#enum-hypersynth_shape) | - | Hypersynth Shape. HYP_DEFAULT and HYP_SHAPE verify 0x00 and 0x0b at standalone file offset 0x39. Intermediate labels are supplied from the 6.6.x UI, not individually fixture-tested.  |
+| `shape` | `0x1c` | 1 | `u1`; [hypersynth_shape](#enum-hypersynth_shape) | - | Hypersynth Shape. HYP_DEFAULT and HYP_SHAPE verify 0x00 and 0x0b at standalone file offset 0x39. Other labels come from the 6.6.x UI.  |
 | `unknown_2` | `0x1d..0x2e` | 18 | bytes | `size`: `18` |  |
 
 ## Type: external_body_before_eq

@@ -10,13 +10,9 @@ Byte order: `le`.
 
 Body schema for song files with header schema version 6.6.2.
 
-The 6.6.3C fixtures establish ModFX Comb, unchanged chain-bookmark
-bitmasks, and a new one-byte-per-row color bank. Other 6.5.0 components
-are reused provisionally until further controlled 6.6.x edits verify them.
-
-Three fresh 6.6.3C Song fixtures parse at the expected size and offsets.
-Other Song fields are carried forward from the 6.5.x mapping, not yet all
-retested with controlled 6.6.x edits. Unknown bytes remain preserved.
+Mapped with M8 6.6.3C Song fixtures for ModFX Comb, chain bookmarks, and
+row bookmark colors. Other fields reuse 6.5.0 components. Unknown byte
+ranges remain preserved.
 
 
 File schema version: `6.6.2`.

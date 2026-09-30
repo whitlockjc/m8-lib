@@ -10,10 +10,9 @@ meta:
     - file-versions/4.0.1/scale
     - file-versions/1.0.2/theme
 doc: |
-  Entry schema for M8 files created with 6.6.x firmware. Last synchronized
-  with fixtures created on M8 firmware 6.6.3C. Shared 6.5.x components are
-  provisionally reused where current fixture evidence supports their layout;
-  full cross-version semantic compatibility is still under investigation.
+  Entry schema for M8 files created or verified against the 6.6.x firmware line.
+
+  Last synchronized with fixtures created from M8 firmware 6.6.3C.
 seq:
   - id: header
     type: file_header

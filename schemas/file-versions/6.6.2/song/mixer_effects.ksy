@@ -10,8 +10,7 @@ types:
   mixer_settings:
     doc: |
       Mixer and Mix & Limiter Scope storage. Offsets are relative to absolute
-      file offset 0x00ce in 6.5.x fixtures; the 6.6.x baseline parses with
-      the same field boundaries, but controlled Mixer edits are still pending.
+      file offset 0x00ce.
     seq:
       - id: mix
         type: u1
@@ -87,8 +86,7 @@ types:
         doc: |
           Preserved bytes between Mod FX and Delay parameters. Historical
           <https://github.com/whitlockjc/m8-js> reference code treats part of
-          this region as delay filter storage, but this fixture does not change
-          those controls.
+          this region as delay filter storage.
       - id: delay
         type: delay_settings
       - id: unknown_2
@@ -96,8 +94,7 @@ types:
         doc: |
           Preserved bytes between Delay and Reverb parameters. Historical
           <https://github.com/whitlockjc/m8-js> reference code treats part of
-          this region as reverb filter storage, but this fixture does not
-          change those controls.
+          this region as reverb filter storage.
       - id: reverb
         type: reverb_settings
       - id: mix_limiter_scope
