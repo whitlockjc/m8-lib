@@ -17,11 +17,11 @@ File schema version: `6.5.0`.
 ## Contents
 
 - [Layout](#layout)
-- [eq_settings](#type-eq_settings)
-- [instrument_eqs](#type-instrument_eqs)
-- [eq_band](#type-eq_band)
-- [eq_filter_type (enum)](#enum-eq_filter_type)
-- [eq_filter_mode (enum)](#enum-eq_filter_mode)
+- [settings](#type-settings)
+- [instrument_bank](#type-instrument_bank)
+- [band](#type-band)
+- [filter_type (enum)](#enum-filter_type)
+- [filter_mode (enum)](#enum-filter_mode)
 
 ## Layout
 
@@ -29,9 +29,9 @@ Root record.
 
 
 
-## Type: eq_settings
+## Type: settings
 
-`eq_settings`
+`settings`
 
 Three-band EQ storage. Each known EQ uses three adjacent 6-byte band
 records.
@@ -41,13 +41,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `low_band` | `0x00..0x05` | 6 | [eq_band](#type-eq_band) | - | Low EQ band. |
-| `mid_band` | `0x06..0x0b` | 6 | [eq_band](#type-eq_band) | - | Mid EQ band. |
-| `high_band` | `0x0c..0x11` | 6 | [eq_band](#type-eq_band) | - | High EQ band. |
+| `low_band` | `0x00..0x05` | 6 | [band](#type-band) | - | Low EQ band. |
+| `mid_band` | `0x06..0x0b` | 6 | [band](#type-band) | - | Mid EQ band. |
+| `high_band` | `0x0c..0x11` | 6 | [band](#type-band) | - | High EQ band. |
 
-## Type: instrument_eqs
+## Type: instrument_bank
 
-`instrument_eqs`
+`instrument_bank`
 
 128 assignable Instrument EQ banks, each with the standard 18-byte EQ layout.
 
@@ -55,11 +55,11 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x8ff` | 2304 | [eq_settings](#type-eq_settings) | `repeat`: `expr`; `repeat-expr`: `128` |  |
+| `entries` | `0x00..0x8ff` | 2304 | [settings](#type-settings) | `repeat`: `expr`; `repeat-expr`: `128` |  |
 
-## Type: eq_band
+## Type: band
 
-`eq_band`
+`band`
 
 Six-byte EQ band record. The type and mode are packed into one byte: bits
 0..4 hold the filter type and bits 5..7 hold the filter mode. Frequency
@@ -82,12 +82,12 @@ Value expressions do not consume bytes. Positioned instances read the specified 
 
 | Name | Type | Expression / Position / Rules | Description |
 | --- | --- | --- | --- |
-| `filter_type` | derived; [eq_filter_type](#enum-eq_filter_type) | `value`: `type_and_mode & 0x1f` |  |
-| `filter_mode` | derived; [eq_filter_mode](#enum-eq_filter_mode) | `value`: `type_and_mode >> 5` |  |
+| `filter_type` | derived; [filter_type](#enum-filter_type) | `value`: `type_and_mode & 0x1f` |  |
+| `filter_mode` | derived; [filter_mode](#enum-filter_mode) | `value`: `type_and_mode >> 5` |  |
 
-## Enum: eq_filter_type
+## Enum: filter_type
 
-`eq_filter_type`
+`filter_type`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -99,9 +99,9 @@ Value expressions do not consume bytes. Positioned instances read the specified 
 | `0x05` | `hi_cut` | HI.CUT |  |
 | `0x06` | `allpass` | ALLPASS |  |
 
-## Enum: eq_filter_mode
+## Enum: filter_mode
 
-`eq_filter_mode`
+`filter_mode`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |

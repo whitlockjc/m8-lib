@@ -80,16 +80,16 @@ types:
           Three shared FX slots. The UI groups commands as Sequencer,
           Mixer & Effects, Current Instrument, and Instrument Mods. Available
           labels depend on the surrounding instrument and modulation type.
-  song_rows:
+  rows:
     doc: |
       Song View storage of 256 rows, each with one chain index per track.
     seq:
       - id: entries
-        type: song_row
+        type: row
         repeat: expr
         repeat-expr: 256
         doc: Song rows indexed 0x00 through 0xff.
-  song_row:
+  row:
     doc: |
       Eight-byte Song View row. Each byte stores the chain index assigned to a
       track; tracks[0] is M8 Track 1. 0xff means unset.
@@ -150,7 +150,7 @@ enums:
     0xa3: { id: mod_4_parameter_3 }
     0xa4: { id: mod_4_parameter_4 }
     0xa5: { id: mod_4_parameter_5 }
-  phrase_fx_command:
+  fx_command:
     0x00:
       id: arpeggio
       -label: ARP

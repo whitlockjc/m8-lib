@@ -12,12 +12,12 @@ doc: |
   and Instrument Mods command groups. Command labels depend on context.
 seq:
   - id: rows
-    type: table_row
+    type: row
     repeat: expr
     repeat-expr: 16
     doc: Sixteen rows of transpose, volume, and three FX slots.
 types:
-  table_row:
+  row:
     doc: One eight-byte instrument table row.
     seq:
       - id: transpose
@@ -35,7 +35,7 @@ types:
           Mixer & Effects, Current Instrument, and Instrument Mods. Available
           labels depend on the surrounding instrument and modulation type.
 enums:
-  wavsynth_table_fx_command:
+  wavsynth_fx_command:
     0x80:
       id: volume
       -label: VOL
@@ -99,7 +99,7 @@ enums:
     0xff:
       id: unset
       -label: --
-  macrosynth_table_fx_command:
+  macrosynth_fx_command:
     0x80:
       id: volume
       -label: VOL
@@ -163,7 +163,7 @@ enums:
     0xff:
       id: unset
       -label: --
-  sampler_table_fx_command:
+  sampler_fx_command:
     0x80:
       id: volume
       -label: VOL
@@ -227,7 +227,7 @@ enums:
     0xff:
       id: unset
       -label: --
-  fm_synth_table_fx_command:
+  fm_synth_fx_command:
     0x80:
       id: volume
       -label: VOL
@@ -291,7 +291,7 @@ enums:
     0xff:
       id: unset
       -label: --
-  midi_out_table_fx_command:
+  midi_out_fx_command:
     0x80:
       id: volume
       -label: VOL
@@ -343,7 +343,7 @@ enums:
     0xff:
       id: unset
       -label: --
-  hypersynth_table_fx_command:
+  hypersynth_fx_command:
     0x80:
       id: volume
       -label: VOL
@@ -407,7 +407,7 @@ enums:
     0xff:
       id: unset
       -label: --
-  external_table_fx_command:
+  external_fx_command:
     0x80:
       id: volume
       -label: VOL
@@ -471,7 +471,7 @@ enums:
     0xff:
       id: unset
       -label: --
-  none_table_fx_command:
+  none_fx_command:
     0xff:
       id: unset
       -label: --

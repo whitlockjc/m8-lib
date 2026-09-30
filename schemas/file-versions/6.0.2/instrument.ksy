@@ -23,19 +23,19 @@ types:
       The EQ assignment follows the type-specific region.
     seq:
       - id: general_settings
-        type: general_instrument_settings
+        type: general_settings
       - id: body_before_eq
         type:
           switch-on: general_settings.type
           cases:
-            'instrument_type::wavsynth': wavsynth_body_before_eq
-            'instrument_type::macrosynth': macrosynth_body_before_eq
-            'instrument_type::sampler': sampler_body_before_eq
-            'instrument_type::midi_out': midi_out_body_before_eq
-            'instrument_type::fm_synth': fm_synth_body_before_eq
-            'instrument_type::hypersynth': hypersynth_body_before_eq
-            'instrument_type::external': external_body_before_eq
-            'instrument_type::none': unused_body_before_eq
+            'type::wavsynth': wavsynth_body_before_eq
+            'type::macrosynth': macrosynth_body_before_eq
+            'type::sampler': sampler_body_before_eq
+            'type::midi_out': midi_out_body_before_eq
+            'type::fm_synth': fm_synth_body_before_eq
+            'type::hypersynth': hypersynth_body_before_eq
+            'type::external': external_body_before_eq
+            'type::none': unused_body_before_eq
         doc: Instrument-specific body before the common EQ field.
       - id: eq
         type: u1
@@ -46,22 +46,22 @@ types:
         type:
           switch-on: general_settings.type
           cases:
-            'instrument_type::sampler': sampler_data_tail
-            'instrument_type::hypersynth': hypersynth_data_tail
-            'instrument_type::midi_out': standard_data_tail
-            'instrument_type::wavsynth': standard_data_tail
-            'instrument_type::macrosynth': standard_data_tail
-            'instrument_type::fm_synth': standard_data_tail
-            'instrument_type::external': standard_data_tail
-            'instrument_type::none': none_data_tail
+            'type::sampler': sampler_tail
+            'type::hypersynth': hypersynth_tail
+            'type::midi_out': standard_tail
+            'type::wavsynth': standard_tail
+            'type::macrosynth': standard_tail
+            'type::fm_synth': standard_tail
+            'type::external': standard_tail
+            'type::none': none_tail
         doc: Instrument-specific tail after the common EQ field.
-  general_instrument_settings:
+  general_settings:
     doc: |
       General Instrument Settings prefix. The EQ assignment is stored separately.
     seq:
       - id: type
         type: u1
-        enum: instrument_type
+        enum: type
       - id: name
         size: 12
         doc: |
@@ -113,7 +113,7 @@ types:
   sampler_body_before_eq:
     doc: |
       Sampler-specific controls are stored here; the selected sample_path is
-      another Sampler-specific parameter stored in sampler_data_tail.
+      another Sampler-specific parameter stored in sampler_tail.
     seq:
       - id: unknown_0
         size: 2
@@ -181,32 +181,32 @@ types:
         type: instrument_parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 21
-  standard_data_tail:
+  standard_tail:
     seq:
       - id: modulators
-        type: instrument_modulators
+        type: modulators
       - id: unknown
         size: 128
-  none_data_tail:
+  none_tail:
     seq:
       - id: unknown
         size: 152
-  sampler_data_tail:
+  sampler_tail:
     doc: |
       Stores shared modulators followed by the Sampler-specific sample_path.
       The path and sampler_controls belong to the same instrument-specific
       configuration despite their noncontiguous storage.
     seq:
       - id: modulators
-        type: instrument_modulators
+        type: modulators
       - id: sample_path
-        type: sample_path_region
+        type: sample_path
         size: 128
         doc: |
           Selected sample path in a fixed 128-byte field, following the same
           null-terminated path and preserved trailing-byte convention as the
           Song directory. The full sample path must be under 128 characters.
-  sample_path_region:
+  sample_path:
     seq:
       - id: path
         type: strz
@@ -214,10 +214,10 @@ types:
       - id: trailing
         size: _io.size - _io.pos
         doc: Remaining path-field bytes after the terminator; preserve stored bytes.
-  hypersynth_data_tail:
+  hypersynth_tail:
     seq:
       - id: modulators
-        type: instrument_modulators
+        type: modulators
       - id: chords
         type: hypersynth_chord
         repeat: expr
@@ -233,7 +233,7 @@ types:
           corresponding note is enabled.
       - id: notes
         type: instrument_parameters_6_0_1::hypersynth_chord_notes
-  instrument_modulators:
+  modulators:
     doc: |
       Shared Common Modulation Settings block. Four six-byte slots occupy
       standalone offsets 0x4d..0x64 in all seven editable instrument types.
@@ -241,11 +241,11 @@ types:
       bytes as unknown, without assigning modulation semantics.
     seq:
       - id: slots
-        type: instrument_modulation_6_0_1::modulation_slot
+        type: instrument_modulation_6_0_1::slot
         repeat: expr
         repeat-expr: 4
 enums:
-  wavsynth_modulation_destination:
+  wavsynth_destination:
     0x00:
       id: off
       -label: OFF
@@ -291,7 +291,7 @@ enums:
     0x0e:
       id: mod_binv
       -label: MOD BINV
-  macrosynth_modulation_destination:
+  macrosynth_destination:
     0x00:
       id: off
       -label: OFF
@@ -337,7 +337,7 @@ enums:
     0x0e:
       id: mod_binv
       -label: MOD BINV
-  sampler_modulation_destination:
+  sampler_destination:
     0x00:
       id: off
       -label: OFF
@@ -380,7 +380,7 @@ enums:
     0x0d:
       id: mod_binv
       -label: MOD BINV
-  midi_out_modulation_destination:
+  midi_out_destination:
     0x00:
       id: off
       -label: OFF
@@ -426,7 +426,7 @@ enums:
     0x0e:
       id: mod_binv
       -label: MOD BINV
-  fm_synth_modulation_destination:
+  fm_synth_destination:
     0x00:
       id: off
       -label: OFF
@@ -472,7 +472,7 @@ enums:
     0x0e:
       id: mod_binv
       -label: MOD BINV
-  hypersynth_modulation_destination:
+  hypersynth_destination:
     0x00:
       id: off
       -label: OFF
@@ -518,7 +518,7 @@ enums:
     0x0e:
       id: mod_binv
       -label: MOD BINV
-  external_modulation_destination:
+  external_destination:
     0x00:
       id: off
       -label: OFF
@@ -561,7 +561,7 @@ enums:
     0x0d:
       id: mod_binv
       -label: MOD BINV
-  instrument_type:
+  type:
     0x00:
       id: wavsynth
       -label: Wavsynth

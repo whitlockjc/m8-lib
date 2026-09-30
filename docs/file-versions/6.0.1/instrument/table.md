@@ -23,7 +23,7 @@ File schema version: `6.0.1`.
 ## Contents
 
 - [Layout](#layout)
-- [table_row](#type-table_row)
+- [row](#type-row)
 
 FX command values: [FX command reference](../../../common/fx_commands.md).
 
@@ -37,11 +37,11 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `rows` | `0x00..0x7f` | 128 | [table_row](#type-table_row) | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen rows of transpose, volume, and three FX slots. |
+| `rows` | `0x00..0x7f` | 128 | [row](#type-row) | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen rows of transpose, volume, and three FX slots. |
 
-## Type: table_row
+## Type: row
 
-`table_row`
+`row`
 
 One eight-byte instrument table row.
 

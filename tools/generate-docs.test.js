@@ -50,7 +50,7 @@ test('every reachable type, instance, and enum is documented', () => {
       for (const name of Object.keys(definition.instances || {})) assert.ok(source.includes('`' + name + '`'))
     }
     for (const name of Object.keys(context.data.enums || {})) {
-      if (name === 'phrase_fx_command' || name === 'instrument_mod_fx_command' || name.endsWith('_table_fx_command')) {
+      if (name === 'fx_command' || name === 'instrument_mod_fx_command' || name.endsWith('_fx_command')) {
         assert.ok(!source.includes(`## Enum: ${name}\n`))
       } else assert.ok(source.includes(`## Enum: ${name}\n`))
     }

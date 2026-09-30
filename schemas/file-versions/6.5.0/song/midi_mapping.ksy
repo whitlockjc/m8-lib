@@ -7,16 +7,16 @@ doc: |
   MIDI Mapping records and destination groups for Song file schema version
   6.5.0. The Song body determines the 128-entry table position.
 types:
-  midi_mappings:
+  mappings:
     doc: |
       MIDI Mapping page storage containing 128 mapping records.
     seq:
       - id: entries
-        type: midi_mapping
+        type: mapping
         repeat: expr
         repeat-expr: 128
         doc: Up to 128 MIDI control mappings.
-  midi_mapping:
+  mapping:
     doc: |
       Seven-byte MIDI Mapping record.
     seq:
@@ -31,7 +31,7 @@ types:
           MIDI control number. The M8 UI displays 0x80 as T:X and 0x81 as T:Y.
       - id: destination_type
         type: u1
-        enum: midi_mapping_destination_type
+        enum: destination_type
         doc: |
           Destination group. Index and parameter meanings depend on this type.
       - id: destination_index
@@ -47,7 +47,7 @@ types:
         type: u1
         doc: Upper bound of the mapped parameter range.
 enums:
-  midi_mapping_destination_type:
+  destination_type:
     0x05:
       id: instrument
       -label: I

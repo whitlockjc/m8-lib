@@ -26,7 +26,7 @@ seq:
       the remaining reserved bytes in this field. Post-terminator bytes vary between saves
       and must be preserved verbatim, not assumed to be zero-filled padding.
   - id: project_settings
-    type: song_project_6_5_0::project_settings
+    type: song_project_6_5_0::settings
     doc: Project settings, including tempo, scale selection, and MIDI input settings.
   - id: unknown_0
     size: 15
@@ -34,11 +34,11 @@ seq:
       Preserved bytes between the Project settings record and Mixer settings.
       The preceding two unknown bytes belong to the Project settings record.
   - id: mixer
-    type: song_mixer_effects_6_6_2::mixer_settings
+    type: song_mixer_effects_6_6_2::mixer
   - id: grooves
     type: song_sequencing_6_5_0::grooves
   - id: rows
-    type: song_sequencing_6_5_0::song_rows
+    type: song_sequencing_6_5_0::rows
   - id: phrases
     type: song_sequencing_6_5_0::phrases
   - id: chains
@@ -51,18 +51,18 @@ seq:
   - id: instruments
     type: instruments
   - id: effects_and_scope
-    type: song_mixer_effects_6_6_2::effects_and_scope_settings
+    type: song_mixer_effects_6_6_2::effects_and_scope
   - id: unknown_1
     size: 35
     doc: |
       Preserved bytes between Effects/Mix & Limiter Scope storage and the MIDI
       Mapping table.
   - id: midi_mappings
-    type: song_midi_mapping_6_5_0::midi_mappings
+    type: song_midi_mapping_6_5_0::mappings
   - id: bookmarks
     type: bookmarks
   - id: scales
-    type: embedded_scales
+    type: scales
   - id: eqs
     type: eqs
     doc: Instrument and global effect EQ settings.
@@ -79,21 +79,21 @@ types:
     doc: Contiguous bank of 128 Instrument EQs followed by four global EQs.
     seq:
       - id: instrument
-        type: song_eq_6_5_0::eq_settings
+        type: song_eq_6_5_0::settings
         repeat: expr
         repeat-expr: 128
         doc: One EQ for each of the 128 Song Instruments.
       - id: mix
-        type: song_eq_6_5_0::eq_settings
+        type: song_eq_6_5_0::settings
         doc: Master Mix EQ.
       - id: mod_fx
-        type: song_eq_6_5_0::eq_settings
+        type: song_eq_6_5_0::settings
         doc: ModFX EQ.
       - id: delay
-        type: song_eq_6_5_0::eq_settings
+        type: song_eq_6_5_0::settings
         doc: Delay EQ.
       - id: reverb
-        type: song_eq_6_5_0::eq_settings
+        type: song_eq_6_5_0::settings
         doc: Reverb EQ.
   row_bookmark_colors:
     seq:
@@ -166,7 +166,7 @@ types:
         type: instrument_6_0_2::data
         repeat: expr
         repeat-expr: 128
-  embedded_scales:
+  scales:
     doc: |
       Sixteen embedded Scale body records without standalone Scale file headers.
     seq:

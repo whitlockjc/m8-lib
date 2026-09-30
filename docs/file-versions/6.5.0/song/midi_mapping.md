@@ -17,9 +17,9 @@ File schema version: `6.5.0`.
 ## Contents
 
 - [Layout](#layout)
-- [midi_mappings](#type-midi_mappings)
-- [midi_mapping](#type-midi_mapping)
-- [midi_mapping_destination_type (enum)](#enum-midi_mapping_destination_type)
+- [mappings](#type-mappings)
+- [mapping](#type-mapping)
+- [destination_type (enum)](#enum-destination_type)
 
 ## Layout
 
@@ -27,9 +27,9 @@ Root record.
 
 
 
-## Type: midi_mappings
+## Type: mappings
 
-`midi_mappings`
+`mappings`
 
 MIDI Mapping page storage containing 128 mapping records.
 
@@ -38,11 +38,11 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x37f` | 896 | [midi_mapping](#type-midi_mapping) | `repeat`: `expr`; `repeat-expr`: `128` | Up to 128 MIDI control mappings. |
+| `entries` | `0x00..0x37f` | 896 | [mapping](#type-mapping) | `repeat`: `expr`; `repeat-expr`: `128` | Up to 128 MIDI control mappings. |
 
-## Type: midi_mapping
+## Type: mapping
 
-`midi_mapping`
+`mapping`
 
 Seven-byte MIDI Mapping record.
 
@@ -53,15 +53,15 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `channel` | `0x00` | 1 | `u1` | - | 0x00 represents an empty mapping. Other values are displayed as decimal MIDI channels in the M8 UI.  |
 | `control_number` | `0x01` | 1 | `u1` | - | MIDI control number. The M8 UI displays 0x80 as T:X and 0x81 as T:Y.  |
-| `destination_type` | `0x02` | 1 | `u1`; [midi_mapping_destination_type](#enum-midi_mapping_destination_type) | - | Destination group. Index and parameter meanings depend on this type.  |
+| `destination_type` | `0x02` | 1 | `u1`; [destination_type](#enum-destination_type) | - | Destination group. Index and parameter meanings depend on this type.  |
 | `destination_index` | `0x03` | 1 | `u1` | - | Index within the destination group; interpretation depends on destination type. |
 | `destination_parameter` | `0x04` | 1 | `u1` | - | Parameter within the selected destination; labels depend on destination type. |
 | `minimum_value` | `0x05` | 1 | `u1` | - | Lower bound of the mapped parameter range. |
 | `maximum_value` | `0x06` | 1 | `u1` | - | Upper bound of the mapped parameter range. |
 
-## Enum: midi_mapping_destination_type
+## Enum: destination_type
 
-`midi_mapping_destination_type`
+`destination_type`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |

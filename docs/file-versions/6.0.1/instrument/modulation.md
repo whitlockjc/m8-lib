@@ -17,17 +17,17 @@ File schema version: `6.0.1`.
 ## Contents
 
 - [Layout](#layout)
-- [modulation_slot](#type-modulation_slot)
-- [modulation_ahd_env_params](#type-modulation_ahd_env_params)
-- [modulation_adsr_env_params](#type-modulation_adsr_env_params)
-- [modulation_drum_env_params](#type-modulation_drum_env_params)
-- [modulation_lfo_params](#type-modulation_lfo_params)
-- [modulation_trig_env_params](#type-modulation_trig_env_params)
-- [modulation_tracking_params](#type-modulation_tracking_params)
-- [modulation_type (enum)](#enum-modulation_type)
-- [modulation_tracking_source (enum)](#enum-modulation_tracking_source)
-- [modulation_lfo_oscillator (enum)](#enum-modulation_lfo_oscillator)
-- [modulation_lfo_trigger (enum)](#enum-modulation_lfo_trigger)
+- [slot](#type-slot)
+- [ahd_env_params](#type-ahd_env_params)
+- [adsr_env_params](#type-adsr_env_params)
+- [drum_env_params](#type-drum_env_params)
+- [lfo_params](#type-lfo_params)
+- [trig_env_params](#type-trig_env_params)
+- [tracking_params](#type-tracking_params)
+- [type (enum)](#enum-type)
+- [tracking_source (enum)](#enum-tracking_source)
+- [lfo_oscillator (enum)](#enum-lfo_oscillator)
+- [lfo_trigger (enum)](#enum-lfo_trigger)
 
 ## Layout
 
@@ -35,9 +35,9 @@ Root record.
 
 
 
-## Type: modulation_slot
+## Type: slot
 
-`modulation_slot`
+`slot`
 
 Shared six-byte modulation slot: one packed type/destination byte, one
 amount byte, and four type-dependent parameter bytes. The first two
@@ -52,7 +52,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `type_and_destination` | `0x00` | 1 | `u1` | - | Packed byte: high nibble stores modulation type, low nibble stores destination. Destination labels are instrument-specific.  |
 | `amount` | `0x01` | 1 | `u1` | - | Modulation amount. |
-| `params` | `0x02..0x05` | 4 | switch on `modulation_type`: `modulation_type::ahd_env`: [modulation_ahd_env_params](#type-modulation_ahd_env_params); `modulation_type::adsr_env`: [modulation_adsr_env_params](#type-modulation_adsr_env_params); `modulation_type::drum_env`: [modulation_drum_env_params](#type-modulation_drum_env_params); `modulation_type::lfo`: [modulation_lfo_params](#type-modulation_lfo_params); `modulation_type::trig_env`: [modulation_trig_env_params](#type-modulation_trig_env_params); `modulation_type::tracking`: [modulation_tracking_params](#type-modulation_tracking_params) | - | Four-byte payload interpreted according to the modulation type. |
+| `params` | `0x02..0x05` | 4 | switch on `modulation_type`: `type::ahd_env`: [ahd_env_params](#type-ahd_env_params); `type::adsr_env`: [adsr_env_params](#type-adsr_env_params); `type::drum_env`: [drum_env_params](#type-drum_env_params); `type::lfo`: [lfo_params](#type-lfo_params); `type::trig_env`: [trig_env_params](#type-trig_env_params); `type::tracking`: [tracking_params](#type-tracking_params) | - | Four-byte payload interpreted according to the modulation type. |
 
 ### Instances
 
@@ -60,12 +60,12 @@ Value expressions do not consume bytes. Positioned instances read the specified 
 
 | Name | Type | Expression / Position / Rules | Description |
 | --- | --- | --- | --- |
-| `modulation_type` | derived; [modulation_type](#enum-modulation_type) | `value`: `type_and_destination >> 4` |  |
+| `modulation_type` | derived; [type](#enum-type) | `value`: `type_and_destination >> 4` |  |
 | `destination` | derived | `value`: `type_and_destination & 0x0f` | Raw destination nibble shared by all modulation slots. Interpret it using the enclosing instrument type and its corresponding one of seven modulation destination enums in instrument.ksy. No single enum is valid for every instrument.  |
 
-## Type: modulation_ahd_env_params
+## Type: ahd_env_params
 
-`modulation_ahd_env_params`
+`ahd_env_params`
 
 AHD ENV payload; fourth byte is preserved with unknown purpose.
 
@@ -78,9 +78,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `decay` | `0x02` | 1 | `u1` | - | Decay setting. |
 | `unknown` | `0x03` | 1 | `u1` | - |  |
 
-## Type: modulation_adsr_env_params
+## Type: adsr_env_params
 
-`modulation_adsr_env_params`
+`adsr_env_params`
 
 
 
@@ -93,9 +93,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `sustain` | `0x02` | 1 | `u1` | - |  |
 | `release` | `0x03` | 1 | `u1` | - |  |
 
-## Type: modulation_drum_env_params
+## Type: drum_env_params
 
-`modulation_drum_env_params`
+`drum_env_params`
 
 DRUM ENV payload; fourth byte is preserved with unknown purpose.
 
@@ -108,9 +108,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `decay` | `0x02` | 1 | `u1` | - |  |
 | `unknown` | `0x03` | 1 | `u1` | - |  |
 
-## Type: modulation_lfo_params
+## Type: lfo_params
 
-`modulation_lfo_params`
+`lfo_params`
 
 LFO payload; fourth byte is preserved with unknown purpose.
 
@@ -118,14 +118,14 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `oscillator` | `0x00` | 1 | `u1`; [modulation_lfo_oscillator](#enum-modulation_lfo_oscillator) | - |  |
-| `trigger` | `0x01` | 1 | `u1`; [modulation_lfo_trigger](#enum-modulation_lfo_trigger) | - |  |
+| `oscillator` | `0x00` | 1 | `u1`; [lfo_oscillator](#enum-lfo_oscillator) | - |  |
+| `trigger` | `0x01` | 1 | `u1`; [lfo_trigger](#enum-lfo_trigger) | - |  |
 | `frequency` | `0x02` | 1 | `u1` | - |  |
 | `unknown` | `0x03` | 1 | `u1` | - |  |
 
-## Type: modulation_trig_env_params
+## Type: trig_env_params
 
-`modulation_trig_env_params`
+`trig_env_params`
 
 
 
@@ -138,9 +138,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `decay` | `0x02` | 1 | `u1` | - |  |
 | `source` | `0x03` | 1 | `u1` | - |  |
 
-## Type: modulation_tracking_params
+## Type: tracking_params
 
-`modulation_tracking_params`
+`tracking_params`
 
 TRACKING payload; fourth byte is preserved with unknown purpose.
 
@@ -148,14 +148,14 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `source` | `0x00` | 1 | `u1`; [modulation_tracking_source](#enum-modulation_tracking_source) | - |  |
+| `source` | `0x00` | 1 | `u1`; [tracking_source](#enum-tracking_source) | - |  |
 | `lowest_value` | `0x01` | 1 | `u1` | - |  |
 | `highest_value` | `0x02` | 1 | `u1` | - |  |
 | `unknown` | `0x03` | 1 | `u1` | - |  |
 
-## Enum: modulation_type
+## Enum: type
 
-`modulation_type`
+`type`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -166,9 +166,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x04` | `trig_env` | TRIG ENV |  |
 | `0x05` | `tracking` | TRACKING |  |
 
-## Enum: modulation_tracking_source
+## Enum: tracking_source
 
-`modulation_tracking_source`
+`tracking_source`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -176,9 +176,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x01` | `velocity` | VELOCITY |  |
 | `0x02` | `velocity_take` | VEL.TAKE |  |
 
-## Enum: modulation_lfo_oscillator
+## Enum: lfo_oscillator
 
-`modulation_lfo_oscillator`
+`lfo_oscillator`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -203,9 +203,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x12` | `random_t` | RAND T |  |
 | `0x13` | `drunk_t` | DRUNK T |  |
 
-## Enum: modulation_lfo_trigger
+## Enum: lfo_trigger
 
-`modulation_lfo_trigger`
+`lfo_trigger`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |

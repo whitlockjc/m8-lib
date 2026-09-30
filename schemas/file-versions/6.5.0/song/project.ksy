@@ -7,7 +7,7 @@ doc: |
   Project page and MIDI Settings storage for Song file schema version 6.5.0.
   The Song body determines the Project settings position.
 types:
-  project_settings:
+  settings:
     doc: |
       Project page settings.
     seq:
@@ -29,7 +29,7 @@ types:
           Fixed-size byte range for the Project name. Padding bytes are
           preserved as stored.
       - id: midi_settings
-        type: midi_settings
+        type: midi
         doc: Current Song MIDI input and sync settings.
       - id: scale
         type: u1
@@ -45,12 +45,12 @@ types:
         size: 2
         doc: |
           Preserved bytes of unknown purpose.
-  midi_settings:
+  midi:
     doc: |
       MIDI Settings page storage.
     seq:
       - id: sync_settings
-        type: midi_sync_settings
+        type: sync
         doc: |
           Two-byte Sync In and two-byte Sync Out storage. Each setting is
           represented as a clock-enabled boolean plus a transport mode byte.
@@ -91,9 +91,9 @@ types:
           0x01 means ON; 0x00 means OFF.
       - id: mode
         type: u1
-        enum: midi_input_mode
+        enum: input_mode
         doc: MIDI input mode.
-  midi_sync_settings:
+  sync:
     doc: |
       Sync In and Sync Out storage. The M8 UI combines each clock boolean and
       transport byte into one displayed label.
@@ -104,16 +104,16 @@ types:
           0x01 means clock enabled; 0x00 means clock disabled.
       - id: sync_in_transport
         type: u1
-        enum: midi_sync_transport
+        enum: sync_transport
       - id: sync_out_clock
         type: u1
         doc: |
           0x01 means clock enabled; 0x00 means clock disabled.
       - id: sync_out_transport
         type: u1
-        enum: midi_sync_transport
+        enum: sync_transport
 enums:
-  midi_sync_transport:
+  sync_transport:
     0x00:
       id: off
       -label: OFF
@@ -136,7 +136,7 @@ enums:
     0x03:
       id: both
       -label: BOTH
-  midi_input_mode:
+  input_mode:
     0x00:
       id: mono
       -label: MONO

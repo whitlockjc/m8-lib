@@ -11,7 +11,7 @@ const schema = YAML.parse(fs.readFileSync('schemas/file-versions/6.5.0/song/sequ
 const catalog = schema.meta['-fx-instrument-mods']
 const commands = schema.enums.instrument_mod_fx_command
 const modulation = YAML.parse(fs.readFileSync('schemas/file-versions/6.0.1/instrument/modulation.ksy', 'utf8'))
-const types = modulation.enums.modulation_type
+const types = modulation.enums.type
 const slotsByInstrument = [
   ['ahd_env', 'adsr_env', 'drum_env', 'lfo'],
   ['trig_env', 'tracking']

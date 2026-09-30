@@ -17,13 +17,13 @@ File schema version: `6.6.2`.
 ## Contents
 
 - [Layout](#layout)
-- [mixer_settings](#type-mixer_settings)
-- [effects_and_scope_settings](#type-effects_and_scope_settings)
-- [mod_fx_settings](#type-mod_fx_settings)
-- [delay_settings](#type-delay_settings)
-- [reverb_settings](#type-reverb_settings)
-- [mix_limiter_scope_settings](#type-mix_limiter_scope_settings)
-- [mixer_sends](#type-mixer_sends)
+- [mixer](#type-mixer)
+- [effects_and_scope](#type-effects_and_scope)
+- [mod_fx](#type-mod_fx)
+- [delay](#type-delay)
+- [reverb](#type-reverb)
+- [mix_limiter_scope](#type-mix_limiter_scope)
+- [sends](#type-sends)
 - [mod_fx_type (enum)](#enum-mod_fx_type)
 - [dj_filter_type (enum)](#enum-dj_filter_type)
 
@@ -33,9 +33,9 @@ Root record.
 
 
 
-## Type: mixer_settings
+## Type: mixer
 
-`mixer_settings`
+`mixer`
 
 Mixer and Mix & Limiter Scope storage. Offsets are relative to absolute
 file offset 0x00ce.
@@ -48,13 +48,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `mix` | `0x00` | 1 | `u1` | - | Master mix volume. |
 | `limiter` | `0x01` | 1 | `u1` | - | Master limiter amount. |
 | `track_volumes` | `0x02..0x09` | 8 | `u1` | `repeat`: `expr`; `repeat-expr`: `8` | Volume for each of the eight tracks. |
-| `sends` | `0x0a..0x0c` | 3 | [mixer_sends](#type-mixer_sends) | - | Master sends to ModFX, Delay, and Reverb. |
+| `sends` | `0x0a..0x0c` | 3 | [sends](#type-sends) | - | Master sends to ModFX, Delay, and Reverb. |
 | `analog_input_volume` | `0x0d` | 1 | `u1` | - | Analog input volume. |
 | `analog_dual_mono_input_volume` | `0x0e` | 1 | `u1` | - | 0xff displays as unset until dual mono input is enabled.  |
 | `usb_input_volume` | `0x0f` | 1 | `u1` | - | USB input volume. |
-| `analog_input_sends` | `0x10..0x12` | 3 | [mixer_sends](#type-mixer_sends) | - | Analog input effect sends. |
-| `analog_dual_mono_input_sends` | `0x13..0x15` | 3 | [mixer_sends](#type-mixer_sends) | - | Second analog mono input effect sends. |
-| `usb_input_sends` | `0x16..0x18` | 3 | [mixer_sends](#type-mixer_sends) | - | USB input effect sends. |
+| `analog_input_sends` | `0x10..0x12` | 3 | [sends](#type-sends) | - | Analog input effect sends. |
+| `analog_dual_mono_input_sends` | `0x13..0x15` | 3 | [sends](#type-sends) | - | Second analog mono input effect sends. |
+| `usb_input_sends` | `0x16..0x18` | 3 | [sends](#type-sends) | - | USB input effect sends. |
 | `dj_filter` | `0x19` | 1 | `u1` | - | DJ filter setting. |
 | `dj_filter_resonance` | `0x1a` | 1 | `u1` | - | DJ filter resonance. |
 | `dj_filter_type` | `0x1b` | 1 | `u1`; [dj_filter_type](#enum-dj_filter_type) | - | DJ filter type. |
@@ -63,9 +63,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `soft_clip` | `0x1e` | 1 | `u1` | - | 0x00 means OFF; 0x01 means ON.  |
 | `ott` | `0x1f` | 1 | `u1` | - | OTT amount. |
 
-## Type: effects_and_scope_settings
+## Type: effects_and_scope
 
-`effects_and_scope_settings`
+`effects_and_scope`
 
 Shared storage region for the Effects Settings and Mix & Limiter Scope
 views. Storage order does not fully match the UI grouping; the Mod FX
@@ -77,17 +77,17 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` | Preserved bytes before the mapped Mod FX parameter bytes. |
-| `mod_fx` | `0x03..0x06` | 4 | [mod_fx_settings](#type-mod_fx_settings) | - |  |
+| `mod_fx` | `0x03..0x06` | 4 | [mod_fx](#type-mod_fx) | - |  |
 | `unknown_1` | `0x07..0x0b` | 5 | bytes | `size`: `5` | Preserved bytes between Mod FX and Delay parameters. |
-| `delay` | `0x0c..0x10` | 5 | [delay_settings](#type-delay_settings) | - |  |
+| `delay` | `0x0c..0x10` | 5 | [delay](#type-delay) | - |  |
 | `unknown_2` | `0x11..0x13` | 3 | bytes | `size`: `3` | Preserved bytes between Delay and Reverb parameters. |
-| `reverb` | `0x14..0x19` | 6 | [reverb_settings](#type-reverb_settings) | - |  |
-| `mix_limiter_scope` | `0x1a..0x1b` | 2 | [mix_limiter_scope_settings](#type-mix_limiter_scope_settings) | - |  |
+| `reverb` | `0x14..0x19` | 6 | [reverb](#type-reverb) | - |  |
+| `mix_limiter_scope` | `0x1a..0x1b` | 2 | [mix_limiter_scope](#type-mix_limiter_scope) | - |  |
 | `mod_fx_type` | `0x1c` | 1 | `u1`; [mod_fx_type](#enum-mod_fx_type) | - | ModFX type selected in Effects Settings. |
 
-## Type: mod_fx_settings
+## Type: mod_fx
 
-`mod_fx_settings`
+`mod_fx`
 
 Mod FX parameter storage from the Effects Settings View. The Mod FX type
 byte is stored later in the shared Effects/Mix & Limiter Scope region.
@@ -102,9 +102,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `width` | `0x02` | 1 | `u1` | - | ModFX stereo width. |
 | `reverb_send` | `0x03` | 1 | `u1` | - | ModFX send to Reverb. |
 
-## Type: delay_settings
+## Type: delay
 
-`delay_settings`
+`delay`
 
 Delay parameter storage from the Effects Settings View.
 
@@ -118,9 +118,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `width` | `0x03` | 1 | `u1` | - | Delay stereo width. |
 | `reverb_send` | `0x04` | 1 | `u1` | - | Delay send to Reverb. |
 
-## Type: reverb_settings
+## Type: reverb
 
-`reverb_settings`
+`reverb`
 
 Reverb parameter storage from the Effects Settings View.
 
@@ -135,9 +135,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `width` | `0x04` | 1 | `u1` | - | Reverb stereo width. |
 | `shimmer` | `0x05` | 1 | `u1` | - | Reverb shimmer. |
 
-## Type: mix_limiter_scope_settings
+## Type: mix_limiter_scope
 
-`mix_limiter_scope_settings`
+`mix_limiter_scope`
 
 Mix & Limiter Scope storage for OTT detail controls from the Mix &
 Limiter Scope View.
@@ -150,9 +150,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `ott_time` | `0x00` | 1 | `u1` | - | OTT time. |
 | `ott_color` | `0x01` | 1 | `u1` | - | OTT color. |
 
-## Type: mixer_sends
+## Type: sends
 
-`mixer_sends`
+`sends`
 
 Effect send levels for ModFX, Delay, and Reverb.
 

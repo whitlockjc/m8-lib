@@ -7,7 +7,7 @@ doc: |
   Shared modulation slot storage for M8 Instrument file schema 6.0.1.
   Destination labels remain contextual to the enclosing instrument type.
 types:
-  modulation_slot:
+  slot:
     doc: |
       Shared six-byte modulation slot: one packed type/destination byte, one
       amount byte, and four type-dependent parameter bytes. The first two
@@ -27,17 +27,17 @@ types:
         type:
           switch-on: modulation_type
           cases:
-            'modulation_type::ahd_env': modulation_ahd_env_params
-            'modulation_type::adsr_env': modulation_adsr_env_params
-            'modulation_type::drum_env': modulation_drum_env_params
-            'modulation_type::lfo': modulation_lfo_params
-            'modulation_type::trig_env': modulation_trig_env_params
-            'modulation_type::tracking': modulation_tracking_params
+            'type::ahd_env': ahd_env_params
+            'type::adsr_env': adsr_env_params
+            'type::drum_env': drum_env_params
+            'type::lfo': lfo_params
+            'type::trig_env': trig_env_params
+            'type::tracking': tracking_params
         doc: Four-byte payload interpreted according to the modulation type.
     instances:
       modulation_type:
         value: type_and_destination >> 4
-        enum: modulation_type
+        enum: type
       destination:
         value: type_and_destination & 0x0f
         doc: |
@@ -45,7 +45,7 @@ types:
           using the enclosing instrument type and its corresponding one of
           seven modulation destination enums in instrument.ksy. No single
           enum is valid for every instrument.
-  modulation_ahd_env_params:
+  ahd_env_params:
     doc: AHD ENV payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: attack
@@ -59,7 +59,7 @@ types:
         doc: Decay setting.
       - id: unknown
         type: u1
-  modulation_adsr_env_params:
+  adsr_env_params:
     seq:
       - id: attack
         type: u1
@@ -69,7 +69,7 @@ types:
         type: u1
       - id: release
         type: u1
-  modulation_drum_env_params:
+  drum_env_params:
     doc: DRUM ENV payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: peak
@@ -80,20 +80,20 @@ types:
         type: u1
       - id: unknown
         type: u1
-  modulation_lfo_params:
+  lfo_params:
     doc: LFO payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: oscillator
         type: u1
-        enum: modulation_lfo_oscillator
+        enum: lfo_oscillator
       - id: trigger
         type: u1
-        enum: modulation_lfo_trigger
+        enum: lfo_trigger
       - id: frequency
         type: u1
       - id: unknown
         type: u1
-  modulation_trig_env_params:
+  trig_env_params:
     seq:
       - id: attack
         type: u1
@@ -103,12 +103,12 @@ types:
         type: u1
       - id: source
         type: u1
-  modulation_tracking_params:
+  tracking_params:
     doc: TRACKING payload; fourth byte is preserved with unknown purpose.
     seq:
       - id: source
         type: u1
-        enum: modulation_tracking_source
+        enum: tracking_source
       - id: lowest_value
         type: u1
       - id: highest_value
@@ -116,7 +116,7 @@ types:
       - id: unknown
         type: u1
 enums:
-  modulation_type:
+  type:
     0x00:
       id: ahd_env
       -label: AHD ENV
@@ -135,7 +135,7 @@ enums:
     0x05:
       id: tracking
       -label: TRACKING
-  modulation_tracking_source:
+  tracking_source:
     0x00:
       id: note
       -label: NOTE
@@ -145,7 +145,7 @@ enums:
     0x02:
       id: velocity_take
       -label: VEL.TAKE
-  modulation_lfo_oscillator:
+  lfo_oscillator:
     0x00:
       id: triangle
       -label: TRI
@@ -206,7 +206,7 @@ enums:
     0x13:
       id: drunk_t
       -label: DRUNK T
-  modulation_lfo_trigger:
+  lfo_trigger:
     0x00:
       id: free
       -label: FREE

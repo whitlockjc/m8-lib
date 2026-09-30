@@ -7,28 +7,28 @@ doc: |
   Shared EQ layout for Song Instrument banks and Mix, Mod FX, Delay, and
   Reverb EQs in file schema version 6.5.0.
 types:
-  eq_settings:
+  settings:
     doc: |
       Three-band EQ storage. Each known EQ uses three adjacent 6-byte band
       records.
     seq:
       - id: low_band
-        type: eq_band
+        type: band
         doc: Low EQ band.
       - id: mid_band
-        type: eq_band
+        type: band
         doc: Mid EQ band.
       - id: high_band
-        type: eq_band
+        type: band
         doc: High EQ band.
-  instrument_eqs:
+  instrument_bank:
     doc: 128 assignable Instrument EQ banks, each with the standard 18-byte EQ layout.
     seq:
       - id: entries
-        type: eq_settings
+        type: settings
         repeat: expr
         repeat-expr: 128
-  eq_band:
+  band:
     doc: |
       Six-byte EQ band record. The type and mode are packed into one byte: bits
       0..4 hold the filter type and bits 5..7 hold the filter mode. Frequency
@@ -50,12 +50,12 @@ types:
     instances:
       filter_type:
         value: type_and_mode & 0x1f
-        enum: eq_filter_type
+        enum: filter_type
       filter_mode:
         value: type_and_mode >> 5
-        enum: eq_filter_mode
+        enum: filter_mode
 enums:
-  eq_filter_type:
+  filter_type:
     0x00:
       id: lowcut
       -label: LOWCUT
@@ -77,7 +77,7 @@ enums:
     0x06:
       id: allpass
       -label: ALLPASS
-  eq_filter_mode:
+  filter_mode:
     0x00:
       id: stereo
       -label: STEREO

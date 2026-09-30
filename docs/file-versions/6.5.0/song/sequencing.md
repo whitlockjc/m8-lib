@@ -26,8 +26,8 @@ File schema version: `6.5.0`.
 - [phrases](#type-phrases)
 - [phrase](#type-phrase)
 - [phrase_step](#type-phrase_step)
-- [song_rows](#type-song_rows)
-- [song_row](#type-song_row)
+- [rows](#type-rows)
+- [row](#type-row)
 - [chains](#type-chains)
 - [chain](#type-chain)
 - [chain_row](#type-chain_row)
@@ -107,9 +107,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `instrument` | `0x02` | 1 | `u1` | - | Instrument index; 0xff is unset. |
 | `fx` | `0x03..0x08` | 6 | [fx_slot](../../../common/fx_slot.md#layout) | `repeat`: `expr`; `repeat-expr`: `3` | Three shared FX slots. The UI groups commands as Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods. Available labels depend on the surrounding instrument and modulation type.  |
 
-## Type: song_rows
+## Type: rows
 
-`song_rows`
+`rows`
 
 Song View storage of 256 rows, each with one chain index per track.
 
@@ -118,11 +118,11 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x7ff` | 2048 | [song_row](#type-song_row) | `repeat`: `expr`; `repeat-expr`: `256` | Song rows indexed 0x00 through 0xff. |
+| `entries` | `0x00..0x7ff` | 2048 | [row](#type-row) | `repeat`: `expr`; `repeat-expr`: `256` | Song rows indexed 0x00 through 0xff. |
 
-## Type: song_row
+## Type: row
 
-`song_row`
+`row`
 
 Eight-byte Song View row. Each byte stores the chain index assigned to a
 track; tracks[0] is M8 Track 1. 0xff means unset.

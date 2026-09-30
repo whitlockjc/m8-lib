@@ -7,7 +7,7 @@ doc: |
   Mixer, Effects Settings, and Mix & Limiter Scope layouts for Song file
   schema version 6.6.2. The Song body determines their positions.
 types:
-  mixer_settings:
+  mixer:
     doc: |
       Mixer and Mix & Limiter Scope storage. Offsets are relative to absolute
       file offset 0x00ce.
@@ -24,7 +24,7 @@ types:
         repeat-expr: 8
         doc: Volume for each of the eight tracks.
       - id: sends
-        type: mixer_sends
+        type: sends
         doc: Master sends to ModFX, Delay, and Reverb.
       - id: analog_input_volume
         type: u1
@@ -37,13 +37,13 @@ types:
         type: u1
         doc: USB input volume.
       - id: analog_input_sends
-        type: mixer_sends
+        type: sends
         doc: Analog input effect sends.
       - id: analog_dual_mono_input_sends
-        type: mixer_sends
+        type: sends
         doc: Second analog mono input effect sends.
       - id: usb_input_sends
-        type: mixer_sends
+        type: sends
         doc: USB input effect sends.
       - id: dj_filter
         type: u1
@@ -68,7 +68,7 @@ types:
       - id: ott
         type: u1
         doc: OTT amount.
-  effects_and_scope_settings:
+  effects_and_scope:
     doc: |
       Shared storage region for the Effects Settings and Mix & Limiter Scope
       views. Storage order does not fully match the UI grouping; the Mod FX
@@ -78,24 +78,24 @@ types:
         size: 3
         doc: Preserved bytes before the mapped Mod FX parameter bytes.
       - id: mod_fx
-        type: mod_fx_settings
+        type: mod_fx
       - id: unknown_1
         size: 5
         doc: Preserved bytes between Mod FX and Delay parameters.
       - id: delay
-        type: delay_settings
+        type: delay
       - id: unknown_2
         size: 3
         doc: Preserved bytes between Delay and Reverb parameters.
       - id: reverb
-        type: reverb_settings
+        type: reverb
       - id: mix_limiter_scope
-        type: mix_limiter_scope_settings
+        type: mix_limiter_scope
       - id: mod_fx_type
         type: u1
         enum: mod_fx_type
         doc: ModFX type selected in Effects Settings.
-  mod_fx_settings:
+  mod_fx:
     doc: |
       Mod FX parameter storage from the Effects Settings View. The Mod FX type
       byte is stored later in the shared Effects/Mix & Limiter Scope region.
@@ -112,7 +112,7 @@ types:
       - id: reverb_send
         type: u1
         doc: ModFX send to Reverb.
-  delay_settings:
+  delay:
     doc: Delay parameter storage from the Effects Settings View.
     seq:
       - id: time_left
@@ -130,7 +130,7 @@ types:
       - id: reverb_send
         type: u1
         doc: Delay send to Reverb.
-  reverb_settings:
+  reverb:
     doc: Reverb parameter storage from the Effects Settings View.
     seq:
       - id: room_size
@@ -151,7 +151,7 @@ types:
       - id: shimmer
         type: u1
         doc: Reverb shimmer.
-  mix_limiter_scope_settings:
+  mix_limiter_scope:
     doc: |
       Mix & Limiter Scope storage for OTT detail controls from the Mix &
       Limiter Scope View.
@@ -162,7 +162,7 @@ types:
       - id: ott_color
         type: u1
         doc: OTT color.
-  mixer_sends:
+  sends:
     doc: Effect send levels for ModFX, Delay, and Reverb.
     seq:
       - id: mod_fx

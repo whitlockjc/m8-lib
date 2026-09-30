@@ -48,7 +48,7 @@ const fxInstrumentNames = [
   ['fm_synth', 'FM Synth'], ['midi_out', 'MIDI Out'], ['hypersynth', 'Hypersynth'],
   ['external', 'External'], ['none', 'NONE']
 ]
-const isFxEnum = name => name === 'phrase_fx_command' || name === 'instrument_mod_fx_command' || name.endsWith('_table_fx_command')
+const isFxEnum = name => name === 'fx_command' || name === 'instrument_mod_fx_command' || name.endsWith('_fx_command')
 
 function fxFile () {
   return path.join(root, 'docs', 'common', 'fx_commands.md')
@@ -66,17 +66,17 @@ function renderFxCommands (firmware, target) {
   ]
     const modules = graph(load(path.resolve(root, target.entry)))
     const sequencing = modules.find(context => context.data.meta['-fx-sequencer-ranges'])
-    const table = modules.find(context => context.data.enums?.wavsynth_table_fx_command)
-    assert.ok(sequencing?.data.enums?.phrase_fx_command && table, `missing FX catalogs for ${firmware}`)
+    const table = modules.find(context => context.data.enums?.wavsynth_fx_command)
+    assert.ok(sequencing?.data.enums?.fx_command && table, `missing FX catalogs for ${firmware}`)
     const ranges = sequencing.data.meta['-fx-sequencer-ranges']
-    const entries = Object.entries(sequencing.data.enums.phrase_fx_command)
+    const entries = Object.entries(sequencing.data.enums.fx_command)
       .sort(([a], [b]) => Number(a) - Number(b))
     const isSequencer = value => ranges.some(([first, last]) => value >= first && value <= last)
     lines.push(`Values come from ${link(file, sequencing.file, path.relative(root, sequencing.file))} and ${link(file, table.file, path.relative(root, table.file))}.`, '',
       '## Instrument (Current Instrument)', '',
       'Current Instrument command labels vary by instrument type.', '')
     for (const [name, label] of fxInstrumentNames) {
-      const enumName = `${name}_table_fx_command`
+      const enumName = `${name}_fx_command`
       const values = table.data.enums[enumName]
       assert.ok(values, `missing ${enumName} for ${firmware}`)
       lines.push(`### ${label}`, '', ...rows(Object.entries(values).sort(([a], [b]) => Number(a) - Number(b))))

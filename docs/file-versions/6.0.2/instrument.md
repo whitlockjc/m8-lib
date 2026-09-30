@@ -24,7 +24,7 @@ File schema version: `6.0.2`.
 
 - [Layout](#layout)
 - [data](#type-data)
-- [general_instrument_settings](#type-general_instrument_settings)
+- [general_settings](#type-general_settings)
 - [unused_body_before_eq](#type-unused_body_before_eq)
 - [wavsynth_body_before_eq](#type-wavsynth_body_before_eq)
 - [macrosynth_body_before_eq](#type-macrosynth_body_before_eq)
@@ -33,21 +33,21 @@ File schema version: `6.0.2`.
 - [fm_synth_body_before_eq](#type-fm_synth_body_before_eq)
 - [hypersynth_body_before_eq](#type-hypersynth_body_before_eq)
 - [external_body_before_eq](#type-external_body_before_eq)
-- [standard_data_tail](#type-standard_data_tail)
-- [none_data_tail](#type-none_data_tail)
-- [sampler_data_tail](#type-sampler_data_tail)
-- [sample_path_region](#type-sample_path_region)
-- [hypersynth_data_tail](#type-hypersynth_data_tail)
+- [standard_tail](#type-standard_tail)
+- [none_tail](#type-none_tail)
+- [sampler_tail](#type-sampler_tail)
+- [sample_path](#type-sample_path)
+- [hypersynth_tail](#type-hypersynth_tail)
 - [hypersynth_chord](#type-hypersynth_chord)
-- [instrument_modulators](#type-instrument_modulators)
-- [wavsynth_modulation_destination (enum)](#enum-wavsynth_modulation_destination)
-- [macrosynth_modulation_destination (enum)](#enum-macrosynth_modulation_destination)
-- [sampler_modulation_destination (enum)](#enum-sampler_modulation_destination)
-- [midi_out_modulation_destination (enum)](#enum-midi_out_modulation_destination)
-- [fm_synth_modulation_destination (enum)](#enum-fm_synth_modulation_destination)
-- [hypersynth_modulation_destination (enum)](#enum-hypersynth_modulation_destination)
-- [external_modulation_destination (enum)](#enum-external_modulation_destination)
-- [instrument_type (enum)](#enum-instrument_type)
+- [modulators](#type-modulators)
+- [wavsynth_destination (enum)](#enum-wavsynth_destination)
+- [macrosynth_destination (enum)](#enum-macrosynth_destination)
+- [sampler_destination (enum)](#enum-sampler_destination)
+- [midi_out_destination (enum)](#enum-midi_out_destination)
+- [fm_synth_destination (enum)](#enum-fm_synth_destination)
+- [hypersynth_destination (enum)](#enum-hypersynth_destination)
+- [external_destination (enum)](#enum-external_destination)
+- [type (enum)](#enum-type)
 - [hypersynth_shape (enum)](#enum-hypersynth_shape)
 
 ## Layout
@@ -76,14 +76,14 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `general_settings` | `0x00..0x0e` | 15 | [general_instrument_settings](#type-general_instrument_settings) | - |  |
-| `body_before_eq` | `0x0f..0x3d` | 47 | switch on `general_settings.type`: `instrument_type::wavsynth`: [wavsynth_body_before_eq](#type-wavsynth_body_before_eq); `instrument_type::macrosynth`: [macrosynth_body_before_eq](#type-macrosynth_body_before_eq); `instrument_type::sampler`: [sampler_body_before_eq](#type-sampler_body_before_eq); `instrument_type::midi_out`: [midi_out_body_before_eq](#type-midi_out_body_before_eq); `instrument_type::fm_synth`: [fm_synth_body_before_eq](#type-fm_synth_body_before_eq); `instrument_type::hypersynth`: [hypersynth_body_before_eq](#type-hypersynth_body_before_eq); `instrument_type::external`: [external_body_before_eq](#type-external_body_before_eq); `instrument_type::none`: [unused_body_before_eq](#type-unused_body_before_eq) | - | Instrument-specific body before the common EQ field. |
+| `general_settings` | `0x00..0x0e` | 15 | [general_settings](#type-general_settings) | - |  |
+| `body_before_eq` | `0x0f..0x3d` | 47 | switch on `general_settings.type`: `type::wavsynth`: [wavsynth_body_before_eq](#type-wavsynth_body_before_eq); `type::macrosynth`: [macrosynth_body_before_eq](#type-macrosynth_body_before_eq); `type::sampler`: [sampler_body_before_eq](#type-sampler_body_before_eq); `type::midi_out`: [midi_out_body_before_eq](#type-midi_out_body_before_eq); `type::fm_synth`: [fm_synth_body_before_eq](#type-fm_synth_body_before_eq); `type::hypersynth`: [hypersynth_body_before_eq](#type-hypersynth_body_before_eq); `type::external`: [external_body_before_eq](#type-external_body_before_eq); `type::none`: [unused_body_before_eq](#type-unused_body_before_eq) | - | Instrument-specific body before the common EQ field. |
 | `eq` | `0x3e` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --, 0x7f displays as 7F.  |
-| `tail` | `0x3f..0xd6` | 152 | switch on `general_settings.type`: `instrument_type::sampler`: [sampler_data_tail](#type-sampler_data_tail); `instrument_type::hypersynth`: [hypersynth_data_tail](#type-hypersynth_data_tail); `instrument_type::midi_out`: [standard_data_tail](#type-standard_data_tail); `instrument_type::wavsynth`: [standard_data_tail](#type-standard_data_tail); `instrument_type::macrosynth`: [standard_data_tail](#type-standard_data_tail); `instrument_type::fm_synth`: [standard_data_tail](#type-standard_data_tail); `instrument_type::external`: [standard_data_tail](#type-standard_data_tail); `instrument_type::none`: [none_data_tail](#type-none_data_tail) | - | Instrument-specific tail after the common EQ field. |
+| `tail` | `0x3f..0xd6` | 152 | switch on `general_settings.type`: `type::sampler`: [sampler_tail](#type-sampler_tail); `type::hypersynth`: [hypersynth_tail](#type-hypersynth_tail); `type::midi_out`: [standard_tail](#type-standard_tail); `type::wavsynth`: [standard_tail](#type-standard_tail); `type::macrosynth`: [standard_tail](#type-standard_tail); `type::fm_synth`: [standard_tail](#type-standard_tail); `type::external`: [standard_tail](#type-standard_tail); `type::none`: [none_tail](#type-none_tail) | - | Instrument-specific tail after the common EQ field. |
 
-## Type: general_instrument_settings
+## Type: general_settings
 
-`general_instrument_settings`
+`general_settings`
 
 General Instrument Settings prefix. The EQ assignment is stored separately.
 
@@ -92,7 +92,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `type` | `0x00` | 1 | `u1`; [instrument_type](#enum-instrument_type) | - |  |
+| `type` | `0x00` | 1 | `u1`; [type](#enum-type) | - |  |
 | `name` | `0x01..0x0c` | 12 | bytes | `size`: `12` | Fixed-size byte range for the instrument name. Padding bytes are preserved as stored.  |
 | `transpose` | `0x0d` | 1 | `u1` | - | Common instrument transpose setting. 0x01 means ON; 0x00 means OFF.  |
 | `table_tic` | `0x0e` | 1 | `u1` | - | Common instrument table TIC setting. |
@@ -150,7 +150,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 `sampler_body_before_eq`
 
 Sampler-specific controls are stored here; the selected sample_path is
-another Sampler-specific parameter stored in sampler_data_tail.
+another Sampler-specific parameter stored in sampler_tail.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -230,9 +230,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `mixer` | `0x16..0x19` | 4 | [instrument_parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x1a..0x2e` | 21 | bytes | `size`: `21` |  |
 
-## Type: standard_data_tail
+## Type: standard_tail
 
-`standard_data_tail`
+`standard_tail`
 
 
 
@@ -240,12 +240,12 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `modulators` | `0x00..0x17` | 24 | [instrument_modulators](#type-instrument_modulators) | `repeat`: `4` via `slots` |  |
+| `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
 | `unknown` | `0x18..0x97` | 128 | bytes | `size`: `128` |  |
 
-## Type: none_data_tail
+## Type: none_tail
 
-`none_data_tail`
+`none_tail`
 
 
 
@@ -255,9 +255,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `unknown` | `0x00..0x97` | 152 | bytes | `size`: `152` |  |
 
-## Type: sampler_data_tail
+## Type: sampler_tail
 
-`sampler_data_tail`
+`sampler_tail`
 
 Stores shared modulators followed by the Sampler-specific sample_path.
 The path and sampler_controls belong to the same instrument-specific
@@ -268,12 +268,12 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `modulators` | `0x00..0x17` | 24 | [instrument_modulators](#type-instrument_modulators) | `repeat`: `4` via `slots` |  |
-| `sample_path` | `0x18..0x97` | 128 | [sample_path_region](#type-sample_path_region) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. The full sample path must be under 128 characters.  |
+| `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `sample_path` | `0x18..0x97` | 128 | [sample_path](#type-sample_path) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. The full sample path must be under 128 characters.  |
 
-## Type: sample_path_region
+## Type: sample_path
 
-`sample_path_region`
+`sample_path`
 
 
 
@@ -284,9 +284,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `path` | `0x00 onward` | variable | `strz` | `encoding`: `ASCII` |  |
 | `trailing` | `dynamic` | variable | bytes | `size`: `_io.size - _io.pos` | Remaining path-field bytes after the terminator; preserve stored bytes. |
 
-## Type: hypersynth_data_tail
+## Type: hypersynth_tail
 
-`hypersynth_data_tail`
+`hypersynth_tail`
 
 
 
@@ -294,7 +294,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `modulators` | `0x00..0x17` | 24 | [instrument_modulators](#type-instrument_modulators) | `repeat`: `4` via `slots` |  |
+| `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
 | `chords` | `0x18..0x87` | 112 | [hypersynth_chord](#type-hypersynth_chord) | `repeat`: `expr`; `repeat-expr`: `16` |  |
 | `unknown` | `0x88..0x97` | 16 | bytes | `size`: `16` |  |
 
@@ -311,9 +311,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `enabled_notes` | `0x00` | 1 | `u1` | - | Bitmask for six chord notes. Bits 0 through 5 indicate whether each corresponding note is enabled.  |
 | `notes` | `0x01..0x06` | 6 | [instrument_parameters_6_0_1::hypersynth_chord_notes](../6.0.1/instrument/parameters.md#type-hypersynth_chord_notes) | - |  |
 
-## Type: instrument_modulators
+## Type: modulators
 
-`instrument_modulators`
+`modulators`
 
 Shared Common Modulation Settings block. Four six-byte slots occupy
 standalone offsets 0x4d..0x64 in all seven editable instrument types.
@@ -325,11 +325,11 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `slots` | `0x00..0x17` | 24 | [instrument_modulation_6_0_1::modulation_slot](../6.0.1/instrument/modulation.md#type-modulation_slot) | `repeat`: `expr`; `repeat-expr`: `4` |  |
+| `slots` | `0x00..0x17` | 24 | [instrument_modulation_6_0_1::slot](../6.0.1/instrument/modulation.md#type-slot) | `repeat`: `expr`; `repeat-expr`: `4` |  |
 
-## Enum: wavsynth_modulation_destination
+## Enum: wavsynth_destination
 
-`wavsynth_modulation_destination`
+`wavsynth_destination`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -349,9 +349,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x0d` | `mod_both` | MOD BOTH |  |
 | `0x0e` | `mod_binv` | MOD BINV |  |
 
-## Enum: macrosynth_modulation_destination
+## Enum: macrosynth_destination
 
-`macrosynth_modulation_destination`
+`macrosynth_destination`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -371,9 +371,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x0d` | `mod_both` | MOD BOTH |  |
 | `0x0e` | `mod_binv` | MOD BINV |  |
 
-## Enum: sampler_modulation_destination
+## Enum: sampler_destination
 
-`sampler_modulation_destination`
+`sampler_destination`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -392,9 +392,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x0c` | `mod_both` | MOD BOTH |  |
 | `0x0d` | `mod_binv` | MOD BINV |  |
 
-## Enum: midi_out_modulation_destination
+## Enum: midi_out_destination
 
-`midi_out_modulation_destination`
+`midi_out_destination`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -414,9 +414,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x0d` | `mod_both` | MOD BOTH |  |
 | `0x0e` | `mod_binv` | MOD BINV |  |
 
-## Enum: fm_synth_modulation_destination
+## Enum: fm_synth_destination
 
-`fm_synth_modulation_destination`
+`fm_synth_destination`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -436,9 +436,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x0d` | `mod_both` | MOD BOTH |  |
 | `0x0e` | `mod_binv` | MOD BINV |  |
 
-## Enum: hypersynth_modulation_destination
+## Enum: hypersynth_destination
 
-`hypersynth_modulation_destination`
+`hypersynth_destination`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -458,9 +458,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x0d` | `mod_both` | MOD BOTH |  |
 | `0x0e` | `mod_binv` | MOD BINV |  |
 
-## Enum: external_modulation_destination
+## Enum: external_destination
 
-`external_modulation_destination`
+`external_destination`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |
@@ -479,9 +479,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `0x0c` | `mod_both` | MOD BOTH |  |
 | `0x0d` | `mod_binv` | MOD BINV |  |
 
-## Enum: instrument_type
+## Enum: type
 
-`instrument_type`
+`type`
 
 | Stored Value | Identifier | M8 Label | Description |
 | --- | --- | --- | --- |

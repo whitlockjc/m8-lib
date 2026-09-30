@@ -40,28 +40,28 @@ function verifyTable (table, bytes, offset, label) {
 }
 
 for (const [catalog, expected] of [
-  [InstrumentTable601.WavsynthTableFxCommand, 'OSCILLATOR'],
-  [InstrumentTable601.MacrosynthTableFxCommand, 'OSCILLATOR'],
-  [InstrumentTable601.SamplerTableFxCommand, 'PLAY'],
-  [InstrumentTable601.FmSynthTableFxCommand, 'ALGORITHM'],
-  [InstrumentTable601.MidiOutTableFxCommand, 'MIDI_PROGRAM_BANK'],
-  [InstrumentTable601.HypersynthTableFxCommand, 'CHORD'],
-  [InstrumentTable601.ExternalTableFxCommand, 'MIDI_PROGRAM']
+  [InstrumentTable601.WavsynthFxCommand, 'OSCILLATOR'],
+  [InstrumentTable601.MacrosynthFxCommand, 'OSCILLATOR'],
+  [InstrumentTable601.SamplerFxCommand, 'PLAY'],
+  [InstrumentTable601.FmSynthFxCommand, 'ALGORITHM'],
+  [InstrumentTable601.MidiOutFxCommand, 'MIDI_PROGRAM_BANK'],
+  [InstrumentTable601.HypersynthFxCommand, 'CHORD'],
+  [InstrumentTable601.ExternalFxCommand, 'MIDI_PROGRAM']
 ]) {
   assert.equal(catalog[0x80], 'VOLUME')
   assert.equal(catalog[0x83], expected)
   assert.equal(catalog[0xff], 'UNSET')
 }
-assert.equal(InstrumentTable601.NoneTableFxCommand[0xff], 'UNSET')
-assert.equal(SongSequencing650.PhraseFxCommand[0x4d], 'MICRO_TIME')
-assert.equal(SongSequencing650.PhraseFxCommand[0xff], 'UNSET')
-assert.equal(SongProject650.MidiSyncTransport[0x02], 'TRANSPORT_SPP')
+assert.equal(InstrumentTable601.NoneFxCommand[0xff], 'UNSET')
+assert.equal(SongSequencing650.FxCommand[0x4d], 'MICRO_TIME')
+assert.equal(SongSequencing650.FxCommand[0xff], 'UNSET')
+assert.equal(SongProject650.SyncTransport[0x02], 'TRANSPORT_SPP')
 assert.equal(SongProject650.RecordDelayKill[0x03], 'BOTH')
-assert.equal(SongProject650.MidiInputMode[0x02], 'POLY')
+assert.equal(SongProject650.InputMode[0x02], 'POLY')
 assert.equal(SongMixerEffects650.ModFxType[0x02], 'FLANGER')
 assert.equal(SongMixerEffects650.DjFilterType[0x02], 'BANDPASS_HIGHPASS')
-assert.equal(SongMidiMapping650.MidiMappingDestinationType[0x05], 'INSTRUMENT')
-assert.equal(SongMidiMapping650.MidiMappingDestinationType[0x19], 'EQ')
+assert.equal(SongMidiMapping650.DestinationType[0x05], 'INSTRUMENT')
+assert.equal(SongMidiMapping650.DestinationType[0x19], 'EQ')
 
 for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_DEFAULT.m8i`)
@@ -174,13 +174,13 @@ const modulationFields = [
 ]
 const observedModulationTypes = new Set()
 const destinationCatalogs = {
-  WAV: [Instrument601.WavsynthModulationDestination, 0x0b],
-  MAC: [Instrument601.MacrosynthModulationDestination, 0x0b],
-  SAM: [Instrument601.SamplerModulationDestination, 0x0a],
-  MID: [Instrument601.MidiOutModulationDestination, 0x0b],
-  FM: [Instrument601.FmSynthModulationDestination, 0x0b],
-  HYP: [Instrument601.HypersynthModulationDestination, 0x0b],
-  EXT: [Instrument601.ExternalModulationDestination, 0x0a]
+  WAV: [Instrument601.WavsynthDestination, 0x0b],
+  MAC: [Instrument601.MacrosynthDestination, 0x0b],
+  SAM: [Instrument601.SamplerDestination, 0x0a],
+  MID: [Instrument601.MidiOutDestination, 0x0b],
+  FM: [Instrument601.FmSynthDestination, 0x0b],
+  HYP: [Instrument601.HypersynthDestination, 0x0b],
+  EXT: [Instrument601.ExternalDestination, 0x0a]
 }
 const modulationDestinationLabels = ['MOD_AMOUNT', 'MOD_RATE', 'MOD_BOTH', 'MOD_BINV']
 const observedDestinations = new Map()
@@ -222,9 +222,9 @@ for (const [name, [, firstModDestination]] of Object.entries(destinationCatalogs
     [0, 1, 2, 3].map(index => firstModDestination + index),
     `${name} high destinations covered by fixtures`)
 }
-assert.equal(Instrument601.WavsynthModulationDestination[0x03], 'SIZE')
-assert.equal(Instrument601.MacrosynthModulationDestination[0x03], 'TIMBRE')
-assert.equal(Instrument601.MidiOutModulationDestination[0x03], 'CC_C')
+assert.equal(Instrument601.WavsynthDestination[0x03], 'SIZE')
+assert.equal(Instrument601.MacrosynthDestination[0x03], 'TIMBRE')
+assert.equal(Instrument601.MidiOutDestination[0x03], 'CC_C')
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')
