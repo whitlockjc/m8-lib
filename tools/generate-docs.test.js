@@ -16,6 +16,29 @@ test('all generated pages are deterministic and up to date', () => {
   assert.ok(generate(undefined, { check: true }).size >= 15)
 })
 
+test('schema descriptions contain data semantics, not research status', () => {
+  const provenance = /\b(fixture|fixtures|verif(?:ied|ication|y)|observed|historical|research|evidence|not yet)\b|m8-js/i
+  const seen = new Set()
+  const visit = (value, location) => {
+    if (!value || typeof value !== 'object') return
+    for (const [key, child] of Object.entries(value)) {
+      const next = `${location}.${key}`
+      if (key === 'doc' && typeof child === 'string') {
+        assert.doesNotMatch(child, provenance, next)
+      } else {
+        visit(child, next)
+      }
+    }
+  }
+  for (const target of Object.values(targets)) {
+    for (const context of graph(load(target.entry))) {
+      if (seen.has(context.file)) continue
+      seen.add(context.file)
+      visit(context.data, context.file)
+    }
+  }
+})
+
 test('every reachable type, instance, and enum is documented', () => {
   for (const context of graph(load(target.entry))) {
     const suffix = path.relative('schemas', context.file).replace(/\.ksy$/, '.md')
@@ -27,7 +50,7 @@ test('every reachable type, instance, and enum is documented', () => {
       for (const name of Object.keys(definition.instances || {})) assert.ok(source.includes('`' + name + '`'))
     }
     for (const name of Object.keys(context.data.enums || {})) {
-      if (name === 'phrase_fx_command' || name.endsWith('_table_fx_command')) {
+      if (name === 'phrase_fx_command' || name === 'instrument_mod_fx_command' || name.endsWith('_table_fx_command')) {
         assert.ok(!source.includes(`## Enum: ${name}\n`))
       } else assert.ok(source.includes(`## Enum: ${name}\n`))
     }
@@ -67,7 +90,7 @@ test('firmware indexes summarize fields without repeating linked type details or
     const source = renderTarget(firmware, targets[firmware]).get(path.resolve(`docs/${firmware}.md`))
     assert.match(source, /\[data\]\(file-versions\/6\.0\.[12]\/instrument\.md#type-data\)/)
     assert.match(source, /\| `background` \|[^\n]*Background color\./)
-    assert.match(source, /\| `tuning_offset` \|[^\n]*Scale tuning offset from A440, stored as a 32-bit float\./)
+    assert.match(source, /\| `tuning_offset` \|[^\n]*Tuning offset in Hz from A440, stored as a 32-bit float\./)
     assert.doesNotMatch(source, /instrument_data|Fixture observations and research history/)
     assert.doesNotMatch(source, /The encoded version appears|The M8 manual groups general_settings|FX slots can use/)
   }
@@ -93,7 +116,9 @@ test('FX values are shared while firmware catalogs agree and linked from phrase 
     assert.match(catalog, /\| `0x00` \| ARP \|/)
     assert.match(catalog, /\| `0x1b` \| VMV \|/)
     assert.match(catalog, /\| `0x83` \| OSC \|/)
-    assert.match(catalog, /No verified command-value enum is available yet/)
+    assert.match(catalog, /\| `0x92` \| `EA1` \| `EA1` \| `EA1` \| `LA1` \| `EA1` \| `TA1` \|/)
+    assert.match(catalog, /\| `0x97` \| `EA2` \| `EA2` \| `EA2` \| `LA2` \| `EA2` \| `TA2` \|/)
+    assert.match(catalog, /\| `0xa5` \| `ET4` \| `ET4` \| `ET4` \| `LT4` \| `ET4` \| `TX4` \|/)
     assert.match(pages.get(path.resolve('docs', `${firmware}.md`)), /\[command reference\]\(common\/fx_commands\.md\)/)
   }
   for (const suffix of ['/instrument/table.md', '/song/sequencing.md']) {

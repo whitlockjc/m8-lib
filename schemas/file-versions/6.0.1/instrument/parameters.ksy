@@ -73,20 +73,17 @@ types:
       - id: channel
         type: u1
         doc: |
-          Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
-          displayed channel 16 is stored as 0x10.
+          MIDI channel, displayed in decimal; channel 16 is stored as 0x10.
       - id: bank
         type: u1
         doc: |
-          Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
-          displayed bank 127 is stored as 0x7f.
+          MIDI bank, displayed in decimal; bank 127 is stored as 0x7f.
       - id: unknown_0
         size: 2
       - id: program_change
         type: u1
         doc: |
-          Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
-          displayed program change 126 is stored as 0x7e.
+          Program change, displayed in decimal; program 126 is stored as 0x7e.
       - id: unknown_1
         size: 3
       - id: custom_ccs
@@ -115,18 +112,15 @@ types:
       - id: channel
         type: u1
         doc: |
-          Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies
-          displayed channel 16 is stored as 0x10.
+          MIDI channel, displayed in decimal; channel 16 is stored as 0x10.
       - id: bank
         type: u1
         doc: |
-          Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies
-          displayed bank 127 is stored as 0x7f.
+          MIDI bank, displayed in decimal; bank 127 is stored as 0x7f.
       - id: program_change
         type: u1
         doc: |
-          Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies
-          displayed program change 126 is stored as 0x7e.
+          Program change, displayed in decimal; program 126 is stored as 0x7e.
       - id: custom_ccs
         type: custom_cc
         repeat: expr
@@ -156,11 +150,8 @@ types:
       - id: current_chord
         type: hypersynth_current_chord
         doc: |
-          Current/edit chord state. The HYP_PARAMS fixture verifies index 0x0c
-          when chord 0C is selected. The note bytes are a memory representation
-          of the current chord; in HYP_PARAMS they match the entry selected in
-          the persistent Hypersynth tail chord table. Both byte regions remain
-          separately stored.
+          Currently selected chord and its notes. These bytes mirror the
+          selected entry in the separately stored Hypersynth chord table.
       - id: scale
         type: u1
       - id: shift

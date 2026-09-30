@@ -8,18 +8,8 @@ meta:
     - instrument/parameters
     - instrument/table
 doc: |
-  Body schema for instrument files with header schema version 6.0.1.
-
-  Initial schema verified against M8 6.5.2C NONE, Wavsynth, Macrosynth,
-  Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument fixtures. The
-  instrument type byte, fixed-size name byte range, common instrument prefix,
-  and NONE table are mapped.
-  Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
-  filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
-  Sampler/MIDI Out/FM Synth/Hypersynth/External instrument tables, sample path,
-  Hypersynth chord table, and common EQ assignment are mapped from params,
-  MODS, and table fixtures. Unknown ranges are preserved until additional
-  instrument fixtures provide evidence for their layout.
+  Instrument body for file schema version 6.0.1, containing an instrument
+  record and its table.
 seq:
   - id: instrument
     type: data
@@ -30,9 +20,7 @@ types:
     doc: |
       Fixed 215-byte instrument record. This record is stored directly in Song
       files; standalone Instrument files append one 128-byte instrument table.
-      The M8 manual groups general_settings and eq as General Instrument
-      Settings. EQ is stored after the type-specific region, so it remains a
-      separate field in the raw storage sequence.
+      The EQ assignment follows the type-specific region.
     seq:
       - id: general_settings
         type: general_instrument_settings
@@ -52,7 +40,7 @@ types:
       - id: eq
         type: u1
         doc: |
-          Common instrument EQ assignment. Observed values: 0x80 displays as
+          Common instrument EQ assignment. 0x80 displays as
           --, 0x7f displays as 7F.
       - id: tail
         type:
@@ -69,8 +57,7 @@ types:
         doc: Instrument-specific tail after the common EQ field.
   general_instrument_settings:
     doc: |
-      Contiguous General Instrument Settings prefix. The M8 manual also groups
-      the noncontiguous eq assignment with these settings.
+      General Instrument Settings prefix. The EQ assignment is stored separately.
     seq:
       - id: type
         type: u1
@@ -83,7 +70,7 @@ types:
       - id: transpose
         type: u1
         doc: |
-          Common instrument transpose setting. Observed values: 0x01 means ON,
+          Common instrument transpose setting. 0x01 means ON;
           0x00 means OFF.
       - id: table_tic
         type: u1
@@ -154,12 +141,8 @@ types:
         type: instrument_parameters_6_0_1::fm_synth_params
       - id: filter
         type: instrument_parameters_6_0_1::filter_params
-        doc: |
-          Type, cutoff, and resonance offsets are verified by FM_PARAMS.
       - id: amp
         type: instrument_parameters_6_0_1::amp_params
-        doc: |
-          Amp, limit, and pan offsets are verified by FM_PARAMS.
       - id: mixer
         type: instrument_parameters_6_0_1::mixer_params
       - id: unknown_1
@@ -216,8 +199,7 @@ types:
         doc: |
           Selected sample path in a fixed 128-byte field, following the same
           null-terminated path and preserved trailing-byte convention as the
-          Song directory. SAM_PARAMS stores /Samples/Kick.wav at offset 0x65.
-          The M8 manual requires the entire path to be under 128 characters.
+          Song directory. The full sample path must be under 128 characters.
   sample_path_region:
     seq:
       - id: path
@@ -241,9 +223,8 @@ types:
       - id: enabled_notes
         type: u1
         doc: |
-          Observed as a bit mask for six chord notes. Chord 0 changed from
-          0xff to 0xfe when note 1 was unset. Chord 15 changed from 0xff to
-          0xdf when note 6 was unset.
+          Bitmask for six chord notes. Bits 0 through 5 indicate whether each
+          corresponding note is enabled.
       - id: notes
         type: instrument_parameters_6_0_1::hypersynth_chord_notes
   instrument_modulators:

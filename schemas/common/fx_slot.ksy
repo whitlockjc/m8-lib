@@ -5,14 +5,8 @@ meta:
   ks-version: 0.11
 doc: |
   Two-byte FX slot used by Phrase steps and Instrument Table rows. Command
-  bytes and argument bytes have the same storage in both places. The M8 UI
-  groups commands under Sequencer, Mixer & Effects, Current Instrument, and
-  Instrument Mods. Current Instrument commands depend on the active instrument;
-  Instrument Mods labels also depend on the selected modulation type. These
-  groups describe contextual labels and availability, not distinct byte layouts.
-  Sequencer and Mixer & Effects byte values are verified in the 6.5.x Phrase
-  fixture, and selected Current Instrument values in Instrument Table fixtures.
-  Instrument Mods command values still need fixture evidence.
+  and argument bytes have the same layout in both places. The command label
+  depends on its group, active instrument, and modulation type.
 seq:
   - id: command
     type: u1

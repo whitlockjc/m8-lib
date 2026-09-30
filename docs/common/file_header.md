@@ -8,10 +8,8 @@ Source: [schemas/common/file_header.ksy](../../schemas/common/file_header.ksy).
 
 Byte order: `le`.
 
-Common header present at the start of M8 files.
-
-The encoded version appears to describe the persisted file schema version for
-this file, not necessarily the M8 firmware version used to create it.
+Header containing the M8 signature, file schema version, and file kind.
+The file schema version is distinct from the firmware version.
 
 
 ## Contents

@@ -44,9 +44,7 @@ types:
           Raw destination nibble shared by all modulation slots. Interpret it
           using the enclosing instrument type and its corresponding one of
           seven modulation destination enums in instrument.ksy. No single
-          enum is valid for every instrument. The A/B modulation fixtures
-          directly verify selected high destination values; other catalog entries have not
-          each been exercised by a fixture.
+          enum is valid for every instrument.
   modulation_ahd_env_params:
     doc: AHD ENV payload; fourth byte is preserved with unknown purpose.
     seq:

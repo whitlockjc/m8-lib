@@ -61,7 +61,7 @@ Value expressions do not consume bytes. Positioned instances read the specified 
 | Name | Type | Expression / Position / Rules | Description |
 | --- | --- | --- | --- |
 | `modulation_type` | derived; [modulation_type](#enum-modulation_type) | `value`: `type_and_destination >> 4` |  |
-| `destination` | derived | `value`: `type_and_destination & 0x0f` | Raw destination nibble shared by all modulation slots. Interpret it using the enclosing instrument type and its corresponding one of seven modulation destination enums in instrument.ksy. No single enum is valid for every instrument. The A/B modulation fixtures directly verify selected high destination values; other catalog entries have not each been exercised by a fixture.  |
+| `destination` | derived | `value`: `type_and_destination & 0x0f` | Raw destination nibble shared by all modulation slots. Interpret it using the enclosing instrument type and its corresponding one of seven modulation destination enums in instrument.ksy. No single enum is valid for every instrument.  |
 
 ## Type: modulation_ahd_env_params
 

@@ -44,9 +44,7 @@ Root record.
 
 `grooves`
 
-Groove storage. Offsets are relative to absolute file offset 0x00ee in
-6.5.x fixtures. The M8 stores 32 grooves, and each groove stores 16 one
-byte step values.
+Thirty-two grooves, each containing 16 one-byte step values.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -71,10 +69,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `phrases`
 
-Phrase View storage. Offsets are relative to absolute file offset 0x0aee
-in 6.5.x fixtures. The M8 stores phrase indexes 0x00 through 0xfe. Value
-0xff is observed as an unset phrase reference rather than a stored phrase
-record.
+Phrases indexed 0x00 through 0xfe; 0xff is an unset phrase reference.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -99,7 +94,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `phrase_step`
 
-Nine-byte Phrase step. 0xff is observed as unset for note, volume,
+Nine-byte Phrase step. 0xff means unset for note, volume,
 instrument, and FX command bytes. FX value bytes default to 0x00.
 
 
@@ -116,9 +111,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `song_rows`
 
-Song View row storage. Offsets are relative to absolute file offset
-0x02ee in 6.5.x fixtures. The M8 stores 256 rows, and each row stores one
-chain index per track.
+Song View storage of 256 rows, each with one chain index per track.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -132,7 +125,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 `song_row`
 
 Eight-byte Song View row. Each byte stores the chain index assigned to a
-track; tracks[0] is M8 Track 1. 0xff is observed as unset.
+track; tracks[0] is M8 Track 1. 0xff means unset.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -145,8 +138,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `chains`
 
-Chain View storage. Offsets are relative to absolute file offset 0x9a5e
-in 6.5.x fixtures. The M8 stores chain indexes 0x00 through 0xfe; 0xff is
+Chain View storage. Chains have indexes 0x00 through 0xfe; 0xff is
 the unset reference sentinel. Each chain stores 16 rows.
 
 
@@ -173,7 +165,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 `chain_row`
 
 Chain row storage. The phrase byte stores the referenced phrase index;
-0xff is observed as unset.
+0xff means unset.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.

@@ -4,13 +4,13 @@ Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 
 [Documentation index](../README.md)
 
-Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type. This page is shared only while the selected command catalogs are identical across firmware targets.
+Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type.
 
 Values come from [schemas/file-versions/6.5.0/song/sequencing.ksy](../../schemas/file-versions/6.5.0/song/sequencing.ksy) and [schemas/file-versions/6.0.1/instrument/table.ksy](../../schemas/file-versions/6.0.1/instrument/table.ksy).
 
 ## Instrument (Current Instrument)
 
-These enums contain fixture-verified command subsets for each instrument, not every command available in an FX slot.
+Current Instrument command labels vary by instrument type.
 
 ### Wavsynth
 
@@ -198,7 +198,30 @@ These enums contain fixture-verified command subsets for each instrument, not ev
 
 ## Instrument Mods
 
-No verified command-value enum is available yet. Labels depend on the selected modulation slot and modulation type; targeted fixtures are needed before listing byte values.
+The stored value selects a modulator slot and parameter position. Its label depends on that slot's modulation type.
+
+| Stored Value | AHD ENV | ADSR ENV | DRUM ENV | LFO | TRIG ENV | TRACKING |
+| --- | --- | --- | --- | --- | --- | --- |
+| `0x92` | `EA1` | `EA1` | `EA1` | `LA1` | `EA1` | `TA1` |
+| `0x93` | `AT1` | `AT1` | `PK1` | `LO1` | `AT1` | `TS1` |
+| `0x94` | `HO1` | `DE1` | `BO1` | `LS1` | `HO1` | `TL1` |
+| `0x95` | `DE1` | `SU1` | `DE1` | `LF1` | `DE1` | `TH1` |
+| `0x96` | `ET1` | `ET1` | `ET1` | `LT1` | `ET1` | `TX1` |
+| `0x97` | `EA2` | `EA2` | `EA2` | `LA2` | `EA2` | `TA2` |
+| `0x98` | `AT2` | `AT2` | `PK2` | `LO2` | `AT2` | `TS2` |
+| `0x99` | `HO2` | `DE2` | `BO2` | `LS2` | `HO2` | `TL2` |
+| `0x9a` | `DE2` | `SU2` | `DE2` | `LF2` | `DE2` | `TH2` |
+| `0x9b` | `ET2` | `ET2` | `ET2` | `LT2` | `ET2` | `TX2` |
+| `0x9c` | `EA3` | `EA3` | `EA3` | `LA3` | `EA3` | `TA3` |
+| `0x9d` | `AT3` | `AT3` | `PK3` | `LO3` | `AT3` | `TS3` |
+| `0x9e` | `HO3` | `DE3` | `BO3` | `LS3` | `HO3` | `TL3` |
+| `0x9f` | `DE3` | `SU3` | `DE3` | `LF3` | `DE3` | `TH3` |
+| `0xa0` | `ET3` | `ET3` | `ET3` | `LT3` | `ET3` | `TX3` |
+| `0xa1` | `EA4` | `EA4` | `EA4` | `LA4` | `EA4` | `TA4` |
+| `0xa2` | `AT4` | `AT4` | `PK4` | `LO4` | `AT4` | `TS4` |
+| `0xa3` | `HO4` | `DE4` | `BO4` | `LS4` | `HO4` | `TL4` |
+| `0xa4` | `DE4` | `SU4` | `DE4` | `LF4` | `DE4` | `TH4` |
+| `0xa5` | `ET4` | `ET4` | `ET4` | `LT4` | `ET4` | `TX4` |
 
 ## Mixer & Effects
 

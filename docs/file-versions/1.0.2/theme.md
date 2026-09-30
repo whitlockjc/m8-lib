@@ -8,13 +8,8 @@ Source: [schemas/file-versions/1.0.2/theme.ksy](../../../schemas/file-versions/1
 
 Byte order: `le`.
 
-Body schema for theme files with header schema version 1.0.2.
-
-Verified against M8 6.5.2C theme fixtures. The body contains 13 color triples
-and no unaccounted bytes.
-
-RGB versus HSV editing mode is not stored in any M8 file and is outside this
-schema.
+Theme body with 13 color triples. RGB versus HSV editing mode is not stored
+in the Theme file.
 
 
 File schema version: `1.0.2`.

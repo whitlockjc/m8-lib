@@ -120,10 +120,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `port` | `0x00` | 1 | `u1`; [midi_out_port](#enum-midi_out_port) | - |  |
-| `channel` | `0x01` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies displayed channel 16 is stored as 0x10.  |
-| `bank` | `0x02` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies displayed bank 127 is stored as 0x7f.  |
+| `channel` | `0x01` | 1 | `u1` | - | MIDI channel, displayed in decimal; channel 16 is stored as 0x10.  |
+| `bank` | `0x02` | 1 | `u1` | - | MIDI bank, displayed in decimal; bank 127 is stored as 0x7f.  |
 | `unknown_0` | `0x03..0x04` | 2 | bytes | `size`: `2` |  |
-| `program_change` | `0x05` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies displayed program change 126 is stored as 0x7e.  |
+| `program_change` | `0x05` | 1 | `u1` | - | Program change, displayed in decimal; program 126 is stored as 0x7e.  |
 | `unknown_1` | `0x06..0x08` | 3 | bytes | `size`: `3` |  |
 | `custom_ccs` | `0x09..0x1c` | 20 | [custom_cc](#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `10` | Ten configurable MIDI controller number and value pairs. |
 
@@ -152,9 +152,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `input` | `0x00` | 1 | `u1`; [external_input](#enum-external_input) | - |  |
 | `port` | `0x01` | 1 | `u1`; [external_port](#enum-external_port) | - |  |
-| `channel` | `0x02` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies displayed channel 16 is stored as 0x10.  |
-| `bank` | `0x03` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies displayed bank 127 is stored as 0x7f.  |
-| `program_change` | `0x04` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies displayed program change 126 is stored as 0x7e.  |
+| `channel` | `0x02` | 1 | `u1` | - | MIDI channel, displayed in decimal; channel 16 is stored as 0x10.  |
+| `bank` | `0x03` | 1 | `u1` | - | MIDI bank, displayed in decimal; bank 127 is stored as 0x7f.  |
+| `program_change` | `0x04` | 1 | `u1` | - | Program change, displayed in decimal; program 126 is stored as 0x7e.  |
 | `custom_ccs` | `0x05..0x0c` | 8 | [custom_cc](#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `4` | Four configurable MIDI controller number and value pairs. |
 
 ## Type: fm_synth_params
@@ -185,7 +185,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `current_chord` | `0x00..0x06` | 7 | [hypersynth_current_chord](#type-hypersynth_current_chord) | - | Current/edit chord state. The HYP_PARAMS fixture verifies index 0x0c when chord 0C is selected. The note bytes are a memory representation of the current chord; in HYP_PARAMS they match the entry selected in the persistent Hypersynth tail chord table. Both byte regions remain separately stored.  |
+| `current_chord` | `0x00..0x06` | 7 | [hypersynth_current_chord](#type-hypersynth_current_chord) | - | Currently selected chord and its notes. These bytes mirror the selected entry in the separately stored Hypersynth chord table.  |
 | `scale` | `0x07` | 1 | `u1` | - |  |
 | `shift` | `0x08` | 1 | `u1` | - |  |
 | `swarm` | `0x09` | 1 | `u1` | - |  |

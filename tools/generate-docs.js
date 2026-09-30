@@ -48,7 +48,7 @@ const fxInstrumentNames = [
   ['fm_synth', 'FM Synth'], ['midi_out', 'MIDI Out'], ['hypersynth', 'Hypersynth'],
   ['external', 'External'], ['none', 'NONE']
 ]
-const isFxEnum = name => name === 'phrase_fx_command' || name.endsWith('_table_fx_command')
+const isFxEnum = name => name === 'phrase_fx_command' || name === 'instrument_mod_fx_command' || name.endsWith('_table_fx_command')
 
 function fxFile () {
   return path.join(root, 'docs', 'common', 'fx_commands.md')
@@ -59,7 +59,7 @@ function renderFxCommands (firmware, target) {
   const lines = ['# M8 FX Commands', '',
     'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
     link(file, path.join(root, 'docs', 'README.md'), 'Documentation index'), '',
-    'Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type. This page is shared only while the selected command catalogs are identical across firmware targets.', '']
+    'Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type.', '']
   const rows = entries => [
     '| Stored Value | M8 Label | Identifier |', '| --- | --- | --- |',
     ...entries.map(([value, entry]) => `| ${code(hex(Number(value)))} | ${escape(entry['-label'] || '')} | ${code(entry.id)} |`), ''
@@ -74,15 +74,37 @@ function renderFxCommands (firmware, target) {
     const isSequencer = value => ranges.some(([first, last]) => value >= first && value <= last)
     lines.push(`Values come from ${link(file, sequencing.file, path.relative(root, sequencing.file))} and ${link(file, table.file, path.relative(root, table.file))}.`, '',
       '## Instrument (Current Instrument)', '',
-      'These enums contain fixture-verified command subsets for each instrument, not every command available in an FX slot.', '')
+      'Current Instrument command labels vary by instrument type.', '')
     for (const [name, label] of fxInstrumentNames) {
       const enumName = `${name}_table_fx_command`
       const values = table.data.enums[enumName]
       assert.ok(values, `missing ${enumName} for ${firmware}`)
       lines.push(`### ${label}`, '', ...rows(Object.entries(values).sort(([a], [b]) => Number(a) - Number(b))))
     }
+    const mods = sequencing.data.meta['-fx-instrument-mods']
+    const modCommands = sequencing.data.enums.instrument_mod_fx_command
+    assert.ok(mods && modCommands, `missing Instrument Mods catalog for ${firmware}`)
+    const modTypes = [
+      ['ahd_env', 'AHD ENV'], ['adsr_env', 'ADSR ENV'], ['drum_env', 'DRUM ENV'],
+      ['lfo', 'LFO'], ['trig_env', 'TRIG ENV'], ['tracking', 'TRACKING']
+    ]
+    const modRows = []
+    for (let slot = 1; slot <= mods.slots; slot++) {
+      for (let parameter = 1; parameter <= mods['parameters-per-slot']; parameter++) {
+        const value = mods.base + (slot - 1) * mods['parameters-per-slot'] + parameter - 1
+        assert.equal(modCommands[value]?.id, `mod_${slot}_parameter_${parameter}`)
+        modRows.push(`| ${code(hex(value))} | ${modTypes.map(([type]) => {
+          const prefixes = mods.prefixes[type]
+          assert.equal(prefixes.length, mods['parameters-per-slot'])
+          return code(`${prefixes[parameter - 1]}${slot}`)
+        }).join(' | ')} |`)
+      }
+    }
     lines.push('## Instrument Mods', '',
-      'No verified command-value enum is available yet. Labels depend on the selected modulation slot and modulation type; targeted fixtures are needed before listing byte values.', '',
+      'The stored value selects a modulator slot and parameter position. Its label depends on that slot\'s modulation type.', '',
+      `| Stored Value | ${modTypes.map(([, label]) => label).join(' | ')} |`,
+      `| --- | ${modTypes.map(() => '---').join(' | ')} |`,
+      ...modRows, '',
       '## Mixer & Effects', '',
       ...rows(entries.filter(([value]) => Number(value) !== 0xff && !isSequencer(Number(value)))),
       '## Sequencer', '',
@@ -262,7 +284,7 @@ function renderTarget (firmware, target, catalog = targets) {
   indexLines.push('', '## Layout', '', 'Entry dispatch; offsets are absolute file offsets.', '', ...layout(index, entry, entry.data.seq, 0, { summary: true }), '',
     '## Components', '', ...modules.filter(context => context !== entry).map(context => `- ${link(index, pages.get(context), context.data.meta.id)}`), '',
     'Component links follow schema imports. Unchanged schemas and their documentation are shared across firmware entries.', '',
-    'Unknown byte ranges retain their schema names. Stable fixture values do not establish that bytes are unused.', '')
+    'Unknown byte ranges retain their schema names.', '')
   outputs.set(index, indexLines.join('\n'))
   return outputs
 }

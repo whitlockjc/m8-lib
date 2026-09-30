@@ -37,8 +37,7 @@ Root record.
 
 `mixer_settings`
 
-Mixer and Mix & Limiter Scope storage. Offsets are relative to absolute
-file offset 0x00ce in 6.5.x fixtures.
+Mixer and Mix & Limiter Scope storage.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -50,7 +49,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `track_volumes` | `0x02..0x09` | 8 | `u1` | `repeat`: `expr`; `repeat-expr`: `8` | Volume for each of the eight tracks. |
 | `sends` | `0x0a..0x0c` | 3 | [mixer_sends](#type-mixer_sends) | - | Master sends to ModFX, Delay, and Reverb. |
 | `analog_input_volume` | `0x0d` | 1 | `u1` | - | Analog input volume. |
-| `analog_dual_mono_input_volume` | `0x0e` | 1 | `u1` | - | Default fixture stores 0xff. The M8 UI displays this as unset until dual mono input is enabled.  |
+| `analog_dual_mono_input_volume` | `0x0e` | 1 | `u1` | - | 0xff displays as unset until dual mono input is enabled.  |
 | `usb_input_volume` | `0x0f` | 1 | `u1` | - | USB input volume. |
 | `analog_input_sends` | `0x10..0x12` | 3 | [mixer_sends](#type-mixer_sends) | - | Analog input effect sends. |
 | `analog_dual_mono_input_sends` | `0x13..0x15` | 3 | [mixer_sends](#type-mixer_sends) | - | Second analog mono input effect sends. |
@@ -60,7 +59,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `dj_filter_type` | `0x1b` | 1 | `u1`; [dj_filter_type](#enum-dj_filter_type) | - | DJ filter type. |
 | `limiter_attack` | `0x1c` | 1 | `u1` | - | Limiter attack setting. |
 | `limiter_release` | `0x1d` | 1 | `u1` | - | Limiter release setting. |
-| `soft_clip` | `0x1e` | 1 | `u1` | - | Observed values: 0x00 means OFF, 0x01 means ON.  |
+| `soft_clip` | `0x1e` | 1 | `u1` | - | 0x00 means OFF; 0x01 means ON.  |
 | `ott` | `0x1f` | 1 | `u1` | - | OTT amount. |
 
 ## Type: effects_and_scope_settings
@@ -68,8 +67,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 `effects_and_scope_settings`
 
 Shared storage region for the Effects Settings and Mix & Limiter Scope
-views. Offsets are relative to absolute file offset 0x1a5be in 6.5.x
-fixtures. Storage order does not fully match the UI grouping; the Mod FX
+views. Storage order does not fully match the UI grouping; the Mod FX
 type byte is stored after the Mix & Limiter Scope OTT detail bytes.
 
 
@@ -79,9 +77,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` | Preserved bytes before the mapped Mod FX parameter bytes. |
 | `mod_fx` | `0x03..0x06` | 4 | [mod_fx_settings](#type-mod_fx_settings) | - |  |
-| `unknown_1` | `0x07..0x0b` | 5 | bytes | `size`: `5` | Preserved bytes between Mod FX and Delay parameters. Historical &lt;https://github.com/whitlockjc/m8-js&gt; reference code treats part of this region as delay filter storage, but this fixture does not change those controls.  |
+| `unknown_1` | `0x07..0x0b` | 5 | bytes | `size`: `5` | Preserved bytes between Mod FX and Delay parameters. |
 | `delay` | `0x0c..0x10` | 5 | [delay_settings](#type-delay_settings) | - |  |
-| `unknown_2` | `0x11..0x13` | 3 | bytes | `size`: `3` | Preserved bytes between Delay and Reverb parameters. Historical &lt;https://github.com/whitlockjc/m8-js&gt; reference code treats part of this region as reverb filter storage, but this fixture does not change those controls.  |
+| `unknown_2` | `0x11..0x13` | 3 | bytes | `size`: `3` | Preserved bytes between Delay and Reverb parameters. |
 | `reverb` | `0x14..0x19` | 6 | [reverb_settings](#type-reverb_settings) | - |  |
 | `mix_limiter_scope` | `0x1a..0x1b` | 2 | [mix_limiter_scope_settings](#type-mix_limiter_scope_settings) | - |  |
 | `mod_fx_type` | `0x1c` | 1 | `u1`; [mod_fx_type](#enum-mod_fx_type) | - | ModFX type selected in Effects Settings. |
@@ -141,8 +139,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 `mix_limiter_scope_settings`
 
 Mix & Limiter Scope storage for OTT detail controls from the Mix &
-Limiter Scope View. Offsets are relative to absolute file offset
-0x1a5d8 in 6.5.x fixtures.
+Limiter Scope View.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.

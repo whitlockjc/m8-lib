@@ -12,7 +12,7 @@ test('6.5.x header expectations follow the entry schema', () => {
   const files = fixtureFiles(target)
   assert.ok(files.length > 40)
   for (const file of files) assert.doesNotThrow(() => verifyHeader(readHeader(file), target))
-  assert.equal(verifyFixtureMetadata(target), 54)
+  assert.equal(verifyFixtureMetadata(target), 55)
   assert.throws(() => verifyHeader(readHeader(files[0])), /firmware target required/)
 })
 

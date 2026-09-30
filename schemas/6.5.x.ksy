@@ -10,9 +10,7 @@ meta:
     - file-versions/4.0.1/scale
     - file-versions/1.0.2/theme
 doc: |
-  Entry schema for M8 files created or verified against the 6.5.x firmware line.
-
-  Last synchronized with fixtures created from M8 firmware 6.5.2C.
+  M8 Instrument, Scale, Song, and Theme files for the 6.5.x firmware line.
 seq:
   - id: header
     type: file_header

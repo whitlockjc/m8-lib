@@ -8,18 +8,8 @@ Source: [schemas/file-versions/6.0.1/instrument.ksy](../../../schemas/file-versi
 
 Byte order: `le`.
 
-Body schema for instrument files with header schema version 6.0.1.
-
-Initial schema verified against M8 6.5.2C NONE, Wavsynth, Macrosynth,
-Sampler, MIDI Out, FM Synth, Hypersynth, and External instrument fixtures. The
-instrument type byte, fixed-size name byte range, common instrument prefix,
-and NONE table are mapped.
-Wavsynth/Macrosynth/Sampler/MIDI Out/FM Synth/Hypersynth/External params,
-filter params, amp params, mixer params, modulators, Wavsynth/Macrosynth/
-Sampler/MIDI Out/FM Synth/Hypersynth/External instrument tables, sample path,
-Hypersynth chord table, and common EQ assignment are mapped from params,
-MODS, and table fixtures. Unknown ranges are preserved until additional
-instrument fixtures provide evidence for their layout.
+Instrument body for file schema version 6.0.1, containing an instrument
+record and its table.
 
 
 File schema version: `6.0.1`.
@@ -78,9 +68,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 Fixed 215-byte instrument record. This record is stored directly in Song
 files; standalone Instrument files append one 128-byte instrument table.
-The M8 manual groups general_settings and eq as General Instrument
-Settings. EQ is stored after the type-specific region, so it remains a
-separate field in the raw storage sequence.
+The EQ assignment follows the type-specific region.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -89,15 +77,14 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `general_settings` | `0x00..0x0e` | 15 | [general_instrument_settings](#type-general_instrument_settings) | - |  |
 | `body_before_eq` | `0x0f..0x3d` | 47 | switch on `general_settings.type`: `instrument_type::wavsynth`: [wavsynth_body_before_eq](#type-wavsynth_body_before_eq); `instrument_type::macrosynth`: [macrosynth_body_before_eq](#type-macrosynth_body_before_eq); `instrument_type::sampler`: [sampler_body_before_eq](#type-sampler_body_before_eq); `instrument_type::midi_out`: [midi_out_body_before_eq](#type-midi_out_body_before_eq); `instrument_type::fm_synth`: [fm_synth_body_before_eq](#type-fm_synth_body_before_eq); `instrument_type::hypersynth`: [hypersynth_body_before_eq](#type-hypersynth_body_before_eq); `instrument_type::external`: [external_body_before_eq](#type-external_body_before_eq); `instrument_type::none`: [unused_body_before_eq](#type-unused_body_before_eq) | - | Instrument-specific body before the common EQ field. |
-| `eq` | `0x3e` | 1 | `u1` | - | Common instrument EQ assignment. Observed values: 0x80 displays as --, 0x7f displays as 7F.  |
+| `eq` | `0x3e` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --, 0x7f displays as 7F.  |
 | `tail` | `0x3f..0xd6` | 152 | switch on `general_settings.type`: `instrument_type::sampler`: [sampler_data_tail](#type-sampler_data_tail); `instrument_type::hypersynth`: [hypersynth_data_tail](#type-hypersynth_data_tail); `instrument_type::midi_out`: [standard_data_tail](#type-standard_data_tail); `instrument_type::wavsynth`: [standard_data_tail](#type-standard_data_tail); `instrument_type::macrosynth`: [standard_data_tail](#type-standard_data_tail); `instrument_type::fm_synth`: [standard_data_tail](#type-standard_data_tail); `instrument_type::external`: [standard_data_tail](#type-standard_data_tail); `instrument_type::none`: [none_data_tail](#type-none_data_tail) | - | Instrument-specific tail after the common EQ field. |
 
 ## Type: general_instrument_settings
 
 `general_instrument_settings`
 
-Contiguous General Instrument Settings prefix. The M8 manual also groups
-the noncontiguous eq assignment with these settings.
+General Instrument Settings prefix. The EQ assignment is stored separately.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -106,7 +93,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `type` | `0x00` | 1 | `u1`; [instrument_type](#enum-instrument_type) | - |  |
 | `name` | `0x01..0x0c` | 12 | bytes | `size`: `12` | Fixed-size byte range for the instrument name. Padding bytes are preserved as stored.  |
-| `transpose` | `0x0d` | 1 | `u1` | - | Common instrument transpose setting. Observed values: 0x01 means ON, 0x00 means OFF.  |
+| `transpose` | `0x0d` | 1 | `u1` | - | Common instrument transpose setting. 0x01 means ON; 0x00 means OFF.  |
 | `table_tic` | `0x0e` | 1 | `u1` | - | Common instrument table TIC setting. |
 
 ## Type: unused_body_before_eq
@@ -201,8 +188,8 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x02` | 3 | bytes | `size`: `3` |  |
 | `params` | `0x03..0x23` | 33 | [instrument_parameters_6_0_1::fm_synth_params](instrument/parameters.md#type-fm_synth_params) | - |  |
-| `filter` | `0x24..0x26` | 3 | [instrument_parameters_6_0_1::filter_params](instrument/parameters.md#type-filter_params) | - | Type, cutoff, and resonance offsets are verified by FM_PARAMS.  |
-| `amp` | `0x27..0x29` | 3 | [instrument_parameters_6_0_1::amp_params](instrument/parameters.md#type-amp_params) | - | Amp, limit, and pan offsets are verified by FM_PARAMS.  |
+| `filter` | `0x24..0x26` | 3 | [instrument_parameters_6_0_1::filter_params](instrument/parameters.md#type-filter_params) | - |  |
+| `amp` | `0x27..0x29` | 3 | [instrument_parameters_6_0_1::amp_params](instrument/parameters.md#type-amp_params) | - |  |
 | `mixer` | `0x2a..0x2d` | 4 | [instrument_parameters_6_0_1::mixer_params](instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x2e` | 1 | bytes | `size`: `1` |  |
 
@@ -279,7 +266,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `modulators` | `0x00..0x17` | 24 | [instrument_modulators](#type-instrument_modulators) | `repeat`: `4` via `slots` |  |
-| `sample_path` | `0x18..0x97` | 128 | [sample_path_region](#type-sample_path_region) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. SAM_PARAMS stores /Samples/Kick.wav at offset 0x65. The M8 manual requires the entire path to be under 128 characters.  |
+| `sample_path` | `0x18..0x97` | 128 | [sample_path_region](#type-sample_path_region) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. The full sample path must be under 128 characters.  |
 
 ## Type: sample_path_region
 
@@ -318,7 +305,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `enabled_notes` | `0x00` | 1 | `u1` | - | Observed as a bit mask for six chord notes. Chord 0 changed from 0xff to 0xfe when note 1 was unset. Chord 15 changed from 0xff to 0xdf when note 6 was unset.  |
+| `enabled_notes` | `0x00` | 1 | `u1` | - | Bitmask for six chord notes. Bits 0 through 5 indicate whether each corresponding note is enabled.  |
 | `notes` | `0x01..0x06` | 6 | [instrument_parameters_6_0_1::hypersynth_chord_notes](instrument/parameters.md#type-hypersynth_chord_notes) | - |  |
 
 ## Type: instrument_modulators

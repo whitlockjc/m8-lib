@@ -9,8 +9,7 @@ doc: |
 types:
   midi_mappings:
     doc: |
-      MIDI Mapping page storage. Offsets are relative to absolute file offset
-      0x1a5fe in 6.5.x fixtures. M8 supports 128 mapping records.
+      MIDI Mapping page storage containing 128 mapping records.
     seq:
       - id: entries
         type: midi_mapping
@@ -19,27 +18,22 @@ types:
         doc: Up to 128 MIDI control mappings.
   midi_mapping:
     doc: |
-      Seven-byte MIDI Mapping record. Historical m8-js reference code reads
-      these fields in this byte order. The 6.5.x MIDI_MAPPING fixture verifies
-      the record size and table base offset.
+      Seven-byte MIDI Mapping record.
     seq:
       - id: channel
         type: u1
         doc: |
-          0x00 is observed for empty mappings. Other values are displayed as
+          0x00 represents an empty mapping. Other values are displayed as
           decimal MIDI channels in the M8 UI.
       - id: control_number
         type: u1
         doc: |
-          Observed values include 0x00, 0x7f, 0x80, and 0x81. The M8 UI
-          displays 0x80 as T:X and 0x81 as T:Y in the current fixture.
+          MIDI control number. The M8 UI displays 0x80 as T:X and 0x81 as T:Y.
       - id: destination_type
         type: u1
         enum: midi_mapping_destination_type
         doc: |
-          Raw destination type byte. Observed labels identify the UI
-          destination group. Destination index and parameter interpretation is
-          destination-specific and deferred to the corresponding page schemas.
+          Destination group. Index and parameter meanings depend on this type.
       - id: destination_index
         type: u1
         doc: Index within the destination group; interpretation depends on destination type.

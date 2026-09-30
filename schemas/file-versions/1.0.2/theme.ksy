@@ -4,13 +4,8 @@ meta:
   license: Apache-2.0
   ks-version: 0.11
 doc: |
-  Body schema for theme files with header schema version 1.0.2.
-
-  Verified against M8 6.5.2C theme fixtures. The body contains 13 color triples
-  and no unaccounted bytes.
-
-  RGB versus HSV editing mode is not stored in any M8 file and is outside this
-  schema.
+  Theme body with 13 color triples. RGB versus HSV editing mode is not stored
+  in the Theme file.
 seq:
   - id: background
     type: color

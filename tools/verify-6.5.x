@@ -180,6 +180,8 @@ tools/map-fixture.js \
   fixtures/6.5.x/songs/PHRASES.m8s \
   fixtures/6.5.x/songs/PHRASES.yaml
 
+node tools/verify-instrument-mod-fx.js
+
 tools/map-fixture.js \
   fixtures/6.5.x/songs/DEFAULT.m8s \
   fixtures/6.5.x/songs/BOOKMARKS.m8s \

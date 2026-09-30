@@ -1,0 +1,36 @@
+fileType: song
+firmware: 6.5.2C
+screen: phrase
+# Chain 00 rows 00 and 01 reference phrases 00 and 01; chain 01 is empty.
+
+changes:
+  - { phrase: 0, step: 0, fx: 0, command: 0x92, label: EA1, value: 0xff }
+  - { phrase: 0, step: 0, fx: 1, command: 0x93, label: AT1, value: 0xfe }
+  - { phrase: 0, step: 0, fx: 2, command: 0x94, label: HO1, value: 0xfd }
+  - { phrase: 0, step: 1, fx: 0, command: 0x95, label: DE1, value: 0xfc }
+  - { phrase: 0, step: 1, fx: 1, command: 0x96, label: ET1, value: 0xfb }
+  - { phrase: 0, step: 3, fx: 0, command: 0x97, label: EA2, value: 0xfa }
+  - { phrase: 0, step: 3, fx: 1, command: 0x98, label: AT2, value: 0xf9 }
+  - { phrase: 0, step: 3, fx: 2, command: 0x99, label: DE2, value: 0xf8 }
+  - { phrase: 0, step: 4, fx: 0, command: 0x9a, label: SU2, value: 0xf7 }
+  - { phrase: 0, step: 4, fx: 1, command: 0x9b, label: ET2, value: 0xf6 }
+  - { phrase: 0, step: 6, fx: 0, command: 0x9c, label: EA3, value: 0xf5 }
+  - { phrase: 0, step: 6, fx: 1, command: 0x9d, label: PK3, value: 0xf4 }
+  - { phrase: 0, step: 6, fx: 2, command: 0x9e, label: BO3, value: 0xf3 }
+  - { phrase: 0, step: 7, fx: 0, command: 0x9f, label: DE3, value: 0xf2 }
+  - { phrase: 0, step: 7, fx: 1, command: 0xa0, label: ET3, value: 0xf1 }
+  - { phrase: 0, step: 9, fx: 0, command: 0xa1, label: LA4, value: 0xf0 }
+  - { phrase: 0, step: 9, fx: 1, command: 0xa2, label: LO4, value: 0xef }
+  - { phrase: 0, step: 9, fx: 2, command: 0xa3, label: LS4, value: 0xee }
+  - { phrase: 0, step: 10, fx: 0, command: 0xa4, label: LF4, value: 0xed }
+  - { phrase: 0, step: 10, fx: 1, command: 0xa5, label: LT4, value: 0xec }
+  - { phrase: 1, step: 0, fx: 0, command: 0x92, label: EA1, value: 0xff }
+  - { phrase: 1, step: 0, fx: 1, command: 0x93, label: AT1, value: 0xfe }
+  - { phrase: 1, step: 0, fx: 2, command: 0x94, label: HO1, value: 0xfd }
+  - { phrase: 1, step: 1, fx: 0, command: 0x95, label: DE1, value: 0xfc }
+  - { phrase: 1, step: 1, fx: 1, command: 0x96, label: ET1, value: 0xfb }
+  - { phrase: 1, step: 3, fx: 0, command: 0x97, label: TA2, value: 0xfa }
+  - { phrase: 1, step: 3, fx: 1, command: 0x98, label: TS2, value: 0xf9 }
+  - { phrase: 1, step: 3, fx: 2, command: 0x99, label: TL2, value: 0xf8 }
+  - { phrase: 1, step: 4, fx: 0, command: 0x9a, label: TH2, value: 0xf7 }
+  - { phrase: 1, step: 4, fx: 1, command: 0x9b, label: TX2, value: 0xf6 }

@@ -9,11 +9,7 @@ doc: |
   Sixteen eight-byte Instrument Table rows for file schema 6.0.1.
   Standalone Instruments append one table; Songs store 256 tables separately.
   FX slots can use the M8 UI's Sequencer, Mixer & Effects, Current Instrument,
-  and Instrument Mods command groups. The FX command reference generated from
-  the schemas documents verified Current Instrument command subsets by type;
-  it is not a complete catalog of commands available in a table. Instrument
-  Mods labels depend on the selected modulation type and still need fixture
-  evidence.
+  and Instrument Mods command groups. Command labels depend on context.
 seq:
   - id: rows
     type: table_row
@@ -29,7 +25,7 @@ types:
         doc: Row transpose value.
       - id: volume
         type: u1
-        doc: Observed value 0xff displays as --.
+        doc: 0xff displays as --.
       - id: fx
         type: fx_slot
         repeat: expr

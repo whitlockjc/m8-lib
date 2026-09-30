@@ -9,8 +9,7 @@ doc: |
 types:
   project_settings:
     doc: |
-      Project page settings. Offsets are relative to absolute file offset
-      0x008e in 6.5.x fixtures.
+      Project page settings.
     seq:
       - id: transpose
         type: u1
@@ -18,8 +17,7 @@ types:
       - id: tempo
         type: f4
         doc: |
-          Verified as a 32-bit little-endian float. A UI change from 120.00 to
-          121.99 stored approximately 121.98999786376953.
+          Song tempo as a 32-bit little-endian float.
       - id: live_quantize
         type: u1
         doc: |
@@ -38,25 +36,18 @@ types:
         doc: |
           Project page Scale selector and Scale View key storage. The high
           nibble stores the key index; the low nibble stores the embedded Scale
-          index. The PROJECT fixture changed this byte from 0x00 to 0xfe while
-          changing the Project page Scale value. The SCALES fixture changed the
-          key from C to E and changed this byte from 0x00 to 0x40. The KEY_ONLY
-          fixture changed the key from C to G and changed this byte from 0x00
-          to 0x70. The UI presents key and scale together, but the schema model
-          has distinct values: key index, scale index, and Scale definition
-          record.
+          index. Key index, Scale index, and the selected Scale definition are
+          distinct values.
       - id: groove
         type: u1
         doc: Index of the selected Song groove.
       - id: unknown
         size: 2
         doc: |
-          Changed in the PROJECT fixture, but not yet mapped to a Project UI
-          meaning. Preserve until targeted fixtures provide evidence.
+          Preserved bytes of unknown purpose.
   midi_settings:
     doc: |
-      MIDI Settings page storage. Offsets are relative to absolute file offset
-      0x00a0 in 6.5.x fixtures.
+      MIDI Settings page storage.
     seq:
       - id: sync_settings
         type: midi_sync_settings
@@ -69,7 +60,7 @@ types:
       - id: record_velocity
         type: u1
         doc: |
-          Observed values: 0x01 means ON, 0x00 means OFF.
+          0x01 means ON; 0x00 means OFF.
       - id: record_delay_kill
         type: u1
         enum: record_delay_kill
@@ -77,7 +68,7 @@ types:
       - id: control_map_channel
         type: u1
         doc: |
-          Observed values: 0x00 means OFF, 0x11 means ALL, and 0x01 through
+          0x00 means OFF, 0x11 means ALL, and 0x01 through
           0x10 display as decimal channels 01 through 16.
       - id: song_row_cue_channel
         type: u1
@@ -97,7 +88,7 @@ types:
       - id: program_change
         type: u1
         doc: |
-          Observed values: 0x01 means ON, 0x00 means OFF.
+          0x01 means ON; 0x00 means OFF.
       - id: mode
         type: u1
         enum: midi_input_mode
@@ -110,14 +101,14 @@ types:
       - id: sync_in_clock
         type: u1
         doc: |
-          Observed values: 0x01 means clock enabled, 0x00 means clock disabled.
+          0x01 means clock enabled; 0x00 means clock disabled.
       - id: sync_in_transport
         type: u1
         enum: midi_sync_transport
       - id: sync_out_clock
         type: u1
         doc: |
-          Observed values: 0x01 means clock enabled, 0x00 means clock disabled.
+          0x01 means clock enabled; 0x00 means clock disabled.
       - id: sync_out_transport
         type: u1
         enum: midi_sync_transport

@@ -4,10 +4,8 @@ meta:
   license: Apache-2.0
   ks-version: 0.11
 doc: |
-  Common header present at the start of M8 files.
-
-  The encoded version appears to describe the persisted file schema version for
-  this file, not necessarily the M8 firmware version used to create it.
+  Header containing the M8 signature, file schema version, and file kind.
+  The file schema version is distinct from the firmware version.
 seq:
   - id: magic
     contents: M8VERSION

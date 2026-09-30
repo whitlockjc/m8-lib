@@ -7,6 +7,17 @@ meta:
     - [0x00, 0x1a]
     - [0x43, 0x47]
     - [0x4d, 0x4d]
+  -fx-instrument-mods:
+    base: 0x92
+    slots: 4
+    parameters-per-slot: 5
+    prefixes:
+      ahd_env: [EA, AT, HO, DE, ET]
+      adsr_env: [EA, AT, DE, SU, ET]
+      drum_env: [EA, PK, BO, DE, ET]
+      lfo: [LA, LO, LS, LF, LT]
+      trig_env: [EA, AT, HO, DE, ET]
+      tracking: [TA, TS, TL, TH, TX]
   imports:
     - ../../../common/fx_slot
 doc: |
@@ -15,9 +26,7 @@ doc: |
 types:
   grooves:
     doc: |
-      Groove storage. Offsets are relative to absolute file offset 0x00ee in
-      6.5.x fixtures. The M8 stores 32 grooves, and each groove stores 16 one
-      byte step values.
+      Thirty-two grooves, each containing 16 one-byte step values.
     seq:
       - id: entries
         type: groove
@@ -34,10 +43,7 @@ types:
         doc: Sixteen groove step values.
   phrases:
     doc: |
-      Phrase View storage. Offsets are relative to absolute file offset 0x0aee
-      in 6.5.x fixtures. The M8 stores phrase indexes 0x00 through 0xfe. Value
-      0xff is observed as an unset phrase reference rather than a stored phrase
-      record.
+      Phrases indexed 0x00 through 0xfe; 0xff is an unset phrase reference.
     seq:
       - id: entries
         type: phrase
@@ -54,7 +60,7 @@ types:
         doc: Sixteen steps in this phrase.
   phrase_step:
     doc: |
-      Nine-byte Phrase step. 0xff is observed as unset for note, volume,
+      Nine-byte Phrase step. 0xff means unset for note, volume,
       instrument, and FX command bytes. FX value bytes default to 0x00.
     seq:
       - id: note
@@ -76,9 +82,7 @@ types:
           labels depend on the surrounding instrument and modulation type.
   song_rows:
     doc: |
-      Song View row storage. Offsets are relative to absolute file offset
-      0x02ee in 6.5.x fixtures. The M8 stores 256 rows, and each row stores one
-      chain index per track.
+      Song View storage of 256 rows, each with one chain index per track.
     seq:
       - id: entries
         type: song_row
@@ -88,7 +92,7 @@ types:
   song_row:
     doc: |
       Eight-byte Song View row. Each byte stores the chain index assigned to a
-      track; tracks[0] is M8 Track 1. 0xff is observed as unset.
+      track; tracks[0] is M8 Track 1. 0xff means unset.
     seq:
       - id: tracks
         type: u1
@@ -97,8 +101,7 @@ types:
         doc: Chain index for each of the eight tracks; 0xff is unset.
   chains:
     doc: |
-      Chain View storage. Offsets are relative to absolute file offset 0x9a5e
-      in 6.5.x fixtures. The M8 stores chain indexes 0x00 through 0xfe; 0xff is
+      Chain View storage. Chains have indexes 0x00 through 0xfe; 0xff is
       the unset reference sentinel. Each chain stores 16 rows.
     seq:
       - id: entries
@@ -117,7 +120,7 @@ types:
   chain_row:
     doc: |
       Chain row storage. The phrase byte stores the referenced phrase index;
-      0xff is observed as unset.
+      0xff means unset.
     seq:
       - id: phrase
         type: u1
@@ -126,6 +129,27 @@ types:
         type: u1
         doc: Transpose value for the referenced phrase.
 enums:
+  instrument_mod_fx_command:
+    0x92: { id: mod_1_parameter_1 }
+    0x93: { id: mod_1_parameter_2 }
+    0x94: { id: mod_1_parameter_3 }
+    0x95: { id: mod_1_parameter_4 }
+    0x96: { id: mod_1_parameter_5 }
+    0x97: { id: mod_2_parameter_1 }
+    0x98: { id: mod_2_parameter_2 }
+    0x99: { id: mod_2_parameter_3 }
+    0x9a: { id: mod_2_parameter_4 }
+    0x9b: { id: mod_2_parameter_5 }
+    0x9c: { id: mod_3_parameter_1 }
+    0x9d: { id: mod_3_parameter_2 }
+    0x9e: { id: mod_3_parameter_3 }
+    0x9f: { id: mod_3_parameter_4 }
+    0xa0: { id: mod_3_parameter_5 }
+    0xa1: { id: mod_4_parameter_1 }
+    0xa2: { id: mod_4_parameter_2 }
+    0xa3: { id: mod_4_parameter_3 }
+    0xa4: { id: mod_4_parameter_4 }
+    0xa5: { id: mod_4_parameter_5 }
   phrase_fx_command:
     0x00:
       id: arpeggio

@@ -14,11 +14,9 @@ meta:
     - song/mixer_effects
     - ../6.5.0/song/midi_mapping
 doc: |
-  Body schema for song files with header schema version 6.6.2.
-
-  Mapped with M8 6.6.3C Song fixtures for ModFX Comb, chain bookmarks, and
-  row bookmark colors. Other fields reuse 6.5.0 components. Unknown byte
-  ranges remain preserved.
+  Song body for file schema version 6.6.2, containing project settings,
+  sequencing, instruments, tables, scales, MIDI mappings, mixer and effects
+  settings, and row bookmark colors.
 seq:
   - id: directory
     type: directory
@@ -34,8 +32,7 @@ seq:
     size: 15
     doc: |
       Preserved bytes between the Project settings record and Mixer settings.
-      The preceding two unknown bytes remain inside project_settings to retain
-      that record boundary and the existing fixture attribution.
+      The preceding two unknown bytes belong to the Project settings record.
   - id: mixer
     type: song_mixer_effects_6_6_2::mixer_settings
   - id: grooves
@@ -49,9 +46,8 @@ seq:
   - id: tables
     type: tables
     doc: |
-      Song table storage. Record boundaries and default bytes are verified by
-      INSTRUMENTS.m8s. Tables 0x00 through 0x7f are associated by matching index
-      with Instruments 0x00 through 0x7f.
+      Song table storage. Tables 0x00 through 0x7f correspond to Instruments
+      0x00 through 0x7f by index.
   - id: instruments
     type: instruments
   - id: effects_and_scope
@@ -112,8 +108,7 @@ types:
         enum: row_bookmark_color_value
   bookmarks:
     doc: |
-      Song View bookmark storage. Offsets are relative to absolute file offset
-      0x1a97e in 6.5.x and 6.6.x fixtures. The M8 stores one bitmask byte per Song row.
+      Song View chain-cell bookmarks, with one bitmask byte per Song row.
     seq:
       - id: entries
         type: bookmark_row
@@ -155,9 +150,7 @@ types:
       Song table storage at absolute offsets 0xba3e..0x13a3d. The region contains
       256 fixed 128-byte tables using the same table structure appended to a
       standalone Instrument file. Tables 0x00 through 0x7f are associated with
-      Instruments 0x00 through 0x7f by matching index. The purpose of Tables
-      0x80 through 0xff is not yet documented by this schema. TABLES.m8s
-      verified rows 0 and 15 in Tables 0x00 and 0xff in 6.5.x fixtures.
+      Instruments 0x00 through 0x7f by matching index.
     seq:
       - id: entries
         type: instrument_table_6_0_1
@@ -175,9 +168,7 @@ types:
         repeat-expr: 128
   embedded_scales:
     doc: |
-      Embedded Scale storage. Offsets are relative to absolute file offset
-      0x1aa7e in 6.5.x fixtures. The M8 stores 16 Scale body records without
-      standalone Scale file headers.
+      Sixteen embedded Scale body records without standalone Scale file headers.
     seq:
       - id: entries
         type: scale_4_0_1

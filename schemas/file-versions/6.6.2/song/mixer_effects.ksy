@@ -32,8 +32,7 @@ types:
       - id: analog_dual_mono_input_volume
         type: u1
         doc: |
-          Default fixture stores 0xff. The M8 UI displays this as unset until
-          dual mono input is enabled.
+          0xff displays as unset until dual mono input is enabled.
       - id: usb_input_volume
         type: u1
         doc: USB input volume.
@@ -65,15 +64,14 @@ types:
       - id: soft_clip
         type: u1
         doc: |
-          Observed values: 0x00 means OFF, 0x01 means ON.
+          0x00 means OFF; 0x01 means ON.
       - id: ott
         type: u1
         doc: OTT amount.
   effects_and_scope_settings:
     doc: |
       Shared storage region for the Effects Settings and Mix & Limiter Scope
-      views. Offsets are relative to absolute file offset 0x1a5be in 6.5.x and
-      6.6.x fixtures. Storage order does not fully match the UI grouping; the Mod FX
+      views. Storage order does not fully match the UI grouping; the Mod FX
       type byte is stored after the Mix & Limiter Scope OTT detail bytes.
     seq:
       - id: unknown_0
@@ -83,18 +81,12 @@ types:
         type: mod_fx_settings
       - id: unknown_1
         size: 5
-        doc: |
-          Preserved bytes between Mod FX and Delay parameters. Historical
-          <https://github.com/whitlockjc/m8-js> reference code treats part of
-          this region as delay filter storage.
+        doc: Preserved bytes between Mod FX and Delay parameters.
       - id: delay
         type: delay_settings
       - id: unknown_2
         size: 3
-        doc: |
-          Preserved bytes between Delay and Reverb parameters. Historical
-          <https://github.com/whitlockjc/m8-js> reference code treats part of
-          this region as reverb filter storage.
+        doc: Preserved bytes between Delay and Reverb parameters.
       - id: reverb
         type: reverb_settings
       - id: mix_limiter_scope
@@ -162,8 +154,7 @@ types:
   mix_limiter_scope_settings:
     doc: |
       Mix & Limiter Scope storage for OTT detail controls from the Mix &
-      Limiter Scope View. Offsets are relative to absolute file offset
-      0x1a5d8 in 6.5.x fixtures.
+      Limiter Scope View.
     seq:
       - id: ott_time
         type: u1
