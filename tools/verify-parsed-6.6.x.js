@@ -9,7 +9,7 @@ const compiledDir = process.argv[2]
 if (!compiledDir) throw new Error('usage: node tools/verify-parsed-6.6.x.js <compiled-schema-dir>')
 
 const { File66X } = require(path.resolve(compiledDir, 'File66X.js'))
-const { Instrument602 } = require(path.resolve(compiledDir, 'Instrument602.js'))
+const { InstrumentHypersynth602 } = require(path.resolve(compiledDir, 'InstrumentHypersynth602.js'))
 const { Song662 } = require(path.resolve(compiledDir, 'Song662.js'))
 const { SongMixerEffects662 } = require(path.resolve(compiledDir, 'SongMixerEffects662.js'))
 
@@ -18,7 +18,7 @@ function parse (fixture) {
   return { bytes, file: new File66X(new KaitaiStream(bytes)) }
 }
 
-assert.equal(Instrument602.HypersynthShape[0x0b], 'SINE_ORGAN')
+assert.equal(InstrumentHypersynth602.Shape[0x0b], 'SINE_ORGAN')
 assert.equal(SongMixerEffects662.ModFxType[0x03], 'COMB')
 assert.equal(Song662.RowBookmarkColorValue[0x05], 'TEXT_TITLES')
 assert.equal(Song662.RowBookmarkColorValue[0x15], 'TEXT_TITLES_ARROWS')
@@ -29,12 +29,12 @@ for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'FM', 'HYP', 'MID', 'EXT']) {
   assert.equal(file.body.instrument.generalSettings.type, bytes[0x0e], `${name} type`)
   assert.equal(file.body.instrument.eq, bytes[0x4c], `${name} EQ`)
   assert.equal(file.body.table.rows.length, 16, `${name} table length`)
-  if (name === 'HYP') assert.equal(file.body.instrument.bodyBeforeEq.shape, 0x00)
+  if (name === 'HYP') assert.equal(file.body.instrument.params.shape, 0x00)
 }
 
 {
   const { bytes, file } = parse('fixtures/6.6.x/instruments/HYP_SHAPE.m8i')
-  assert.equal(file.body.instrument.bodyBeforeEq.shape, 0x0b)
+  assert.equal(file.body.instrument.params.shape, 0x0b)
   assert.equal(bytes[0x39], 0x0b)
 }
 

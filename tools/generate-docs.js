@@ -66,20 +66,20 @@ function renderFxCommands (firmware, target) {
   ]
     const modules = graph(load(path.resolve(root, target.entry)))
     const sequencing = modules.find(context => context.data.meta['-fx-sequencer-ranges'])
-    const table = modules.find(context => context.data.enums?.wavsynth_fx_command)
-    assert.ok(sequencing?.data.enums?.fx_command && table, `missing FX catalogs for ${firmware}`)
+    assert.ok(sequencing?.data.enums?.fx_command, `missing FX catalog for ${firmware}`)
     const ranges = sequencing.data.meta['-fx-sequencer-ranges']
     const entries = Object.entries(sequencing.data.enums.fx_command)
       .sort(([a], [b]) => Number(a) - Number(b))
     const isSequencer = value => ranges.some(([first, last]) => value >= first && value <= last)
-    lines.push(`Values come from ${link(file, sequencing.file, path.relative(root, sequencing.file))} and ${link(file, table.file, path.relative(root, table.file))}.`, '',
+    lines.push(`Values come from ${link(file, sequencing.file, path.relative(root, sequencing.file))} and the instrument-specific schemas linked below.`, '',
       '## Instrument (Current Instrument)', '',
       'Current Instrument command labels vary by instrument type.', '')
     for (const [name, label] of fxInstrumentNames) {
-      const enumName = `${name}_fx_command`
-      const values = table.data.enums[enumName]
-      assert.ok(values, `missing ${enumName} for ${firmware}`)
-      lines.push(`### ${label}`, '', ...rows(Object.entries(values).sort(([a], [b]) => Number(a) - Number(b))))
+      const owner = modules.find(context => context.data.meta.id === `instrument_${name}_6_0_1`)
+      const values = owner?.data.enums?.fx_command
+      assert.ok(values, `missing ${name} FX commands for ${firmware}`)
+      lines.push(`### ${label}`, '', `Source: ${link(file, owner.file, path.relative(root, owner.file))}.`, '',
+        ...rows(Object.entries(values).sort(([a], [b]) => Number(a) - Number(b))))
     }
     const mods = sequencing.data.meta['-fx-instrument-mods']
     const modCommands = sequencing.data.enums.instrument_mod_fx_command
@@ -226,7 +226,8 @@ function renderTarget (firmware, target, catalog = targets) {
       ...Object.keys(data.types || {}).map(name => `- ${link(file, file, name, `type-${name}`)}`),
       ...Object.keys(data.enums || {}).filter(name => !isFxEnum(name))
         .map(name => `- ${link(file, file, `${name} (enum)`, `enum-${name}`)}`), '')
-    if (context.data.meta.id === 'fx_slot' || Object.keys(data.enums || {}).some(isFxEnum)) {
+    if (context.data.meta.id === 'fx_slot' || context.data.meta.id.startsWith('instrument_table_') ||
+        Object.keys(data.enums || {}).some(isFxEnum)) {
       lines.push(`FX command values: ${link(file, fxFile(), 'FX command reference')}.`, '')
     }
     const renderDefinition = (definition, heading, anchor) => {

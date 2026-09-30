@@ -7,6 +7,15 @@ meta:
     - ../6.0.1/instrument/modulation
     - ../6.0.1/instrument/parameters
     - ../6.0.1/instrument/table
+    - ../6.0.1/instrument/wavsynth
+    - ../6.0.1/instrument/macrosynth
+    - ../6.0.1/instrument/sampler
+    - ../6.0.1/instrument/midi_out
+    - ../6.0.1/instrument/fm_synth
+    - ../6.0.1/instrument/hypersynth
+    - ../6.0.1/instrument/external
+    - ../6.0.1/instrument/none
+    - instrument/hypersynth
 doc: |
   Instrument body for file schema version 6.0.2, containing an instrument
   record and its table. Hypersynth includes a waveform shape setting.
@@ -24,19 +33,19 @@ types:
     seq:
       - id: general_settings
         type: general_settings
-      - id: body_before_eq
+      - id: params
         type:
           switch-on: general_settings.type
           cases:
-            'type::wavsynth': wavsynth_body_before_eq
-            'type::macrosynth': macrosynth_body_before_eq
-            'type::sampler': sampler_body_before_eq
-            'type::midi_out': midi_out_body_before_eq
-            'type::fm_synth': fm_synth_body_before_eq
-            'type::hypersynth': hypersynth_body_before_eq
-            'type::external': external_body_before_eq
-            'type::none': unused_body_before_eq
-        doc: Instrument-specific body before the common EQ field.
+            'type::wavsynth': wavsynth_params
+            'type::macrosynth': macrosynth_params
+            'type::sampler': sampler_params
+            'type::midi_out': midi_out_params
+            'type::fm_synth': fm_synth_params
+            'type::hypersynth': hypersynth_params
+            'type::external': external_params
+            'type::none': unused_params
+        doc: Instrument settings before the common EQ field.
       - id: eq
         type: u1
         doc: |
@@ -75,19 +84,19 @@ types:
       - id: table_tic
         type: u1
         doc: Common instrument table TIC setting.
-  unused_body_before_eq:
+  unused_params:
     doc: |
       Preserved bytes between the common instrument prefix and common EQ field
       for NONE.
     seq:
       - id: unknown
         size: 47
-  wavsynth_body_before_eq:
+  wavsynth_params:
     seq:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_parameters_6_0_1::wavsynth_params
+        type: instrument_wavsynth_6_0_1::instrument_params
       - id: filter
         type: instrument_parameters_6_0_1::filter_params
       - id: amp
@@ -96,12 +105,12 @@ types:
         type: instrument_parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 29
-  macrosynth_body_before_eq:
+  macrosynth_params:
     seq:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_parameters_6_0_1::macrosynth_params
+        type: instrument_macrosynth_6_0_1::instrument_params
       - id: filter
         type: instrument_parameters_6_0_1::filter_params
       - id: amp
@@ -110,7 +119,7 @@ types:
         type: instrument_parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 29
-  sampler_body_before_eq:
+  sampler_params:
     doc: |
       Sampler-specific controls are stored here; the selected sample_path is
       another Sampler-specific parameter stored in sampler_tail.
@@ -118,7 +127,7 @@ types:
       - id: unknown_0
         size: 2
       - id: controls
-        type: instrument_parameters_6_0_1::sampler_controls
+        type: instrument_sampler_6_0_1::instrument_params
       - id: filter
         type: instrument_parameters_6_0_1::filter_params
       - id: amp
@@ -127,18 +136,18 @@ types:
         type: instrument_parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 28
-  midi_out_body_before_eq:
+  midi_out_params:
     seq:
       - id: params
-        type: instrument_parameters_6_0_1::midi_out_params
+        type: instrument_midi_out_6_0_1::instrument_params
       - id: unknown
         size: 18
-  fm_synth_body_before_eq:
+  fm_synth_params:
     seq:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_parameters_6_0_1::fm_synth_params
+        type: instrument_fm_synth_6_0_1::instrument_params
       - id: filter
         type: instrument_parameters_6_0_1::filter_params
       - id: amp
@@ -147,12 +156,12 @@ types:
         type: instrument_parameters_6_0_1::mixer_params
       - id: unknown_1
         size: 1
-  hypersynth_body_before_eq:
+  hypersynth_params:
     seq:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_parameters_6_0_1::hypersynth_params
+        type: instrument_hypersynth_6_0_1::instrument_params
       - id: filter
         type: instrument_parameters_6_0_1::filter_params
       - id: amp
@@ -163,16 +172,16 @@ types:
         size: 3
       - id: shape
         type: u1
-        enum: hypersynth_shape
+        enum: instrument_hypersynth_6_0_2::shape
         doc: Hypersynth waveform shape.
       - id: unknown_2
         size: 18
-  external_body_before_eq:
+  external_params:
     seq:
       - id: unknown_0
         size: 3
       - id: params
-        type: instrument_parameters_6_0_1::external_params
+        type: instrument_external_6_0_1::instrument_params
       - id: filter
         type: instrument_parameters_6_0_1::filter_params
       - id: amp
@@ -194,45 +203,28 @@ types:
   sampler_tail:
     doc: |
       Stores shared modulators followed by the Sampler-specific sample_path.
-      The path and sampler_controls belong to the same instrument-specific
+      The path and instrument_params belong to the same instrument-specific
       configuration despite their noncontiguous storage.
     seq:
       - id: modulators
         type: modulators
       - id: sample_path
-        type: sample_path
+        type: instrument_sampler_6_0_1::sample_path
         size: 128
         doc: |
           Selected sample path in a fixed 128-byte field, following the same
           null-terminated path and preserved trailing-byte convention as the
           Song directory. The full sample path must be under 128 characters.
-  sample_path:
-    seq:
-      - id: path
-        type: strz
-        encoding: ASCII
-      - id: trailing
-        size: _io.size - _io.pos
-        doc: Remaining path-field bytes after the terminator; preserve stored bytes.
   hypersynth_tail:
     seq:
       - id: modulators
         type: modulators
       - id: chords
-        type: hypersynth_chord
+        type: instrument_hypersynth_6_0_1::chord
         repeat: expr
         repeat-expr: 16
       - id: unknown
         size: 16
-  hypersynth_chord:
-    seq:
-      - id: enabled_notes
-        type: u1
-        doc: |
-          Bitmask for six chord notes. Bits 0 through 5 indicate whether each
-          corresponding note is enabled.
-      - id: notes
-        type: instrument_parameters_6_0_1::hypersynth_chord_notes
   modulators:
     doc: |
       Shared Common Modulation Settings block. Four six-byte slots occupy
@@ -245,322 +237,6 @@ types:
         repeat: expr
         repeat-expr: 4
 enums:
-  wavsynth_destination:
-    0x00:
-      id: off
-      -label: OFF
-    0x01:
-      id: volume
-      -label: VOLUME
-    0x02:
-      id: pitch
-      -label: PITCH
-    0x03:
-      id: size
-      -label: SIZE
-    0x04:
-      id: mult
-      -label: MULT
-    0x05:
-      id: warp
-      -label: WARP
-    0x06:
-      id: scan
-      -label: SCAN
-    0x07:
-      id: cutoff
-      -label: CUTOFF
-    0x08:
-      id: resonance
-      -label: RES
-    0x09:
-      id: amp
-      -label: AMP
-    0x0a:
-      id: pan
-      -label: PAN
-    0x0b:
-      id: mod_amount
-      -label: MOD AMT
-    0x0c:
-      id: mod_rate
-      -label: MOD RATE
-    0x0d:
-      id: mod_both
-      -label: MOD BOTH
-    0x0e:
-      id: mod_binv
-      -label: MOD BINV
-  macrosynth_destination:
-    0x00:
-      id: off
-      -label: OFF
-    0x01:
-      id: volume
-      -label: VOLUME
-    0x02:
-      id: pitch
-      -label: PITCH
-    0x03:
-      id: timbre
-      -label: TIMBRE
-    0x04:
-      id: color
-      -label: COLOR
-    0x05:
-      id: degrade
-      -label: DEGRADE
-    0x06:
-      id: redux
-      -label: REDUX
-    0x07:
-      id: cutoff
-      -label: CUTOFF
-    0x08:
-      id: resonance
-      -label: RES
-    0x09:
-      id: amp
-      -label: AMP
-    0x0a:
-      id: pan
-      -label: PAN
-    0x0b:
-      id: mod_amount
-      -label: MOD AMT
-    0x0c:
-      id: mod_rate
-      -label: MOD RATE
-    0x0d:
-      id: mod_both
-      -label: MOD BOTH
-    0x0e:
-      id: mod_binv
-      -label: MOD BINV
-  sampler_destination:
-    0x00:
-      id: off
-      -label: OFF
-    0x01:
-      id: volume
-      -label: VOLUME
-    0x02:
-      id: pitch
-      -label: PITCH
-    0x03:
-      id: loop_start
-      -label: LOOP ST
-    0x04:
-      id: length
-      -label: LENGTH
-    0x05:
-      id: degrade
-      -label: DEGRADE
-    0x06:
-      id: cutoff
-      -label: CUTOFF
-    0x07:
-      id: resonance
-      -label: RES
-    0x08:
-      id: amp
-      -label: AMP
-    0x09:
-      id: pan
-      -label: PAN
-    0x0a:
-      id: mod_amount
-      -label: MOD AMT
-    0x0b:
-      id: mod_rate
-      -label: MOD RATE
-    0x0c:
-      id: mod_both
-      -label: MOD BOTH
-    0x0d:
-      id: mod_binv
-      -label: MOD BINV
-  midi_out_destination:
-    0x00:
-      id: off
-      -label: OFF
-    0x01:
-      id: cc_a
-      -label: CCA
-    0x02:
-      id: cc_b
-      -label: CCB
-    0x03:
-      id: cc_c
-      -label: CCC
-    0x04:
-      id: cc_d
-      -label: CCD
-    0x05:
-      id: cc_e
-      -label: CCE
-    0x06:
-      id: cc_f
-      -label: CCF
-    0x07:
-      id: cc_g
-      -label: CCG
-    0x08:
-      id: cc_h
-      -label: CCH
-    0x09:
-      id: cc_i
-      -label: CCI
-    0x0a:
-      id: cc_j
-      -label: CCJ
-    0x0b:
-      id: mod_amount
-      -label: MOD AMT
-    0x0c:
-      id: mod_rate
-      -label: MOD RATE
-    0x0d:
-      id: mod_both
-      -label: MOD BOTH
-    0x0e:
-      id: mod_binv
-      -label: MOD BINV
-  fm_synth_destination:
-    0x00:
-      id: off
-      -label: OFF
-    0x01:
-      id: volume
-      -label: VOLUME
-    0x02:
-      id: pitch
-      -label: PITCH
-    0x03:
-      id: mod_1
-      -label: MOD 1
-    0x04:
-      id: mod_2
-      -label: MOD 2
-    0x05:
-      id: mod_3
-      -label: MOD 3
-    0x06:
-      id: mod_4
-      -label: MOD 4
-    0x07:
-      id: cutoff
-      -label: CUTOFF
-    0x08:
-      id: resonance
-      -label: RES
-    0x09:
-      id: amp
-      -label: AMP
-    0x0a:
-      id: pan
-      -label: PAN
-    0x0b:
-      id: mod_amount
-      -label: MOD AMT
-    0x0c:
-      id: mod_rate
-      -label: MOD RATE
-    0x0d:
-      id: mod_both
-      -label: MOD BOTH
-    0x0e:
-      id: mod_binv
-      -label: MOD BINV
-  hypersynth_destination:
-    0x00:
-      id: off
-      -label: OFF
-    0x01:
-      id: volume
-      -label: VOLUME
-    0x02:
-      id: pitch
-      -label: PITCH
-    0x03:
-      id: shift
-      -label: SHIFT
-    0x04:
-      id: swarm
-      -label: SWARM
-    0x05:
-      id: width
-      -label: WIDTH
-    0x06:
-      id: subosc
-      -label: SUBOSC
-    0x07:
-      id: cutoff
-      -label: CUTOFF
-    0x08:
-      id: resonance
-      -label: RES
-    0x09:
-      id: amp
-      -label: AMP
-    0x0a:
-      id: pan
-      -label: PAN
-    0x0b:
-      id: mod_amount
-      -label: MOD AMT
-    0x0c:
-      id: mod_rate
-      -label: MOD RATE
-    0x0d:
-      id: mod_both
-      -label: MOD BOTH
-    0x0e:
-      id: mod_binv
-      -label: MOD BINV
-  external_destination:
-    0x00:
-      id: off
-      -label: OFF
-    0x01:
-      id: volume
-      -label: VOLUME
-    0x02:
-      id: cutoff
-      -label: CUTOFF
-    0x03:
-      id: resonance
-      -label: RES
-    0x04:
-      id: amp
-      -label: AMP
-    0x05:
-      id: pan
-      -label: PAN
-    0x06:
-      id: cc_a
-      -label: CCA
-    0x07:
-      id: cc_b
-      -label: CCB
-    0x08:
-      id: cc_c
-      -label: CCC
-    0x09:
-      id: cc_d
-      -label: CCD
-    0x0a:
-      id: mod_amount
-      -label: MOD AMT
-    0x0b:
-      id: mod_rate
-      -label: MOD RATE
-    0x0c:
-      id: mod_both
-      -label: MOD BOTH
-    0x0d:
-      id: mod_binv
-      -label: MOD BINV
   type:
     0x00:
       id: wavsynth
@@ -586,40 +262,3 @@ enums:
     0xff:
       id: none
       -label: NONE
-  hypersynth_shape:
-    0x00:
-      id: saw
-      -label: SAW
-    0x01:
-      id: soft_saw
-      -label: SOFT SAW
-    0x02:
-      id: dark_saw
-      -label: DARK SAW
-    0x03:
-      id: square_soft
-      -label: SQUARE SOFT
-    0x04:
-      id: triangle
-      -label: TRIANGLE
-    0x05:
-      id: sine
-      -label: SINE
-    0x06:
-      id: sine_3x
-      -label: SINE 3X
-    0x07:
-      id: sine_fb
-      -label: SINE FB
-    0x08:
-      id: sine_fold
-      -label: SINE FOLD
-    0x09:
-      id: sine_ring
-      -label: SINE RING
-    0x0a:
-      id: sine_half
-      -label: SINE HALF
-    0x0b:
-      id: sine_organ
-      -label: SINE ORGAN

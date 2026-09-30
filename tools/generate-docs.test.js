@@ -70,7 +70,7 @@ test('adjacent unknown byte regions are represented as one field', () => {
   }
   for (const version of ['6.0.1', '6.0.2']) {
     const source = YAML.parse(fs.readFileSync(`schemas/file-versions/${version}/instrument.ksy`, 'utf8'))
-    assert.deepEqual(source.types.wavsynth_body_before_eq.seq.slice(0, 1), [{ id: 'unknown_0', size: 3 }])
+    assert.deepEqual(source.types.wavsynth_params.seq.slice(0, 1), [{ id: 'unknown_0', size: 3 }])
   }
 })
 
@@ -97,10 +97,10 @@ test('firmware indexes summarize fields without repeating linked type details or
 })
 
 test('dynamic strings, switches, processing expressions, and raw labels survive', () => {
-  assert.match(page('/6.0.1/instrument.md'), /_io.size - _io.pos/)
+  assert.match(page('/instrument/sampler.md'), /_io.size - _io.pos/)
   assert.match(page('/6.0.1/instrument.md'), /switch on/)
   assert.match(page('/instrument/modulation.md'), /type_and_destination & 0x0f/)
-  assert.match(page('/instrument/parameters.md'), /A&gt;B&gt;C&gt;D/)
+  assert.match(page('/instrument/fm_synth.md'), /A&gt;B&gt;C&gt;D/)
   assert.match(page('/song/eq.md'), /type_and_mode >> 5/)
   assert.match(page('/common/file_header.md'), /schema_version_patch/)
 })

@@ -11,8 +11,14 @@ if (!compiledDir) {
 }
 
 const { File65X } = require(path.resolve(compiledDir, 'File65X.js'))
-const { Instrument601 } = require(path.resolve(compiledDir, 'Instrument601.js'))
-const { InstrumentTable601 } = require(path.resolve(compiledDir, 'InstrumentTable601.js'))
+const { InstrumentWavsynth601 } = require(path.resolve(compiledDir, 'InstrumentWavsynth601.js'))
+const { InstrumentMacrosynth601 } = require(path.resolve(compiledDir, 'InstrumentMacrosynth601.js'))
+const { InstrumentSampler601 } = require(path.resolve(compiledDir, 'InstrumentSampler601.js'))
+const { InstrumentMidiOut601 } = require(path.resolve(compiledDir, 'InstrumentMidiOut601.js'))
+const { InstrumentFmSynth601 } = require(path.resolve(compiledDir, 'InstrumentFmSynth601.js'))
+const { InstrumentHypersynth601 } = require(path.resolve(compiledDir, 'InstrumentHypersynth601.js'))
+const { InstrumentExternal601 } = require(path.resolve(compiledDir, 'InstrumentExternal601.js'))
+const { InstrumentNone601 } = require(path.resolve(compiledDir, 'InstrumentNone601.js'))
 const { SongSequencing650 } = require(path.resolve(compiledDir, 'SongSequencing650.js'))
 const { SongProject650 } = require(path.resolve(compiledDir, 'SongProject650.js'))
 const { SongMixerEffects650 } = require(path.resolve(compiledDir, 'SongMixerEffects650.js'))
@@ -40,19 +46,19 @@ function verifyTable (table, bytes, offset, label) {
 }
 
 for (const [catalog, expected] of [
-  [InstrumentTable601.WavsynthFxCommand, 'OSCILLATOR'],
-  [InstrumentTable601.MacrosynthFxCommand, 'OSCILLATOR'],
-  [InstrumentTable601.SamplerFxCommand, 'PLAY'],
-  [InstrumentTable601.FmSynthFxCommand, 'ALGORITHM'],
-  [InstrumentTable601.MidiOutFxCommand, 'MIDI_PROGRAM_BANK'],
-  [InstrumentTable601.HypersynthFxCommand, 'CHORD'],
-  [InstrumentTable601.ExternalFxCommand, 'MIDI_PROGRAM']
+  [InstrumentWavsynth601.FxCommand, 'OSCILLATOR'],
+  [InstrumentMacrosynth601.FxCommand, 'OSCILLATOR'],
+  [InstrumentSampler601.FxCommand, 'PLAY'],
+  [InstrumentFmSynth601.FxCommand, 'ALGORITHM'],
+  [InstrumentMidiOut601.FxCommand, 'MIDI_PROGRAM_BANK'],
+  [InstrumentHypersynth601.FxCommand, 'CHORD'],
+  [InstrumentExternal601.FxCommand, 'MIDI_PROGRAM']
 ]) {
   assert.equal(catalog[0x80], 'VOLUME')
   assert.equal(catalog[0x83], expected)
   assert.equal(catalog[0xff], 'UNSET')
 }
-assert.equal(InstrumentTable601.NoneFxCommand[0xff], 'UNSET')
+assert.equal(InstrumentNone601.FxCommand[0xff], 'UNSET')
 assert.equal(SongSequencing650.FxCommand[0x4d], 'MICRO_TIME')
 assert.equal(SongSequencing650.FxCommand[0xff], 'UNSET')
 assert.equal(SongProject650.SyncTransport[0x02], 'TRANSPORT_SPP')
@@ -174,13 +180,13 @@ const modulationFields = [
 ]
 const observedModulationTypes = new Set()
 const destinationCatalogs = {
-  WAV: [Instrument601.WavsynthDestination, 0x0b],
-  MAC: [Instrument601.MacrosynthDestination, 0x0b],
-  SAM: [Instrument601.SamplerDestination, 0x0a],
-  MID: [Instrument601.MidiOutDestination, 0x0b],
-  FM: [Instrument601.FmSynthDestination, 0x0b],
-  HYP: [Instrument601.HypersynthDestination, 0x0b],
-  EXT: [Instrument601.ExternalDestination, 0x0a]
+  WAV: [InstrumentWavsynth601.Destination, 0x0b],
+  MAC: [InstrumentMacrosynth601.Destination, 0x0b],
+  SAM: [InstrumentSampler601.Destination, 0x0a],
+  MID: [InstrumentMidiOut601.Destination, 0x0b],
+  FM: [InstrumentFmSynth601.Destination, 0x0b],
+  HYP: [InstrumentHypersynth601.Destination, 0x0b],
+  EXT: [InstrumentExternal601.Destination, 0x0a]
 }
 const modulationDestinationLabels = ['MOD_AMOUNT', 'MOD_RATE', 'MOD_BOTH', 'MOD_BINV']
 const observedDestinations = new Map()
@@ -222,9 +228,9 @@ for (const [name, [, firstModDestination]] of Object.entries(destinationCatalogs
     [0, 1, 2, 3].map(index => firstModDestination + index),
     `${name} high destinations covered by fixtures`)
 }
-assert.equal(Instrument601.WavsynthDestination[0x03], 'SIZE')
-assert.equal(Instrument601.MacrosynthDestination[0x03], 'TIMBRE')
-assert.equal(Instrument601.MidiOutDestination[0x03], 'CC_C')
+assert.equal(InstrumentWavsynth601.Destination[0x03], 'SIZE')
+assert.equal(InstrumentMacrosynth601.Destination[0x03], 'TIMBRE')
+assert.equal(InstrumentMidiOut601.Destination[0x03], 'CC_C')
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')
@@ -235,7 +241,7 @@ assert.equal(Instrument601.MidiOutDestination[0x03], 'CC_C')
 
 for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const params = file.body.instrument.bodyBeforeEq.controls
+  const params = file.body.instrument.params.controls
   assert.equal(params.modeValue, bytes[0x1f], `${name} mode value`)
   assert.equal(params.playMode, playMode, `${name} play mode`)
   assert.deepEqual(
@@ -254,7 +260,7 @@ for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) 
 
 for (const [name, firstOffset, count] of [['MID', 0x26, 10], ['EXT', 0x25, 4]]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const entries = file.body.instrument.bodyBeforeEq.params.customCcs
+  const entries = file.body.instrument.params.params.customCcs
   assert.equal(entries.length, count, `${name} custom CC count`)
   for (const [index, entry] of entries.entries()) {
     assert.deepEqual([entry.cc, entry.value],
@@ -268,7 +274,7 @@ for (const [name, offset, expectedType] of [
   ['FM', 0x41, 0x07], ['HYP', 0x2c, 0x07], ['EXT', 0x2d, 0x07]
 ]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const filter = file.body.instrument.bodyBeforeEq.filter
+  const filter = file.body.instrument.params.filter
   assert.deepEqual([filter.type, filter.cutoff, filter.resonance],
     [...bytes.subarray(offset, offset + 3)], `${name} filter layout`)
   assert.equal(filter.type, expectedType, `${name} filter type`)
@@ -280,7 +286,7 @@ for (const [name, offset, expectedAmp, expectedPan] of [
   ['HYP', 0x2f, 0xf3, 0xf2], ['EXT', 0x30, 0xfc, 0xfb]
 ]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const amp = file.body.instrument.bodyBeforeEq.amp
+  const amp = file.body.instrument.params.amp
   assert.deepEqual([amp.amp, amp.limit, amp.pan],
     [...bytes.subarray(offset, offset + 3)], `${name} amplifier layout`)
   assert.deepEqual([amp.amp, amp.limit, amp.pan],
@@ -296,7 +302,7 @@ for (const [name, offset, expected] of [
   ['EXT', 0x33, [0xfa, 0xf9, 0xf8, 0xf7]]
 ]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const mixer = file.body.instrument.bodyBeforeEq.mixer
+  const mixer = file.body.instrument.params.mixer
   const values = [mixer.dry, mixer.modFx, mixer.delay, mixer.reverb]
   assert.deepEqual(values, [...bytes.subarray(offset, offset + 4)],
     `${name} instrument mixer layout`)
@@ -306,7 +312,7 @@ for (const [name, offset, expected] of [
 {
   const { file } = parse('fixtures/6.5.x/instruments/HYP_PARAMS.m8i')
   const instrument = file.body.instrument
-  const current = instrument.bodyBeforeEq.params.currentChord
+  const current = instrument.params.params.currentChord
   const stored = instrument.tail.chords[current.index]
   assert.equal(instrument.tail.chords.length, 16)
   assert.equal(instrument.tail.chords[0].enabledNotes, 0xfe)

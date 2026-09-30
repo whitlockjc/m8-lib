@@ -6,13 +6,15 @@ Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.
 
 Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type.
 
-Values come from [schemas/file-versions/6.5.0/song/sequencing.ksy](../../schemas/file-versions/6.5.0/song/sequencing.ksy) and [schemas/file-versions/6.0.1/instrument/table.ksy](../../schemas/file-versions/6.0.1/instrument/table.ksy).
+Values come from [schemas/file-versions/6.5.0/song/sequencing.ksy](../../schemas/file-versions/6.5.0/song/sequencing.ksy) and the instrument-specific schemas linked below.
 
 ## Instrument (Current Instrument)
 
 Current Instrument command labels vary by instrument type.
 
 ### Wavsynth
+
+Source: [schemas/file-versions/6.0.1/instrument/wavsynth.ksy](../../schemas/file-versions/6.0.1/instrument/wavsynth.ksy).
 
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
@@ -40,6 +42,8 @@ Current Instrument command labels vary by instrument type.
 
 ### Macrosynth
 
+Source: [schemas/file-versions/6.0.1/instrument/macrosynth.ksy](../../schemas/file-versions/6.0.1/instrument/macrosynth.ksy).
+
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
 | `0x80` | VOL | `volume` |
@@ -65,6 +69,8 @@ Current Instrument command labels vary by instrument type.
 | `0xff` | -- | `unset` |
 
 ### Sampler
+
+Source: [schemas/file-versions/6.0.1/instrument/sampler.ksy](../../schemas/file-versions/6.0.1/instrument/sampler.ksy).
 
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
@@ -92,6 +98,8 @@ Current Instrument command labels vary by instrument type.
 
 ### FM Synth
 
+Source: [schemas/file-versions/6.0.1/instrument/fm_synth.ksy](../../schemas/file-versions/6.0.1/instrument/fm_synth.ksy).
+
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
 | `0x80` | VOL | `volume` |
@@ -118,6 +126,8 @@ Current Instrument command labels vary by instrument type.
 
 ### MIDI Out
 
+Source: [schemas/file-versions/6.0.1/instrument/midi_out.ksy](../../schemas/file-versions/6.0.1/instrument/midi_out.ksy).
+
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
 | `0x80` | VOL | `volume` |
@@ -139,6 +149,8 @@ Current Instrument command labels vary by instrument type.
 | `0xff` | -- | `unset` |
 
 ### Hypersynth
+
+Source: [schemas/file-versions/6.0.1/instrument/hypersynth.ksy](../../schemas/file-versions/6.0.1/instrument/hypersynth.ksy).
 
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
@@ -166,6 +178,8 @@ Current Instrument command labels vary by instrument type.
 
 ### External
 
+Source: [schemas/file-versions/6.0.1/instrument/external.ksy](../../schemas/file-versions/6.0.1/instrument/external.ksy).
+
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
 | `0x80` | VOL | `volume` |
@@ -191,6 +205,8 @@ Current Instrument command labels vary by instrument type.
 | `0xff` | -- | `unset` |
 
 ### NONE
+
+Source: [schemas/file-versions/6.0.1/instrument/none.ksy](../../schemas/file-versions/6.0.1/instrument/none.ksy).
 
 | Stored Value | M8 Label | Identifier |
 | --- | --- | --- |
