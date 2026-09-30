@@ -70,7 +70,12 @@ test('adjacent unknown byte regions are represented as one field', () => {
   }
   for (const version of ['6.0.1', '6.0.2']) {
     const source = YAML.parse(fs.readFileSync(`schemas/file-versions/${version}/instrument.ksy`, 'utf8'))
-    assert.deepEqual(source.types.wavsynth_params.seq.slice(0, 1), [{ id: 'unknown_0', size: 3 }])
+    assert.deepEqual(source.types.wavsynth_body.seq.slice(0, 1), [{ id: 'unknown_0', size: 3 }])
+    assert.deepEqual(source.types.data.seq.map(field => field.id), ['general_settings', 'body'])
+    for (const name of ['wavsynth', 'macrosynth', 'sampler', 'midi_out', 'fm_synth', 'hypersynth', 'external', 'none']) {
+      const fields = source.types[`${name}_body`].seq
+      assert.equal(fields.filter(field => field.id === 'eq').length, 1, `${version} ${name} EQ`)
+    }
   }
 })
 

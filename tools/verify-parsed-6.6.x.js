@@ -27,14 +27,14 @@ for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'FM', 'HYP', 'MID', 'EXT']) {
   const { bytes, file } = parse(`fixtures/6.6.x/instruments/${name}_DEFAULT.m8i`)
   assert.equal(bytes.length, 357, `${name} length`)
   assert.equal(file.body.instrument.generalSettings.type, bytes[0x0e], `${name} type`)
-  assert.equal(file.body.instrument.eq, bytes[0x4c], `${name} EQ`)
+  assert.equal(file.body.instrument.body.eq, bytes[0x4c], `${name} EQ`)
   assert.equal(file.body.table.rows.length, 16, `${name} table length`)
-  if (name === 'HYP') assert.equal(file.body.instrument.params.shape, 0x00)
+  if (name === 'HYP') assert.equal(file.body.instrument.body.shape, 0x00)
 }
 
 {
   const { bytes, file } = parse('fixtures/6.6.x/instruments/HYP_SHAPE.m8i')
-  assert.equal(file.body.instrument.params.shape, 0x0b)
+  assert.equal(file.body.instrument.body.shape, 0x0b)
   assert.equal(bytes[0x39], 0x0b)
 }
 

@@ -34,18 +34,14 @@ File schema version: `6.0.2`.
 - [Layout](#layout)
 - [data](#type-data)
 - [general_settings](#type-general_settings)
-- [unused_params](#type-unused_params)
-- [wavsynth_params](#type-wavsynth_params)
-- [macrosynth_params](#type-macrosynth_params)
-- [sampler_params](#type-sampler_params)
-- [midi_out_params](#type-midi_out_params)
-- [fm_synth_params](#type-fm_synth_params)
-- [hypersynth_params](#type-hypersynth_params)
-- [external_params](#type-external_params)
-- [standard_tail](#type-standard_tail)
-- [none_tail](#type-none_tail)
-- [sampler_tail](#type-sampler_tail)
-- [hypersynth_tail](#type-hypersynth_tail)
+- [none_body](#type-none_body)
+- [wavsynth_body](#type-wavsynth_body)
+- [macrosynth_body](#type-macrosynth_body)
+- [sampler_body](#type-sampler_body)
+- [midi_out_body](#type-midi_out_body)
+- [fm_synth_body](#type-fm_synth_body)
+- [hypersynth_body](#type-hypersynth_body)
+- [external_body](#type-external_body)
 - [modulators](#type-modulators)
 - [type (enum)](#enum-type)
 
@@ -76,15 +72,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `general_settings` | `0x00..0x0e` | 15 | [general_settings](#type-general_settings) | - |  |
-| `params` | `0x0f..0x3d` | 47 | switch on `general_settings.type`: `type::wavsynth`: [wavsynth_params](#type-wavsynth_params); `type::macrosynth`: [macrosynth_params](#type-macrosynth_params); `type::sampler`: [sampler_params](#type-sampler_params); `type::midi_out`: [midi_out_params](#type-midi_out_params); `type::fm_synth`: [fm_synth_params](#type-fm_synth_params); `type::hypersynth`: [hypersynth_params](#type-hypersynth_params); `type::external`: [external_params](#type-external_params); `type::none`: [unused_params](#type-unused_params) | - | Instrument settings before the common EQ field. |
-| `eq` | `0x3e` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --, 0x7f displays as 7F.  |
-| `tail` | `0x3f..0xd6` | 152 | switch on `general_settings.type`: `type::sampler`: [sampler_tail](#type-sampler_tail); `type::hypersynth`: [hypersynth_tail](#type-hypersynth_tail); `type::midi_out`: [standard_tail](#type-standard_tail); `type::wavsynth`: [standard_tail](#type-standard_tail); `type::macrosynth`: [standard_tail](#type-standard_tail); `type::fm_synth`: [standard_tail](#type-standard_tail); `type::external`: [standard_tail](#type-standard_tail); `type::none`: [none_tail](#type-none_tail) | - | Instrument-specific tail after the common EQ field. |
+| `body` | `0x0f..0xd6` | 200 | switch on `general_settings.type`: `type::wavsynth`: [wavsynth_body](#type-wavsynth_body); `type::macrosynth`: [macrosynth_body](#type-macrosynth_body); `type::sampler`: [sampler_body](#type-sampler_body); `type::midi_out`: [midi_out_body](#type-midi_out_body); `type::fm_synth`: [fm_synth_body](#type-fm_synth_body); `type::hypersynth`: [hypersynth_body](#type-hypersynth_body); `type::external`: [external_body](#type-external_body); `type::none`: [none_body](#type-none_body) | - | Instrument body selected by type. |
 
 ## Type: general_settings
 
 `general_settings`
 
-General Instrument Settings prefix. The EQ assignment is stored separately.
+General Instrument Settings prefix. The EQ assignment follows in the body.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -96,9 +90,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `transpose` | `0x0d` | 1 | `u1` | - | Common instrument transpose setting. 0x01 means ON; 0x00 means OFF.  |
 | `table_tic` | `0x0e` | 1 | `u1` | - | Common instrument table TIC setting. |
 
-## Type: unused_params
+## Type: none_body
 
-`unused_params`
+`none_body`
 
 Preserved bytes between the common instrument prefix and common EQ field
 for NONE.
@@ -108,11 +102,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `unknown` | `0x00..0x2e` | 47 | bytes | `size`: `47` |  |
+| `unknown_0` | `0x00..0x2e` | 47 | bytes | `size`: `47` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `unknown_1` | `0x30..0xc7` | 152 | bytes | `size`: `152` |  |
 
-## Type: wavsynth_params
+## Type: wavsynth_body
 
-`wavsynth_params`
+`wavsynth_body`
 
 
 
@@ -126,10 +122,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `amp` | `0x0b..0x0d` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
 | `mixer` | `0x0e..0x11` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x12..0x2e` | 29 | bytes | `size`: `29` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `modulators` | `0x30..0x47` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `unknown_2` | `0x48..0xc7` | 128 | bytes | `size`: `128` |  |
 
-## Type: macrosynth_params
+## Type: macrosynth_body
 
-`macrosynth_params`
+`macrosynth_body`
 
 
 
@@ -143,13 +142,16 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `amp` | `0x0b..0x0d` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
 | `mixer` | `0x0e..0x11` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x12..0x2e` | 29 | bytes | `size`: `29` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `modulators` | `0x30..0x47` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `unknown_2` | `0x48..0xc7` | 128 | bytes | `size`: `128` |  |
 
-## Type: sampler_params
+## Type: sampler_body
 
-`sampler_params`
+`sampler_body`
 
 Sampler-specific controls are stored here; the selected sample_path is
-another Sampler-specific parameter stored in sampler_tail.
+another Sampler-specific parameter stored later in this body.
 
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -157,15 +159,18 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `unknown_0` | `0x00..0x01` | 2 | bytes | `size`: `2` |  |
-| `controls` | `0x02..0x08` | 7 | [sampler_6_0_1::instrument_params](../6.0.1/instrument/sampler.md#type-instrument_params) | - |  |
+| `params` | `0x02..0x08` | 7 | [sampler_6_0_1::instrument_params](../6.0.1/instrument/sampler.md#type-instrument_params) | - |  |
 | `filter` | `0x09..0x0b` | 3 | [parameters_6_0_1::filter_params](../6.0.1/instrument/parameters.md#type-filter_params) | - |  |
 | `amp` | `0x0c..0x0e` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
 | `mixer` | `0x0f..0x12` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x13..0x2e` | 28 | bytes | `size`: `28` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `modulators` | `0x30..0x47` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `sample_path` | `0x48..0xc7` | 128 | [sampler_6_0_1::sample_path](../6.0.1/instrument/sampler.md#type-sample_path) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. The full sample path must be under 128 characters.  |
 
-## Type: midi_out_params
+## Type: midi_out_body
 
-`midi_out_params`
+`midi_out_body`
 
 
 
@@ -174,11 +179,14 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `params` | `0x00..0x1c` | 29 | [midi_out_6_0_1::instrument_params](../6.0.1/instrument/midi_out.md#type-instrument_params) | - |  |
-| `unknown` | `0x1d..0x2e` | 18 | bytes | `size`: `18` |  |
+| `unknown_0` | `0x1d..0x2e` | 18 | bytes | `size`: `18` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `modulators` | `0x30..0x47` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `unknown_1` | `0x48..0xc7` | 128 | bytes | `size`: `128` |  |
 
-## Type: fm_synth_params
+## Type: fm_synth_body
 
-`fm_synth_params`
+`fm_synth_body`
 
 
 
@@ -192,10 +200,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `amp` | `0x27..0x29` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
 | `mixer` | `0x2a..0x2d` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x2e` | 1 | bytes | `size`: `1` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `modulators` | `0x30..0x47` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `unknown_2` | `0x48..0xc7` | 128 | bytes | `size`: `128` |  |
 
-## Type: hypersynth_params
+## Type: hypersynth_body
 
-`hypersynth_params`
+`hypersynth_body`
 
 
 
@@ -211,10 +222,14 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `unknown_1` | `0x19..0x1b` | 3 | bytes | `size`: `3` |  |
 | `shape` | `0x1c` | 1 | `u1`; [shape](instrument/hypersynth.md#enum-shape) | - | Hypersynth waveform shape. |
 | `unknown_2` | `0x1d..0x2e` | 18 | bytes | `size`: `18` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `modulators` | `0x30..0x47` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `chords` | `0x48..0xb7` | 112 | [hypersynth_6_0_1::chord](../6.0.1/instrument/hypersynth.md#type-chord) | `repeat`: `expr`; `repeat-expr`: `16` |  |
+| `unknown_3` | `0xb8..0xc7` | 16 | bytes | `size`: `16` |  |
 
-## Type: external_params
+## Type: external_body
 
-`external_params`
+`external_body`
 
 
 
@@ -228,61 +243,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `amp` | `0x13..0x15` | 3 | [parameters_6_0_1::amp_params](../6.0.1/instrument/parameters.md#type-amp_params) | - |  |
 | `mixer` | `0x16..0x19` | 4 | [parameters_6_0_1::mixer_params](../6.0.1/instrument/parameters.md#type-mixer_params) | - |  |
 | `unknown_1` | `0x1a..0x2e` | 21 | bytes | `size`: `21` |  |
-
-## Type: standard_tail
-
-`standard_tail`
-
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
-| `unknown` | `0x18..0x97` | 128 | bytes | `size`: `128` |  |
-
-## Type: none_tail
-
-`none_tail`
-
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `unknown` | `0x00..0x97` | 152 | bytes | `size`: `152` |  |
-
-## Type: sampler_tail
-
-`sampler_tail`
-
-Stores shared modulators followed by the Sampler-specific sample_path.
-The path and instrument_params belong to the same instrument-specific
-configuration despite their noncontiguous storage.
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
-| `sample_path` | `0x18..0x97` | 128 | [sampler_6_0_1::sample_path](../6.0.1/instrument/sampler.md#type-sample_path) | `size`: `128` | Selected sample path in a fixed 128-byte field, following the same null-terminated path and preserved trailing-byte convention as the Song directory. The full sample path must be under 128 characters.  |
-
-## Type: hypersynth_tail
-
-`hypersynth_tail`
-
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `modulators` | `0x00..0x17` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
-| `chords` | `0x18..0x87` | 112 | [hypersynth_6_0_1::chord](../6.0.1/instrument/hypersynth.md#type-chord) | `repeat`: `expr`; `repeat-expr`: `16` |  |
-| `unknown` | `0x88..0x97` | 16 | bytes | `size`: `16` |  |
+| `eq` | `0x2f` | 1 | `u1` | - | Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F. |
+| `modulators` | `0x30..0x47` | 24 | [modulators](#type-modulators) | `repeat`: `4` via `slots` |  |
+| `unknown_2` | `0x48..0xc7` | 128 | bytes | `size`: `128` |  |
 
 ## Type: modulators
 

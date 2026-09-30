@@ -78,7 +78,7 @@ for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   assert.deepEqual(Buffer.from(settings.name), bytes.subarray(0x0f, 0x1b), `${name} name`)
   assert.equal(settings.transpose, bytes[0x1b], `${name} transpose`)
   assert.equal(settings.tableTic, bytes[0x1c], `${name} table TIC`)
-  assert.equal(instrument.eq, bytes[0x4c], `${name} EQ assignment`)
+  assert.equal(instrument.body.eq, bytes[0x4c], `${name} EQ assignment`)
   assert.equal(file.body.table.rows.length, 16, `${name} table rows`)
   assert.equal(file.body.table.rows[0].fx.length, 3, `${name} table FX slots`)
 }
@@ -89,36 +89,36 @@ const chordNoteFields = ['note1', 'note2', 'note3', 'note4', 'note5', 'note6']
 for (const fixture of instrumentFixtures) {
   const name = fixture.split('_')[0]
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${fixture}`)
-  const tail = file.body.instrument.tail
+  const body = file.body.instrument.body
   const table = file.body.table
 
   assert.equal(bytes.length, 0x165, `${fixture} standalone length`)
   verifyTable(table, bytes, 0xe5, fixture)
   if (name === 'NONE') {
-    assert.deepEqual(Buffer.from(tail.unknown), bytes.subarray(0x4d, 0xe5), `${fixture} NONE tail`)
+    assert.deepEqual(Buffer.from(body.unknown1), bytes.subarray(0x4d, 0xe5), `${fixture} NONE tail`)
   } else {
-    assert.equal(tail.modulators.slots.length, 4, `${fixture} modulator boundary`)
+    assert.equal(body.modulators.slots.length, 4, `${fixture} modulator boundary`)
     if (name === 'SAM' || name === 'SAMS' || name === 'SAMB') {
       const region = bytes.subarray(0x65, 0xe5)
       const terminator = region.indexOf(0)
       assert.notEqual(terminator, -1, `${fixture} sample path terminator`)
-      assert.equal(tail.samplePath.path, region.subarray(0, terminator).toString('ascii'),
+      assert.equal(body.samplePath.path, region.subarray(0, terminator).toString('ascii'),
         `${fixture} sample path text`)
-      assert.deepEqual(Buffer.from(tail.samplePath.trailing), region.subarray(terminator + 1),
+      assert.deepEqual(Buffer.from(body.samplePath.trailing), region.subarray(terminator + 1),
         `${fixture} sample path`)
     } else if (name === 'HYP') {
-      assert.equal(tail.chords.length, 16, `${fixture} chord count`)
-      for (const [index, chord] of tail.chords.entries()) {
+      assert.equal(body.chords.length, 16, `${fixture} chord count`)
+      for (const [index, chord] of body.chords.entries()) {
         const offset = 0x65 + index * 7
         assert.equal(chord.enabledNotes, bytes[offset], `${fixture} chord ${index} mask`)
         assert.deepEqual(chordNoteFields.map(field => chord.notes[field]),
           [...bytes.subarray(offset + 1, offset + 7)],
           `${fixture} chord ${index} notes`)
       }
-      assert.deepEqual(Buffer.from(tail.unknown), bytes.subarray(0xd5, 0xe5),
+      assert.deepEqual(Buffer.from(body.unknown2), bytes.subarray(0xd5, 0xe5),
         `${fixture} unknown after chords`)
     } else {
-      assert.deepEqual(Buffer.from(tail.unknown), bytes.subarray(0x65, 0xe5),
+      assert.deepEqual(Buffer.from(body[name === 'MID' ? 'unknown1' : 'unknown2']), bytes.subarray(0x65, 0xe5),
         `${fixture} unknown after modulators`)
     }
   }
@@ -132,7 +132,7 @@ for (const fixture of instrumentFixtures) {
     const embedded = file.body.instruments.entries[index]
     const offset = 0x13a3e + index * 215
     assert.equal(embedded.generalSettings.type, standalone.file.body.instrument.generalSettings.type)
-    assert.equal(embedded.eq, standalone.file.body.instrument.eq)
+    assert.equal(embedded.body.eq, standalone.file.body.instrument.body.eq)
     assert.deepEqual(bytes.subarray(offset, offset + 1), standalone.bytes.subarray(0x0e, 0x0f))
     assert.deepEqual(bytes.subarray(offset + 13, offset + 215),
       standalone.bytes.subarray(0x1b, 0xe5), `${name} embedded record except name`)
@@ -196,7 +196,7 @@ for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   const observed = new Set()
   for (const variant of ['A', 'B']) {
     const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_MODS_${variant}.m8i`)
-    const slots = file.body.instrument.tail.modulators.slots
+    const slots = file.body.instrument.body.modulators.slots
     assert.equal(slots.length, 4, `${name} modulation slots`)
 
     for (const [index, slot] of slots.entries()) {
@@ -234,14 +234,14 @@ assert.equal(MidiOut601.Destination[0x03], 'CC_C')
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/instruments/NONE_DEFAULT.m8i')
-  assert.equal(file.body.instrument.tail.modulators, undefined)
-  assert.deepEqual(Buffer.from(file.body.instrument.tail.unknown),
+  assert.equal(file.body.instrument.body.modulators, undefined)
+  assert.deepEqual(Buffer.from(file.body.instrument.body.unknown1),
     bytes.subarray(0x4d, 0xe5))
 }
 
 for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const params = file.body.instrument.params.controls
+  const params = file.body.instrument.body.params
   assert.equal(params.modeValue, bytes[0x1f], `${name} mode value`)
   assert.equal(params.playMode, playMode, `${name} play mode`)
   assert.deepEqual(
@@ -252,7 +252,7 @@ for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) 
 
 {
   const { file } = parse('fixtures/6.5.x/instruments/SAM_PARAMS.m8i')
-  const samplePath = file.body.instrument.tail.samplePath
+  const samplePath = file.body.instrument.body.samplePath
   assert.equal(samplePath.path, '/Samples/Kick.wav')
   assert.equal(samplePath.trailing.length, 110)
   assert.ok(Buffer.from(samplePath.trailing).every(byte => byte === 0))
@@ -260,7 +260,7 @@ for (const [name, playMode] of [['SAM', 0x08], ['SAMS', 0x0b], ['SAMB', 0x0e]]) 
 
 for (const [name, firstOffset, count] of [['MID', 0x26, 10], ['EXT', 0x25, 4]]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const entries = file.body.instrument.params.params.customCcs
+  const entries = file.body.instrument.body.params.customCcs
   assert.equal(entries.length, count, `${name} custom CC count`)
   for (const [index, entry] of entries.entries()) {
     assert.deepEqual([entry.cc, entry.value],
@@ -274,7 +274,7 @@ for (const [name, offset, expectedType] of [
   ['FM', 0x41, 0x07], ['HYP', 0x2c, 0x07], ['EXT', 0x2d, 0x07]
 ]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const filter = file.body.instrument.params.filter
+  const filter = file.body.instrument.body.filter
   assert.deepEqual([filter.type, filter.cutoff, filter.resonance],
     [...bytes.subarray(offset, offset + 3)], `${name} filter layout`)
   assert.equal(filter.type, expectedType, `${name} filter type`)
@@ -286,7 +286,7 @@ for (const [name, offset, expectedAmp, expectedPan] of [
   ['HYP', 0x2f, 0xf3, 0xf2], ['EXT', 0x30, 0xfc, 0xfb]
 ]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const amp = file.body.instrument.params.amp
+  const amp = file.body.instrument.body.amp
   assert.deepEqual([amp.amp, amp.limit, amp.pan],
     [...bytes.subarray(offset, offset + 3)], `${name} amplifier layout`)
   assert.deepEqual([amp.amp, amp.limit, amp.pan],
@@ -302,7 +302,7 @@ for (const [name, offset, expected] of [
   ['EXT', 0x33, [0xfa, 0xf9, 0xf8, 0xf7]]
 ]) {
   const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_PARAMS.m8i`)
-  const mixer = file.body.instrument.params.mixer
+  const mixer = file.body.instrument.body.mixer
   const values = [mixer.dry, mixer.modFx, mixer.delay, mixer.reverb]
   assert.deepEqual(values, [...bytes.subarray(offset, offset + 4)],
     `${name} instrument mixer layout`)
@@ -312,14 +312,14 @@ for (const [name, offset, expected] of [
 {
   const { file } = parse('fixtures/6.5.x/instruments/HYP_PARAMS.m8i')
   const instrument = file.body.instrument
-  const current = instrument.params.params.currentChord
-  const stored = instrument.tail.chords[current.index]
-  assert.equal(instrument.tail.chords.length, 16)
-  assert.equal(instrument.tail.chords[0].enabledNotes, 0xfe)
-  assert.deepEqual(chordNoteFields.map(field => instrument.tail.chords[0].notes[field]),
+  const current = instrument.body.params.currentChord
+  const stored = instrument.body.chords[current.index]
+  assert.equal(instrument.body.chords.length, 16)
+  assert.equal(instrument.body.chords[0].enabledNotes, 0xfe)
+  assert.deepEqual(chordNoteFields.map(field => instrument.body.chords[0].notes[field]),
     [0x00, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa])
-  assert.equal(instrument.tail.chords[15].enabledNotes, 0xdf)
-  assert.deepEqual(chordNoteFields.map(field => instrument.tail.chords[15].notes[field]),
+  assert.equal(instrument.body.chords[15].enabledNotes, 0xdf)
+  assert.deepEqual(chordNoteFields.map(field => instrument.body.chords[15].notes[field]),
     [0x01, 0x02, 0x03, 0x04, 0x05, 0x00])
   for (const note of ['note1', 'note2', 'note3', 'note4', 'note5', 'note6']) {
     assert.equal(current.notes[note], stored.notes[note], `Hypersynth current ${note}`)
