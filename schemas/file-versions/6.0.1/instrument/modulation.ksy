@@ -22,6 +22,7 @@ types:
           destination. Destination labels are instrument-specific.
       - id: amount
         type: u1
+        doc: Modulation amount.
       - id: params
         type:
           switch-on: modulation_type
@@ -32,6 +33,7 @@ types:
             'modulation_type::lfo': modulation_lfo_params
             'modulation_type::trig_env': modulation_trig_env_params
             'modulation_type::tracking': modulation_tracking_params
+        doc: Four-byte payload interpreted according to the modulation type.
     instances:
       modulation_type:
         value: type_and_destination >> 4
@@ -50,10 +52,13 @@ types:
     seq:
       - id: attack
         type: u1
+        doc: Attack setting.
       - id: hold
         type: u1
+        doc: Hold setting.
       - id: decay
         type: u1
+        doc: Decay setting.
       - id: unknown
         type: u1
   modulation_adsr_env_params:

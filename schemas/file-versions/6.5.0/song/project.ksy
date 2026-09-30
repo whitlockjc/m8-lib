@@ -14,6 +14,7 @@ types:
     seq:
       - id: transpose
         type: u1
+        doc: Project transpose value.
       - id: tempo
         type: f4
         doc: |
@@ -31,6 +32,7 @@ types:
           preserved as stored.
       - id: midi_settings
         type: midi_settings
+        doc: Current Song MIDI input and sync settings.
       - id: scale
         type: u1
         doc: |
@@ -45,7 +47,8 @@ types:
           record.
       - id: groove
         type: u1
-      - id: unknown_trailing_state
+        doc: Index of the selected Song groove.
+      - id: unknown
         size: 2
         doc: |
           Changed in the PROJECT fixture, but not yet mapped to a Project UI
@@ -70,6 +73,7 @@ types:
       - id: record_delay_kill
         type: u1
         enum: record_delay_kill
+        doc: MIDI recording delay and note-off handling mode.
       - id: control_map_channel
         type: u1
         doc: |
@@ -97,6 +101,7 @@ types:
       - id: mode
         type: u1
         enum: midi_input_mode
+        doc: MIDI input mode.
   midi_sync_settings:
     doc: |
       Sync In and Sync Out storage. The M8 UI combines each clock boolean and

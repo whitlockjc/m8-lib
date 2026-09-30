@@ -3,6 +3,10 @@ meta:
   endian: le
   license: Apache-2.0
   ks-version: 0.11
+  -fx-sequencer-ranges:
+    - [0x00, 0x1a]
+    - [0x43, 0x47]
+    - [0x4d, 0x4d]
   imports:
     - ../../../common/fx_slot
 doc: |
@@ -19,6 +23,7 @@ types:
         type: groove
         repeat: expr
         repeat-expr: 32
+        doc: Thirty-two Song groove definitions.
   groove:
     doc: Sixteen-byte Groove record containing one byte per step.
     seq:
@@ -26,6 +31,7 @@ types:
         type: u1
         repeat: expr
         repeat-expr: 16
+        doc: Sixteen groove step values.
   phrases:
     doc: |
       Phrase View storage. Offsets are relative to absolute file offset 0x0aee
@@ -37,6 +43,7 @@ types:
         type: phrase
         repeat: expr
         repeat-expr: 255
+        doc: Stored phrases indexed 0x00 through 0xfe.
   phrase:
     doc: One hundred forty-four byte Phrase record containing 16 phrase steps.
     seq:
@@ -44,6 +51,7 @@ types:
         type: phrase_step
         repeat: expr
         repeat-expr: 16
+        doc: Sixteen steps in this phrase.
   phrase_step:
     doc: |
       Nine-byte Phrase step. 0xff is observed as unset for note, volume,
@@ -51,14 +59,21 @@ types:
     seq:
       - id: note
         type: u1
+        doc: Note value; 0xff is unset.
       - id: volume
         type: u1
+        doc: Step volume; 0xff is unset.
       - id: instrument
         type: u1
+        doc: Instrument index; 0xff is unset.
       - id: fx
         type: fx_slot
         repeat: expr
         repeat-expr: 3
+        doc: |
+          Three shared FX slots. The UI groups commands as Sequencer,
+          Mixer & Effects, Current Instrument, and Instrument Mods. Available
+          labels depend on the surrounding instrument and modulation type.
   song_rows:
     doc: |
       Song View row storage. Offsets are relative to absolute file offset
@@ -69,6 +84,7 @@ types:
         type: song_row
         repeat: expr
         repeat-expr: 256
+        doc: Song rows indexed 0x00 through 0xff.
   song_row:
     doc: |
       Eight-byte Song View row. Each byte stores the chain index assigned to a
@@ -78,6 +94,7 @@ types:
         type: u1
         repeat: expr
         repeat-expr: 8
+        doc: Chain index for each of the eight tracks; 0xff is unset.
   chains:
     doc: |
       Chain View storage. Offsets are relative to absolute file offset 0x9a5e
@@ -88,6 +105,7 @@ types:
         type: chain
         repeat: expr
         repeat-expr: 255
+        doc: Stored chains indexed 0x00 through 0xfe.
   chain:
     doc: Thirty-two-byte Chain View record containing 16 two-byte rows.
     seq:
@@ -95,6 +113,7 @@ types:
         type: chain_row
         repeat: expr
         repeat-expr: 16
+        doc: Sixteen rows in this chain.
   chain_row:
     doc: |
       Chain row storage. The phrase byte stores the referenced phrase index;
@@ -102,8 +121,10 @@ types:
     seq:
       - id: phrase
         type: u1
+        doc: Referenced phrase index; 0xff is unset.
       - id: transpose
         type: u1
+        doc: Transpose value for the referenced phrase.
 enums:
   phrase_fx_command:
     0x00:

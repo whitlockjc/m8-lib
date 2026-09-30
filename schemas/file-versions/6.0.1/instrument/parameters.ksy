@@ -16,20 +16,28 @@ types:
     seq:
       - id: mode_value
         type: u1
+        doc: Displayed as detune, steps, or BPM according to play_mode.
       - id: play_mode
         type: u1
         enum: sampler_play_mode
+        doc: Sampler playback mode.
       - id: slice
         type: u1
+        doc: Sampler slice selection.
       - id: start
         type: u1
+        doc: Sample start setting.
       - id: loop_start
         type: u1
+        doc: Sample loop start setting.
       - id: length
         type: u1
+        doc: Sample length setting.
       - id: degrade
         type: u1
+        doc: Sampler degrade setting.
   wavsynth_params:
+    doc: Wavsynth-specific synthesis parameters.
     seq:
       - id: shape
         type: u1
@@ -43,6 +51,7 @@ types:
       - id: scan
         type: u1
   macrosynth_params:
+    doc: Macrosynth-specific synthesis parameters.
     seq:
       - id: shape
         type: u1
@@ -56,6 +65,7 @@ types:
       - id: redux
         type: u1
   midi_out_params:
+    doc: MIDI Out port, channel, program, and custom CC settings.
     seq:
       - id: port
         type: u1
@@ -70,19 +80,20 @@ types:
         doc: |
           Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
           displayed bank 127 is stored as 0x7f.
-      - id: unknown_before_program_change
+      - id: unknown_0
         size: 2
       - id: program_change
         type: u1
         doc: |
           Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies
           displayed program change 126 is stored as 0x7e.
-      - id: unknown_before_custom_ccs
+      - id: unknown_1
         size: 3
       - id: custom_ccs
         type: custom_cc
         repeat: expr
         repeat-expr: 10
+        doc: Ten configurable MIDI controller number and value pairs.
   custom_cc:
     doc: Two-byte custom CC entry shared by MIDI Out and External.
     seq:
@@ -91,7 +102,9 @@ types:
         doc: Displayed as decimal in the M8 UI.
       - id: value
         type: u1
+        doc: Configured controller value.
   external_params:
+    doc: External input and MIDI output settings.
     seq:
       - id: input
         type: u1
@@ -118,7 +131,9 @@ types:
         type: custom_cc
         repeat: expr
         repeat-expr: 4
+        doc: Four configurable MIDI controller number and value pairs.
   fm_synth_params:
+    doc: FM algorithm, four operators, and modulation values.
     seq:
       - id: algo
         type: u1
@@ -136,6 +151,7 @@ types:
       - id: mods
         type: fm_synth_mod_values
   hypersynth_params:
+    doc: Hypersynth chord state and synthesis settings.
     seq:
       - id: current_chord
         type: hypersynth_current_chord

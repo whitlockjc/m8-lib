@@ -21,6 +21,7 @@ const text = value => typeof value === 'object' ? JSON.stringify(value) : String
 const range = (start, size) => size === 1 ? hex(start) : `${hex(start)}..${hex(start + size - 1)}`
 
 function link (from, to, label, anchor = '') {
+  if (from === to && anchor) return `[${escape(label)}](#${anchor})`
   const relative = path.relative(path.dirname(from), to).split(path.sep).join('/')
   return `[${escape(label)}](${relative || path.basename(to)}${anchor ? `#${anchor}` : ''})`
 }
@@ -40,6 +41,54 @@ function graph (entry) {
   }
   visit(entry)
   return [...seen].sort((a, b) => a.file.localeCompare(b.file, 'en'))
+}
+
+const fxInstrumentNames = [
+  ['wavsynth', 'Wavsynth'], ['macrosynth', 'Macrosynth'], ['sampler', 'Sampler'],
+  ['fm_synth', 'FM Synth'], ['midi_out', 'MIDI Out'], ['hypersynth', 'Hypersynth'],
+  ['external', 'External'], ['none', 'NONE']
+]
+const isFxEnum = name => name === 'phrase_fx_command' || name.endsWith('_table_fx_command')
+
+function renderFxCommands (catalog) {
+  const file = path.join(root, 'docs', 'fx_commands.md')
+  const lines = ['# M8 FX Commands', '',
+    'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
+    '[Documentation index](README.md)', '',
+    'Phrase steps and Instrument Table rows use the same two-byte FX slot. The M8 UI groups command labels by purpose; availability and behavior depend on the slot context, active instrument, and modulation type. Each firmware section below uses the enums selected by its entry schema.', '',
+    '## Firmware Ranges', '',
+    ...Object.keys(catalog).map(firmware => `- ${link(file, file, firmware, firmware.replaceAll('.', ''))}`), '']
+  const rows = entries => [
+    '| Stored Value | M8 Label | Identifier |', '| --- | --- | --- |',
+    ...entries.map(([value, entry]) => `| ${code(hex(Number(value)))} | ${escape(entry['-label'] || '')} | ${code(entry.id)} |`), ''
+  ]
+  for (const [firmware, target] of Object.entries(catalog)) {
+    const modules = graph(load(path.resolve(root, target.entry)))
+    const sequencing = modules.find(context => context.data.meta['-fx-sequencer-ranges'])
+    const table = modules.find(context => context.data.enums?.wavsynth_table_fx_command)
+    assert.ok(sequencing?.data.enums?.phrase_fx_command && table, `missing FX catalogs for ${firmware}`)
+    const ranges = sequencing.data.meta['-fx-sequencer-ranges']
+    const entries = Object.entries(sequencing.data.enums.phrase_fx_command)
+      .sort(([a], [b]) => Number(a) - Number(b))
+    const isSequencer = value => ranges.some(([first, last]) => value >= first && value <= last)
+    lines.push(`## ${firmware}`, '',
+      `Based on firmware ${code(target.verifiedFirmware)}. Values come from ${link(file, sequencing.file, path.relative(root, sequencing.file))} and ${link(file, table.file, path.relative(root, table.file))}. Shared schemas may be carried forward provisionally rather than independently retested for every firmware range.`, '',
+      '### Instrument (Current Instrument)', '',
+      'These enums contain fixture-verified command subsets for each instrument, not every command available in an FX slot.', '')
+    for (const [name, label] of fxInstrumentNames) {
+      const enumName = `${name}_table_fx_command`
+      const values = table.data.enums[enumName]
+      assert.ok(values, `missing ${enumName} for ${firmware}`)
+      lines.push(`#### ${label}`, '', ...rows(Object.entries(values).sort(([a], [b]) => Number(a) - Number(b))))
+    }
+    lines.push('### Instrument Mods', '',
+      'No verified command-value enum is available yet. Labels depend on the selected modulation slot and modulation type; targeted fixtures are needed before listing byte values.', '',
+      '### Mixer & Effects', '',
+      ...rows(entries.filter(([value]) => Number(value) !== 0xff && !isSequencer(Number(value)))),
+      '### Sequencer', '',
+      ...rows(entries.filter(([value]) => isSequencer(Number(value)))))
+  }
+  return lines.join('\n').trimEnd() + '\n'
 }
 
 // Variable lengths propagate instead of producing guessed subsequent offsets.
@@ -79,7 +128,7 @@ function enumOwner (context, name) {
   return [context, name]
 }
 
-function renderTarget (firmware, target) {
+function renderTarget (firmware, target, catalog = targets) {
   const entry = load(path.resolve(root, target.entry))
   const output = path.join(root, 'docs')
   const modules = graph(entry)
@@ -104,11 +153,28 @@ function renderTarget (firmware, target) {
       const [owner, name] = enumOwner(context, field.enum)
       result += `; ${link(file, pages.get(owner), name, `enum-${name}`)}`
     }
+    if (field.type === 'fx_slot') result += `; ${link(file, path.join(output, 'fx_commands.md'), 'FX commands')}`
     return result
   }
-  const attributes = field => Object.entries(field)
+  const attributes = (field, context) => {
+    const values = Object.entries(field)
     .filter(([key]) => !['id', 'doc', 'type', 'enum'].includes(key))
-    .map(([key, value]) => `${code(key)}: ${code(text(value))}`).join('; ') || '-'
+    .map(([key, value]) => `${code(key)}: ${code(text(value))}`)
+    if (context && typeof field.type === 'string' && !field.repeat &&
+        !/^[us][1248](le|be)?$|^f[48](le|be)?$|^strz?$/.test(field.type)) {
+      const [, definition] = resolve(context, field.type)
+      if (definition.seq?.length === 1 && definition.seq[0].repeat === 'expr') {
+        values.push(`${code('repeat')}: ${code(definition.seq[0]['repeat-expr'])} via ${code(definition.seq[0].id)}`)
+      }
+    }
+    return values.join('; ') || '-'
+  }
+  const description = (field, context) => {
+    if (field.doc) return field.doc
+    if (typeof field.type !== 'string' ||
+        /^[us][1248](le|be)?$|^f[48](le|be)?$|^strz?$/.test(field.type)) return ''
+    return resolve(context, field.type)[1].doc || ''
+  }
   const layout = (file, context, seq, start = 0) => {
     let offset = start
     const lines = ['| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |',
@@ -116,7 +182,7 @@ function renderTarget (firmware, target) {
     for (const field of seq) {
       const size = sizeOf(field, context)
       const position = offset === null ? 'dynamic' : size === null ? `${hex(offset)} onward` : range(offset, size)
-      lines.push(`| ${code(field.id)} | ${code(position)} | ${size === null ? 'variable' : size} | ${fieldType(file, context, field)} | ${attributes(field)} | ${escape(field.doc || '')} |`)
+      lines.push(`| ${code(field.id)} | ${code(position)} | ${size === null ? 'variable' : size} | ${fieldType(file, context, field)} | ${attributes(field, context)} | ${escape(description(field, context))} |`)
       offset = size === null || offset === null ? null : offset + size
     }
     return lines
@@ -124,7 +190,7 @@ function renderTarget (firmware, target) {
   const preamble = (file, heading) => [`# ${heading}`, '',
     'Generated from Kaitai schemas. Do not edit; run `npm run docs:generate`.', '',
     link(file, path.join(output, 'README.md'), 'Documentation index'), '']
-  const outputs = new Map()
+  const outputs = new Map([[path.join(output, 'fx_commands.md'), renderFxCommands(catalog)]])
   for (const context of modules) {
     const file = pages.get(context)
     const data = context.data
@@ -137,7 +203,11 @@ function renderTarget (firmware, target) {
       `- ${link(file, pages.get(imported), imported.data.meta.id)}`), '')
     lines.push('## Contents', '', `- ${link(file, file, 'Layout', 'layout')}`,
       ...Object.keys(data.types || {}).map(name => `- ${link(file, file, name, `type-${name}`)}`),
-      ...Object.keys(data.enums || {}).map(name => `- ${link(file, file, `${name} (enum)`, `enum-${name}`)}`), '')
+      ...Object.keys(data.enums || {}).filter(name => !isFxEnum(name))
+        .map(name => `- ${link(file, file, `${name} (enum)`, `enum-${name}`)}`), '')
+    if (context.data.meta.id === 'fx_slot' || Object.keys(data.enums || {}).some(isFxEnum)) {
+      lines.push(`FX command values: ${link(file, path.join(output, 'fx_commands.md'), 'FX command reference')}.`, '')
+    }
     const renderDefinition = (definition, heading, anchor) => {
       const sectionTitle = anchor === 'layout' ? 'Layout' : `Type: ${anchor.slice(5)}`
       lines.push(`## ${sectionTitle}`, '', heading, '', definition.doc || '', '')
@@ -157,6 +227,7 @@ function renderTarget (firmware, target) {
     renderDefinition({ ...data, doc: undefined }, 'Root record.', 'layout')
     for (const [name, definition] of Object.entries(data.types || {})) renderDefinition(definition, code(name), `type-${name}`)
     for (const [name, entries] of Object.entries(data.enums || {})) {
+      if (isFxEnum(name)) continue
       lines.push(`## Enum: ${name}`, '', code(name), '', '| Stored Value | Identifier | M8 Label | Description |', '| --- | --- | --- | --- |')
       for (const [value, entry] of Object.entries(entries).sort(([a], [b]) => Number(a) - Number(b))) {
         const item = typeof entry === 'object' ? entry : { id: entry }
@@ -170,18 +241,19 @@ function renderTarget (firmware, target) {
   const headerSize = sizeOf(headerField, entry)
   assert.ok(Number.isInteger(headerSize), 'file header must have fixed size')
   const indexLines = [...preamble(index, `M8 ${firmware} File Reference`),
-    `Firmware range: **${firmware}**. Verified release: **${target.verifiedFirmware}**.`, '',
+    `Documentation for M8 **${firmware}** file structures (based on firmware **${target.verifiedFirmware}**).`, '',
     `Entry schema: ${link(index, entry.file, target.entry)}.`, '',
+    `FX commands: ${link(index, path.join(output, 'fx_commands.md'), 'versioned command reference', firmware.replaceAll('.', ''))}.`, '',
     '## Files', '', '| File Kind | File Schema Version | Schema |', '| --- | --- | --- |']
   for (const kind of kinds) {
     const context = component(entry, kind)
     const version = path.relative(schemaRoot, context.file).split(path.sep)[1]
-    indexLines.push(`| ${link(index, index, kind, kind)} | ${code(version)} | ${link(index, pages.get(context), context.data.meta.id)} |`)
+    indexLines.push(`| ${link(index, index, kind[0].toUpperCase() + kind.slice(1), kind)} | ${code(version)} | ${link(index, pages.get(context), context.data.meta.id)} |`)
   }
   for (const kind of kinds) {
     const context = component(entry, kind)
     const bodySize = sizeOf({ type: context.data.meta.id }, entry)
-    indexLines.push('', `## ${kind}`, '',
+    indexLines.push('', `## ${kind[0].toUpperCase() + kind.slice(1)}`, '',
       `Header: ${headerSize} bytes. Body: ${bodySize === null ? 'variable' : `${bodySize} bytes`}.`, '',
       `Definition: ${link(index, pages.get(context), context.data.meta.id)}.`, '',
       'Offsets are absolute file offsets. Follow type links for relative record layouts.', '',
@@ -210,7 +282,7 @@ function generate (catalog = targets, { check = false, firmware } = {}) {
   const selected = firmware ? [[firmware, catalog[firmware]]] : Object.entries(catalog)
   const outputs = new Map()
   for (const [name, target] of selected) {
-    for (const [file, content] of renderTarget(name, target)) {
+    for (const [file, content] of renderTarget(name, target, catalog)) {
       if (outputs.has(file)) assert.equal(outputs.get(file), content, `conflicting shared documentation: ${file}`)
       outputs.set(file, content)
     }

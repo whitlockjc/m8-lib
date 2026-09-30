@@ -16,10 +16,10 @@ File schema version: `6.5.0`.
 
 ## Contents
 
-- [Layout](midi_mapping.md#layout)
-- [midi_mappings](midi_mapping.md#type-midi_mappings)
-- [midi_mapping](midi_mapping.md#type-midi_mapping)
-- [midi_mapping_destination_type (enum)](midi_mapping.md#enum-midi_mapping_destination_type)
+- [Layout](#layout)
+- [midi_mappings](#type-midi_mappings)
+- [midi_mapping](#type-midi_mapping)
+- [midi_mapping_destination_type (enum)](#enum-midi_mapping_destination_type)
 
 ## Layout
 
@@ -39,7 +39,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x37f` | 896 | [midi_mapping](midi_mapping.md#type-midi_mapping) | `repeat`: `expr`; `repeat-expr`: `128` |  |
+| `entries` | `0x00..0x37f` | 896 | [midi_mapping](#type-midi_mapping) | `repeat`: `expr`; `repeat-expr`: `128` | Up to 128 MIDI control mappings. |
 
 ## Type: midi_mapping
 
@@ -56,11 +56,11 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `channel` | `0x00` | 1 | `u1` | - | 0x00 is observed for empty mappings. Other values are displayed as decimal MIDI channels in the M8 UI.  |
 | `control_number` | `0x01` | 1 | `u1` | - | Observed values include 0x00, 0x7f, 0x80, and 0x81. The M8 UI displays 0x80 as T:X and 0x81 as T:Y in the current fixture.  |
-| `destination_type` | `0x02` | 1 | `u1`; [midi_mapping_destination_type](midi_mapping.md#enum-midi_mapping_destination_type) | - | Raw destination type byte. Observed labels identify the UI destination group. Destination index and parameter interpretation is destination-specific and deferred to the corresponding page schemas.  |
-| `destination_index` | `0x03` | 1 | `u1` | - |  |
-| `destination_parameter` | `0x04` | 1 | `u1` | - |  |
-| `minimum_value` | `0x05` | 1 | `u1` | - |  |
-| `maximum_value` | `0x06` | 1 | `u1` | - |  |
+| `destination_type` | `0x02` | 1 | `u1`; [midi_mapping_destination_type](#enum-midi_mapping_destination_type) | - | Raw destination type byte. Observed labels identify the UI destination group. Destination index and parameter interpretation is destination-specific and deferred to the corresponding page schemas.  |
+| `destination_index` | `0x03` | 1 | `u1` | - | Index within the destination group; interpretation depends on destination type. |
+| `destination_parameter` | `0x04` | 1 | `u1` | - | Parameter within the selected destination; labels depend on destination type. |
+| `minimum_value` | `0x05` | 1 | `u1` | - | Lower bound of the mapped parameter range. |
+| `maximum_value` | `0x06` | 1 | `u1` | - | Upper bound of the mapped parameter range. |
 
 ## Enum: midi_mapping_destination_type
 

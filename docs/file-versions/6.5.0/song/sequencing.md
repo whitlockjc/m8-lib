@@ -20,18 +20,19 @@ File schema version: `6.5.0`.
 
 ## Contents
 
-- [Layout](sequencing.md#layout)
-- [grooves](sequencing.md#type-grooves)
-- [groove](sequencing.md#type-groove)
-- [phrases](sequencing.md#type-phrases)
-- [phrase](sequencing.md#type-phrase)
-- [phrase_step](sequencing.md#type-phrase_step)
-- [song_rows](sequencing.md#type-song_rows)
-- [song_row](sequencing.md#type-song_row)
-- [chains](sequencing.md#type-chains)
-- [chain](sequencing.md#type-chain)
-- [chain_row](sequencing.md#type-chain_row)
-- [phrase_fx_command (enum)](sequencing.md#enum-phrase_fx_command)
+- [Layout](#layout)
+- [grooves](#type-grooves)
+- [groove](#type-groove)
+- [phrases](#type-phrases)
+- [phrase](#type-phrase)
+- [phrase_step](#type-phrase_step)
+- [song_rows](#type-song_rows)
+- [song_row](#type-song_row)
+- [chains](#type-chains)
+- [chain](#type-chain)
+- [chain_row](#type-chain_row)
+
+FX command values: [FX command reference](../../../fx_commands.md).
 
 ## Layout
 
@@ -52,7 +53,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x1ff` | 512 | [groove](sequencing.md#type-groove) | `repeat`: `expr`; `repeat-expr`: `32` |  |
+| `entries` | `0x00..0x1ff` | 512 | [groove](#type-groove) | `repeat`: `expr`; `repeat-expr`: `32` | Thirty-two Song groove definitions. |
 
 ## Type: groove
 
@@ -64,7 +65,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `steps` | `0x00..0x0f` | 16 | `u1` | `repeat`: `expr`; `repeat-expr`: `16` |  |
+| `steps` | `0x00..0x0f` | 16 | `u1` | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen groove step values. |
 
 ## Type: phrases
 
@@ -80,7 +81,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x8f6f` | 36720 | [phrase](sequencing.md#type-phrase) | `repeat`: `expr`; `repeat-expr`: `255` |  |
+| `entries` | `0x00..0x8f6f` | 36720 | [phrase](#type-phrase) | `repeat`: `expr`; `repeat-expr`: `255` | Stored phrases indexed 0x00 through 0xfe. |
 
 ## Type: phrase
 
@@ -92,7 +93,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `steps` | `0x00..0x8f` | 144 | [phrase_step](sequencing.md#type-phrase_step) | `repeat`: `expr`; `repeat-expr`: `16` |  |
+| `steps` | `0x00..0x8f` | 144 | [phrase_step](#type-phrase_step) | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen steps in this phrase. |
 
 ## Type: phrase_step
 
@@ -106,10 +107,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `note` | `0x00` | 1 | `u1` | - |  |
-| `volume` | `0x01` | 1 | `u1` | - |  |
-| `instrument` | `0x02` | 1 | `u1` | - |  |
-| `fx` | `0x03..0x08` | 6 | [fx_slot](../../../common/fx_slot.md#layout) | `repeat`: `expr`; `repeat-expr`: `3` |  |
+| `note` | `0x00` | 1 | `u1` | - | Note value; 0xff is unset. |
+| `volume` | `0x01` | 1 | `u1` | - | Step volume; 0xff is unset. |
+| `instrument` | `0x02` | 1 | `u1` | - | Instrument index; 0xff is unset. |
+| `fx` | `0x03..0x08` | 6 | [fx_slot](../../../common/fx_slot.md#layout); [FX commands](../../../fx_commands.md) | `repeat`: `expr`; `repeat-expr`: `3` | Three shared FX slots. The UI groups commands as Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods. Available labels depend on the surrounding instrument and modulation type.  |
 
 ## Type: song_rows
 
@@ -124,7 +125,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x7ff` | 2048 | [song_row](sequencing.md#type-song_row) | `repeat`: `expr`; `repeat-expr`: `256` |  |
+| `entries` | `0x00..0x7ff` | 2048 | [song_row](#type-song_row) | `repeat`: `expr`; `repeat-expr`: `256` | Song rows indexed 0x00 through 0xff. |
 
 ## Type: song_row
 
@@ -138,7 +139,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `tracks` | `0x00..0x07` | 8 | `u1` | `repeat`: `expr`; `repeat-expr`: `8` |  |
+| `tracks` | `0x00..0x07` | 8 | `u1` | `repeat`: `expr`; `repeat-expr`: `8` | Chain index for each of the eight tracks; 0xff is unset. |
 
 ## Type: chains
 
@@ -153,7 +154,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x1fdf` | 8160 | [chain](sequencing.md#type-chain) | `repeat`: `expr`; `repeat-expr`: `255` |  |
+| `entries` | `0x00..0x1fdf` | 8160 | [chain](#type-chain) | `repeat`: `expr`; `repeat-expr`: `255` | Stored chains indexed 0x00 through 0xfe. |
 
 ## Type: chain
 
@@ -165,7 +166,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `rows` | `0x00..0x1f` | 32 | [chain_row](sequencing.md#type-chain_row) | `repeat`: `expr`; `repeat-expr`: `16` |  |
+| `rows` | `0x00..0x1f` | 32 | [chain_row](#type-chain_row) | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen rows in this chain. |
 
 ## Type: chain_row
 
@@ -179,91 +180,5 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `phrase` | `0x00` | 1 | `u1` | - |  |
-| `transpose` | `0x01` | 1 | `u1` | - |  |
-
-## Enum: phrase_fx_command
-
-`phrase_fx_command`
-
-| Stored Value | Identifier | M8 Label | Description |
-| --- | --- | --- | --- |
-| `0x00` | `arpeggio` | ARP |  |
-| `0x01` | `chance` | CHA |  |
-| `0x02` | `delay` | DEL |  |
-| `0x03` | `groove` | GRV |  |
-| `0x04` | `hop` | HOP |  |
-| `0x05` | `kill_note` | KIL |  |
-| `0x06` | `randomize` | RND |  |
-| `0x07` | `randomize_left` | RNL |  |
-| `0x08` | `retrig` | RET |  |
-| `0x09` | `repeat` | REP |  |
-| `0x0a` | `remix` | RMX |  |
-| `0x0b` | `nth` | NTH |  |
-| `0x0c` | `pitch_slide` | PSL |  |
-| `0x0d` | `pitch_bend` | PBN |  |
-| `0x0e` | `vibrato` | PVB |  |
-| `0x0f` | `extreme_vibrato` | PVX |  |
-| `0x10` | `track_scale` | SCA |  |
-| `0x11` | `global_scale` | SCG |  |
-| `0x12` | `random_seed` | SED |  |
-| `0x13` | `song_hop` | SNG |  |
-| `0x14` | `table` | TBL |  |
-| `0x15` | `table_hop` | THO |  |
-| `0x16` | `table_tick` | TIC |  |
-| `0x17` | `aux_table` | TBX |  |
-| `0x18` | `tempo` | TPO |  |
-| `0x19` | `transpose` | TSP |  |
-| `0x1a` | `note_off` | OFF |  |
-| `0x1b` | `main_volume` | VMV |  |
-| `0x1c` | `mod_fx_modulation_depth` | XMM |  |
-| `0x1d` | `mod_fx_modulation_frequency` | XMF |  |
-| `0x1e` | `mod_fx_stereo_width` | XMW |  |
-| `0x1f` | `mod_fx_reverb_mix` | XMR |  |
-| `0x20` | `delay_time` | XDT |  |
-| `0x21` | `delay_feedback` | XDF |  |
-| `0x22` | `delay_stereo_width` | XDW |  |
-| `0x23` | `delay_reverb_mix` | XDR |  |
-| `0x24` | `reverb_room_size` | XRS |  |
-| `0x25` | `reverb_decay` | XRD |  |
-| `0x26` | `reverb_modulation_depth` | XRM |  |
-| `0x27` | `reverb_modulation_frequency` | XRF |  |
-| `0x28` | `reverb_stereo_width` | XRW |  |
-| `0x29` | `reverb_freeze` | XRZ |  |
-| `0x2a` | `mod_fx_volume` | VMX |  |
-| `0x2b` | `delay_volume` | VDE |  |
-| `0x2c` | `reverb_volume` | VRE |  |
-| `0x2d` | `track_1_volume` | VT1 |  |
-| `0x2e` | `track_2_volume` | VT2 |  |
-| `0x2f` | `track_3_volume` | VT3 |  |
-| `0x30` | `track_4_volume` | VT4 |  |
-| `0x31` | `track_5_volume` | VT5 |  |
-| `0x32` | `track_6_volume` | VT6 |  |
-| `0x33` | `track_7_volume` | VT7 |  |
-| `0x34` | `track_8_volume` | VT8 |  |
-| `0x35` | `dj_filter_cutoff` | DJC |  |
-| `0x36` | `line_input_volume` | VIN |  |
-| `0x37` | `line_input_mod_fx_send` | IMX |  |
-| `0x38` | `line_input_delay_send` | IDE |  |
-| `0x39` | `line_input_reverb_send` | IRE |  |
-| `0x3a` | `second_line_input_volume` | VI2 |  |
-| `0x3b` | `second_line_input_mod_fx_send` | IM2 |  |
-| `0x3c` | `second_line_input_delay_send` | ID2 |  |
-| `0x3d` | `second_line_input_reverb_send` | IR2 |  |
-| `0x3e` | `usb_input_volume` | USB |  |
-| `0x3f` | `dj_filter_resonance` | DJR |  |
-| `0x40` | `dj_filter_type` | DJT |  |
-| `0x41` | `main_song_eq_assignment` | EQM |  |
-| `0x42` | `current_instrument_eq_assignment` | EQI |  |
-| `0x43` | `instrument` | INS |  |
-| `0x44` | `repeat_boundary` | RTO |  |
-| `0x45` | `arpeggio_config` | ARC |  |
-| `0x46` | `global_groove` | GGR |  |
-| `0x47` | `next_track` | NXT |  |
-| `0x48` | `reverb_highpass` | XRH |  |
-| `0x49` | `mod_fx_type_and_phase` | XMT |  |
-| `0x4a` | `ott` | OTT |  |
-| `0x4b` | `ott_color` | OTC |  |
-| `0x4c` | `ott_time` | OTI |  |
-| `0x4d` | `micro_time` | MTT |  |
-| `0xff` | `unset` | -- |  |
+| `phrase` | `0x00` | 1 | `u1` | - | Referenced phrase index; 0xff is unset. |
+| `transpose` | `0x01` | 1 | `u1` | - | Transpose value for the referenced phrase. |

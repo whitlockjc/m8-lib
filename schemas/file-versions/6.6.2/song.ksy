@@ -24,19 +24,22 @@ doc: |
   Other Song fields are carried forward from the 6.5.x mapping, not yet all
   retested with controlled 6.6.x edits. Unknown bytes remain preserved.
 seq:
-  - id: directory_region
-    type: directory_region
+  - id: directory
+    type: directory
     size: 128
     doc: |
       Fixed 128-byte directory field. The null-terminated path is followed by
-      the remaining reserved bytes in this field. The path is /Songs/6_5_X/
-      in 6.5.x Song fixtures. Post-terminator bytes vary between saves
+      the remaining reserved bytes in this field. Post-terminator bytes vary between saves
       and must be preserved verbatim, not assumed to be zero-filled padding.
-  - id: project
+  - id: project_settings
     type: song_project_6_5_0::project_settings
-  - id: unknown_between_project_and_mixer
+    doc: Project settings, including tempo, scale selection, and MIDI input settings.
+  - id: unknown_0
     size: 15
-    doc: Preserved bytes between Project settings and Mixer settings.
+    doc: |
+      Preserved bytes between the Project settings record and Mixer settings.
+      The preceding two unknown bytes remain inside project_settings to retain
+      that record boundary and the existing fixture attribution.
   - id: mixer
     type: song_mixer_effects_6_6_2::mixer_settings
   - id: grooves
@@ -57,7 +60,7 @@ seq:
     type: instruments
   - id: effects_and_scope
     type: song_mixer_effects_6_6_2::effects_and_scope_settings
-  - id: unknown_between_effects_and_scope_and_midi_mappings
+  - id: unknown_1
     size: 35
     doc: |
       Preserved bytes between Effects/Mix & Limiter Scope storage and the MIDI
@@ -68,17 +71,10 @@ seq:
     type: bookmarks
   - id: scales
     type: embedded_scales
-  - id: instrument_eqs
-    type: song_eq_6_5_0::instrument_eqs
-  - id: mix_eq
-    type: song_eq_6_5_0::eq_settings
-  - id: mod_fx_eq
-    type: song_eq_6_5_0::eq_settings
-  - id: delay_eq
-    type: song_eq_6_5_0::eq_settings
-  - id: reverb_eq
-    type: song_eq_6_5_0::eq_settings
-  - id: unknown_after_reverb_eq
+  - id: eqs
+    type: eqs
+    doc: Instrument and global effect EQ settings.
+  - id: unknown_2
     size: 32
     doc: Preserved 32-byte region present in both 6.5.0 and 6.6.2 Songs.
   - id: row_bookmark_colors
@@ -87,6 +83,26 @@ seq:
       Added in 6.6.2 at absolute offset 0x1b6c6. One color code per Song
       row, independent of chain-cell bookmark bitmasks.
 types:
+  eqs:
+    doc: Contiguous bank of 128 Instrument EQs followed by four global EQs.
+    seq:
+      - id: instrument
+        type: song_eq_6_5_0::eq_settings
+        repeat: expr
+        repeat-expr: 128
+        doc: One EQ for each of the 128 Song Instruments.
+      - id: mix
+        type: song_eq_6_5_0::eq_settings
+        doc: Master Mix EQ.
+      - id: mod_fx
+        type: song_eq_6_5_0::eq_settings
+        doc: ModFX EQ.
+      - id: delay
+        type: song_eq_6_5_0::eq_settings
+        doc: Delay EQ.
+      - id: reverb
+        type: song_eq_6_5_0::eq_settings
+        doc: Reverb EQ.
   row_bookmark_colors:
     seq:
       - id: entries
@@ -129,7 +145,7 @@ types:
         value: (track_mask & 0x40) != 0
       track_8:
         value: (track_mask & 0x80) != 0
-  directory_region:
+  directory:
     doc: Fixed 128-byte Song directory field, including reserved post-terminator space.
     seq:
       - id: path

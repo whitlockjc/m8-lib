@@ -97,10 +97,8 @@ types:
         size: 47
   wavsynth_body_before_eq:
     seq:
-      - id: unknown_common_0
-        size: 2
-      - id: unknown_before_params
-        size: 1
+      - id: unknown_0
+        size: 3
       - id: params
         type: instrument_parameters_6_0_1::wavsynth_params
       - id: filter
@@ -109,14 +107,12 @@ types:
         type: instrument_parameters_6_0_1::amp_params
       - id: mixer
         type: instrument_parameters_6_0_1::mixer_params
-      - id: unknown_before_eq
+      - id: unknown_1
         size: 29
   macrosynth_body_before_eq:
     seq:
-      - id: unknown_common_0
-        size: 2
-      - id: unknown_before_params
-        size: 1
+      - id: unknown_0
+        size: 3
       - id: params
         type: instrument_parameters_6_0_1::macrosynth_params
       - id: filter
@@ -125,14 +121,14 @@ types:
         type: instrument_parameters_6_0_1::amp_params
       - id: mixer
         type: instrument_parameters_6_0_1::mixer_params
-      - id: unknown_before_eq
+      - id: unknown_1
         size: 29
   sampler_body_before_eq:
     doc: |
       Sampler-specific controls are stored here; the selected sample_path is
       another Sampler-specific parameter stored in sampler_data_tail.
     seq:
-      - id: unknown_common_0
+      - id: unknown_0
         size: 2
       - id: controls
         type: instrument_parameters_6_0_1::sampler_controls
@@ -142,20 +138,18 @@ types:
         type: instrument_parameters_6_0_1::amp_params
       - id: mixer
         type: instrument_parameters_6_0_1::mixer_params
-      - id: unknown_before_eq
+      - id: unknown_1
         size: 28
   midi_out_body_before_eq:
     seq:
       - id: params
         type: instrument_parameters_6_0_1::midi_out_params
-      - id: unknown_before_eq
+      - id: unknown
         size: 18
   fm_synth_body_before_eq:
     seq:
-      - id: unknown_common_0
-        size: 2
-      - id: unknown_before_params
-        size: 1
+      - id: unknown_0
+        size: 3
       - id: params
         type: instrument_parameters_6_0_1::fm_synth_params
       - id: filter
@@ -168,14 +162,12 @@ types:
           Amp, limit, and pan offsets are verified by FM_PARAMS.
       - id: mixer
         type: instrument_parameters_6_0_1::mixer_params
-      - id: unknown_before_eq
+      - id: unknown_1
         size: 1
   hypersynth_body_before_eq:
     seq:
-      - id: unknown_common_0
-        size: 2
-      - id: unknown_before_params
-        size: 1
+      - id: unknown_0
+        size: 3
       - id: params
         type: instrument_parameters_6_0_1::hypersynth_params
       - id: filter
@@ -184,14 +176,12 @@ types:
         type: instrument_parameters_6_0_1::amp_params
       - id: mixer
         type: instrument_parameters_6_0_1::mixer_params
-      - id: unknown_before_eq
+      - id: unknown_1
         size: 22
   external_body_before_eq:
     seq:
-      - id: unknown_common_0
-        size: 2
-      - id: unknown_before_params
-        size: 1
+      - id: unknown_0
+        size: 3
       - id: params
         type: instrument_parameters_6_0_1::external_params
       - id: filter
@@ -200,13 +190,13 @@ types:
         type: instrument_parameters_6_0_1::amp_params
       - id: mixer
         type: instrument_parameters_6_0_1::mixer_params
-      - id: unknown_before_eq
+      - id: unknown_1
         size: 21
   standard_data_tail:
     seq:
       - id: modulators
         type: instrument_modulators
-      - id: unknown_after_modulators
+      - id: unknown
         size: 128
   none_data_tail:
     seq:
@@ -244,7 +234,7 @@ types:
         type: hypersynth_chord
         repeat: expr
         repeat-expr: 16
-      - id: unknown_after_chords
+      - id: unknown
         size: 16
   hypersynth_chord:
     seq:

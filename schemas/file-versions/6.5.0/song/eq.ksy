@@ -14,10 +14,13 @@ types:
     seq:
       - id: low_band
         type: eq_band
+        doc: Low EQ band.
       - id: mid_band
         type: eq_band
+        doc: Mid EQ band.
       - id: high_band
         type: eq_band
+        doc: High EQ band.
   instrument_eqs:
     doc: 128 assignable Instrument EQ banks, each with the standard 18-byte EQ layout.
     seq:
@@ -34,12 +37,16 @@ types:
     seq:
       - id: type_and_mode
         type: u1
+        doc: Packed filter type and channel mode.
       - id: frequency
         type: u2
+        doc: Band frequency stored as an unsigned little-endian integer.
       - id: gain
         type: s2
+        doc: Signed band gain in hundredths.
       - id: q
         type: u1
+        doc: Band Q value.
     instances:
       filter_type:
         value: type_and_mode & 0x1f

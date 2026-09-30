@@ -16,6 +16,7 @@ types:
         type: midi_mapping
         repeat: expr
         repeat-expr: 128
+        doc: Up to 128 MIDI control mappings.
   midi_mapping:
     doc: |
       Seven-byte MIDI Mapping record. Historical m8-js reference code reads
@@ -41,12 +42,16 @@ types:
           destination-specific and deferred to the corresponding page schemas.
       - id: destination_index
         type: u1
+        doc: Index within the destination group; interpretation depends on destination type.
       - id: destination_parameter
         type: u1
+        doc: Parameter within the selected destination; labels depend on destination type.
       - id: minimum_value
         type: u1
+        doc: Lower bound of the mapped parameter range.
       - id: maximum_value
         type: u1
+        doc: Upper bound of the mapped parameter range.
 enums:
   midi_mapping_destination_type:
     0x05:

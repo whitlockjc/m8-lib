@@ -16,38 +16,38 @@ File schema version: `6.0.1`.
 
 ## Contents
 
-- [Layout](parameters.md#layout)
-- [sampler_controls](parameters.md#type-sampler_controls)
-- [wavsynth_params](parameters.md#type-wavsynth_params)
-- [macrosynth_params](parameters.md#type-macrosynth_params)
-- [midi_out_params](parameters.md#type-midi_out_params)
-- [custom_cc](parameters.md#type-custom_cc)
-- [external_params](parameters.md#type-external_params)
-- [fm_synth_params](parameters.md#type-fm_synth_params)
-- [hypersynth_params](parameters.md#type-hypersynth_params)
-- [hypersynth_current_chord](parameters.md#type-hypersynth_current_chord)
-- [hypersynth_chord_notes](parameters.md#type-hypersynth_chord_notes)
-- [fm_synth_operator_shapes](parameters.md#type-fm_synth_operator_shapes)
-- [fm_synth_operator_ratios](parameters.md#type-fm_synth_operator_ratios)
-- [fm_synth_operator_ratio](parameters.md#type-fm_synth_operator_ratio)
-- [fm_synth_operator_level_feedbacks](parameters.md#type-fm_synth_operator_level_feedbacks)
-- [fm_synth_operator_level_feedback](parameters.md#type-fm_synth_operator_level_feedback)
-- [fm_synth_operator_mod_slots](parameters.md#type-fm_synth_operator_mod_slots)
-- [fm_synth_mod_values](parameters.md#type-fm_synth_mod_values)
-- [filter_params](parameters.md#type-filter_params)
-- [amp_params](parameters.md#type-amp_params)
-- [mixer_params](parameters.md#type-mixer_params)
-- [midi_out_port (enum)](parameters.md#enum-midi_out_port)
-- [external_input (enum)](parameters.md#enum-external_input)
-- [external_port (enum)](parameters.md#enum-external_port)
-- [filter_type (enum)](parameters.md#enum-filter_type)
-- [limit_type (enum)](parameters.md#enum-limit_type)
-- [fm_synth_algo (enum)](parameters.md#enum-fm_synth_algo)
-- [fm_synth_operator_shape (enum)](parameters.md#enum-fm_synth_operator_shape)
-- [fm_synth_operator_mod_slot (enum)](parameters.md#enum-fm_synth_operator_mod_slot)
-- [wavsynth_shape (enum)](parameters.md#enum-wavsynth_shape)
-- [macrosynth_shape (enum)](parameters.md#enum-macrosynth_shape)
-- [sampler_play_mode (enum)](parameters.md#enum-sampler_play_mode)
+- [Layout](#layout)
+- [sampler_controls](#type-sampler_controls)
+- [wavsynth_params](#type-wavsynth_params)
+- [macrosynth_params](#type-macrosynth_params)
+- [midi_out_params](#type-midi_out_params)
+- [custom_cc](#type-custom_cc)
+- [external_params](#type-external_params)
+- [fm_synth_params](#type-fm_synth_params)
+- [hypersynth_params](#type-hypersynth_params)
+- [hypersynth_current_chord](#type-hypersynth_current_chord)
+- [hypersynth_chord_notes](#type-hypersynth_chord_notes)
+- [fm_synth_operator_shapes](#type-fm_synth_operator_shapes)
+- [fm_synth_operator_ratios](#type-fm_synth_operator_ratios)
+- [fm_synth_operator_ratio](#type-fm_synth_operator_ratio)
+- [fm_synth_operator_level_feedbacks](#type-fm_synth_operator_level_feedbacks)
+- [fm_synth_operator_level_feedback](#type-fm_synth_operator_level_feedback)
+- [fm_synth_operator_mod_slots](#type-fm_synth_operator_mod_slots)
+- [fm_synth_mod_values](#type-fm_synth_mod_values)
+- [filter_params](#type-filter_params)
+- [amp_params](#type-amp_params)
+- [mixer_params](#type-mixer_params)
+- [midi_out_port (enum)](#enum-midi_out_port)
+- [external_input (enum)](#enum-external_input)
+- [external_port (enum)](#enum-external_port)
+- [filter_type (enum)](#enum-filter_type)
+- [limit_type (enum)](#enum-limit_type)
+- [fm_synth_algo (enum)](#enum-fm_synth_algo)
+- [fm_synth_operator_shape (enum)](#enum-fm_synth_operator_shape)
+- [fm_synth_operator_mod_slot (enum)](#enum-fm_synth_operator_mod_slot)
+- [wavsynth_shape (enum)](#enum-wavsynth_shape)
+- [macrosynth_shape (enum)](#enum-macrosynth_shape)
+- [sampler_play_mode (enum)](#enum-sampler_play_mode)
 
 ## Layout
 
@@ -69,25 +69,25 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `mode_value` | `0x00` | 1 | `u1` | - |  |
-| `play_mode` | `0x01` | 1 | `u1`; [sampler_play_mode](parameters.md#enum-sampler_play_mode) | - |  |
-| `slice` | `0x02` | 1 | `u1` | - |  |
-| `start` | `0x03` | 1 | `u1` | - |  |
-| `loop_start` | `0x04` | 1 | `u1` | - |  |
-| `length` | `0x05` | 1 | `u1` | - |  |
-| `degrade` | `0x06` | 1 | `u1` | - |  |
+| `mode_value` | `0x00` | 1 | `u1` | - | Displayed as detune, steps, or BPM according to play_mode. |
+| `play_mode` | `0x01` | 1 | `u1`; [sampler_play_mode](#enum-sampler_play_mode) | - | Sampler playback mode. |
+| `slice` | `0x02` | 1 | `u1` | - | Sampler slice selection. |
+| `start` | `0x03` | 1 | `u1` | - | Sample start setting. |
+| `loop_start` | `0x04` | 1 | `u1` | - | Sample loop start setting. |
+| `length` | `0x05` | 1 | `u1` | - | Sample length setting. |
+| `degrade` | `0x06` | 1 | `u1` | - | Sampler degrade setting. |
 
 ## Type: wavsynth_params
 
 `wavsynth_params`
 
-
+Wavsynth-specific synthesis parameters.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `shape` | `0x00` | 1 | `u1`; [wavsynth_shape](parameters.md#enum-wavsynth_shape) | - |  |
+| `shape` | `0x00` | 1 | `u1`; [wavsynth_shape](#enum-wavsynth_shape) | - |  |
 | `size` | `0x01` | 1 | `u1` | - |  |
 | `mult` | `0x02` | 1 | `u1` | - |  |
 | `warp` | `0x03` | 1 | `u1` | - |  |
@@ -97,13 +97,13 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `macrosynth_params`
 
-
+Macrosynth-specific synthesis parameters.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `shape` | `0x00` | 1 | `u1`; [macrosynth_shape](parameters.md#enum-macrosynth_shape) | - |  |
+| `shape` | `0x00` | 1 | `u1`; [macrosynth_shape](#enum-macrosynth_shape) | - |  |
 | `timbre` | `0x01` | 1 | `u1` | - |  |
 | `color` | `0x02` | 1 | `u1` | - |  |
 | `degrade` | `0x03` | 1 | `u1` | - |  |
@@ -113,19 +113,19 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 `midi_out_params`
 
-
+MIDI Out port, channel, program, and custom CC settings.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `port` | `0x00` | 1 | `u1`; [midi_out_port](parameters.md#enum-midi_out_port) | - |  |
+| `port` | `0x00` | 1 | `u1`; [midi_out_port](#enum-midi_out_port) | - |  |
 | `channel` | `0x01` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies displayed channel 16 is stored as 0x10.  |
 | `bank` | `0x02` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies displayed bank 127 is stored as 0x7f.  |
-| `unknown_before_program_change` | `0x03..0x04` | 2 | bytes | `size`: `2` |  |
+| `unknown_0` | `0x03..0x04` | 2 | bytes | `size`: `2` |  |
 | `program_change` | `0x05` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The MID_PARAMS fixture verifies displayed program change 126 is stored as 0x7e.  |
-| `unknown_before_custom_ccs` | `0x06..0x08` | 3 | bytes | `size`: `3` |  |
-| `custom_ccs` | `0x09..0x1c` | 20 | [custom_cc](parameters.md#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `10` |  |
+| `unknown_1` | `0x06..0x08` | 3 | bytes | `size`: `3` |  |
+| `custom_ccs` | `0x09..0x1c` | 20 | [custom_cc](#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `10` | Ten configurable MIDI controller number and value pairs. |
 
 ## Type: custom_cc
 
@@ -138,54 +138,54 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `cc` | `0x00` | 1 | `u1` | - | Displayed as decimal in the M8 UI. |
-| `value` | `0x01` | 1 | `u1` | - |  |
+| `value` | `0x01` | 1 | `u1` | - | Configured controller value. |
 
 ## Type: external_params
 
 `external_params`
 
-
+External input and MIDI output settings.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `input` | `0x00` | 1 | `u1`; [external_input](parameters.md#enum-external_input) | - |  |
-| `port` | `0x01` | 1 | `u1`; [external_port](parameters.md#enum-external_port) | - |  |
+| `input` | `0x00` | 1 | `u1`; [external_input](#enum-external_input) | - |  |
+| `port` | `0x01` | 1 | `u1`; [external_port](#enum-external_port) | - |  |
 | `channel` | `0x02` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies displayed channel 16 is stored as 0x10.  |
 | `bank` | `0x03` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies displayed bank 127 is stored as 0x7f.  |
 | `program_change` | `0x04` | 1 | `u1` | - | Displayed as decimal in the M8 UI. The EXT_PARAMS fixture verifies displayed program change 126 is stored as 0x7e.  |
-| `custom_ccs` | `0x05..0x0c` | 8 | [custom_cc](parameters.md#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `4` |  |
+| `custom_ccs` | `0x05..0x0c` | 8 | [custom_cc](#type-custom_cc) | `repeat`: `expr`; `repeat-expr`: `4` | Four configurable MIDI controller number and value pairs. |
 
 ## Type: fm_synth_params
 
 `fm_synth_params`
 
-
+FM algorithm, four operators, and modulation values.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `algo` | `0x00` | 1 | `u1`; [fm_synth_algo](parameters.md#enum-fm_synth_algo) | - |  |
-| `operator_shapes` | `0x01..0x04` | 4 | [fm_synth_operator_shapes](parameters.md#type-fm_synth_operator_shapes) | - |  |
-| `operator_ratios` | `0x05..0x0c` | 8 | [fm_synth_operator_ratios](parameters.md#type-fm_synth_operator_ratios) | - |  |
-| `operator_levels` | `0x0d..0x14` | 8 | [fm_synth_operator_level_feedbacks](parameters.md#type-fm_synth_operator_level_feedbacks) | - |  |
-| `operator_mod_a` | `0x15..0x18` | 4 | [fm_synth_operator_mod_slots](parameters.md#type-fm_synth_operator_mod_slots) | - |  |
-| `operator_mod_b` | `0x19..0x1c` | 4 | [fm_synth_operator_mod_slots](parameters.md#type-fm_synth_operator_mod_slots) | - |  |
-| `mods` | `0x1d..0x20` | 4 | [fm_synth_mod_values](parameters.md#type-fm_synth_mod_values) | - |  |
+| `algo` | `0x00` | 1 | `u1`; [fm_synth_algo](#enum-fm_synth_algo) | - |  |
+| `operator_shapes` | `0x01..0x04` | 4 | [fm_synth_operator_shapes](#type-fm_synth_operator_shapes) | - |  |
+| `operator_ratios` | `0x05..0x0c` | 8 | [fm_synth_operator_ratios](#type-fm_synth_operator_ratios) | - |  |
+| `operator_levels` | `0x0d..0x14` | 8 | [fm_synth_operator_level_feedbacks](#type-fm_synth_operator_level_feedbacks) | - |  |
+| `operator_mod_a` | `0x15..0x18` | 4 | [fm_synth_operator_mod_slots](#type-fm_synth_operator_mod_slots) | - |  |
+| `operator_mod_b` | `0x19..0x1c` | 4 | [fm_synth_operator_mod_slots](#type-fm_synth_operator_mod_slots) | - |  |
+| `mods` | `0x1d..0x20` | 4 | [fm_synth_mod_values](#type-fm_synth_mod_values) | - |  |
 
 ## Type: hypersynth_params
 
 `hypersynth_params`
 
-
+Hypersynth chord state and synthesis settings.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `current_chord` | `0x00..0x06` | 7 | [hypersynth_current_chord](parameters.md#type-hypersynth_current_chord) | - | Current/edit chord state. The HYP_PARAMS fixture verifies index 0x0c when chord 0C is selected. The note bytes are a memory representation of the current chord; in HYP_PARAMS they match the entry selected in the persistent Hypersynth tail chord table. Both byte regions remain separately stored.  |
+| `current_chord` | `0x00..0x06` | 7 | [hypersynth_current_chord](#type-hypersynth_current_chord) | - | Current/edit chord state. The HYP_PARAMS fixture verifies index 0x0c when chord 0C is selected. The note bytes are a memory representation of the current chord; in HYP_PARAMS they match the entry selected in the persistent Hypersynth tail chord table. Both byte regions remain separately stored.  |
 | `scale` | `0x07` | 1 | `u1` | - |  |
 | `shift` | `0x08` | 1 | `u1` | - |  |
 | `swarm` | `0x09` | 1 | `u1` | - |  |
@@ -203,7 +203,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `index` | `0x00` | 1 | `u1` | - |  |
-| `notes` | `0x01..0x06` | 6 | [hypersynth_chord_notes](parameters.md#type-hypersynth_chord_notes) | - |  |
+| `notes` | `0x01..0x06` | 6 | [hypersynth_chord_notes](#type-hypersynth_chord_notes) | - |  |
 
 ## Type: hypersynth_chord_notes
 
@@ -232,10 +232,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `operator_1` | `0x00` | 1 | `u1`; [fm_synth_operator_shape](parameters.md#enum-fm_synth_operator_shape) | - |  |
-| `operator_2` | `0x01` | 1 | `u1`; [fm_synth_operator_shape](parameters.md#enum-fm_synth_operator_shape) | - |  |
-| `operator_3` | `0x02` | 1 | `u1`; [fm_synth_operator_shape](parameters.md#enum-fm_synth_operator_shape) | - |  |
-| `operator_4` | `0x03` | 1 | `u1`; [fm_synth_operator_shape](parameters.md#enum-fm_synth_operator_shape) | - |  |
+| `operator_1` | `0x00` | 1 | `u1`; [fm_synth_operator_shape](#enum-fm_synth_operator_shape) | - |  |
+| `operator_2` | `0x01` | 1 | `u1`; [fm_synth_operator_shape](#enum-fm_synth_operator_shape) | - |  |
+| `operator_3` | `0x02` | 1 | `u1`; [fm_synth_operator_shape](#enum-fm_synth_operator_shape) | - |  |
+| `operator_4` | `0x03` | 1 | `u1`; [fm_synth_operator_shape](#enum-fm_synth_operator_shape) | - |  |
 
 ## Type: fm_synth_operator_ratios
 
@@ -247,10 +247,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `operator_1` | `0x00..0x01` | 2 | [fm_synth_operator_ratio](parameters.md#type-fm_synth_operator_ratio) | - |  |
-| `operator_2` | `0x02..0x03` | 2 | [fm_synth_operator_ratio](parameters.md#type-fm_synth_operator_ratio) | - |  |
-| `operator_3` | `0x04..0x05` | 2 | [fm_synth_operator_ratio](parameters.md#type-fm_synth_operator_ratio) | - |  |
-| `operator_4` | `0x06..0x07` | 2 | [fm_synth_operator_ratio](parameters.md#type-fm_synth_operator_ratio) | - |  |
+| `operator_1` | `0x00..0x01` | 2 | [fm_synth_operator_ratio](#type-fm_synth_operator_ratio) | - |  |
+| `operator_2` | `0x02..0x03` | 2 | [fm_synth_operator_ratio](#type-fm_synth_operator_ratio) | - |  |
+| `operator_3` | `0x04..0x05` | 2 | [fm_synth_operator_ratio](#type-fm_synth_operator_ratio) | - |  |
+| `operator_4` | `0x06..0x07` | 2 | [fm_synth_operator_ratio](#type-fm_synth_operator_ratio) | - |  |
 
 ## Type: fm_synth_operator_ratio
 
@@ -275,10 +275,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `operator_1` | `0x00..0x01` | 2 | [fm_synth_operator_level_feedback](parameters.md#type-fm_synth_operator_level_feedback) | - |  |
-| `operator_2` | `0x02..0x03` | 2 | [fm_synth_operator_level_feedback](parameters.md#type-fm_synth_operator_level_feedback) | - |  |
-| `operator_3` | `0x04..0x05` | 2 | [fm_synth_operator_level_feedback](parameters.md#type-fm_synth_operator_level_feedback) | - |  |
-| `operator_4` | `0x06..0x07` | 2 | [fm_synth_operator_level_feedback](parameters.md#type-fm_synth_operator_level_feedback) | - |  |
+| `operator_1` | `0x00..0x01` | 2 | [fm_synth_operator_level_feedback](#type-fm_synth_operator_level_feedback) | - |  |
+| `operator_2` | `0x02..0x03` | 2 | [fm_synth_operator_level_feedback](#type-fm_synth_operator_level_feedback) | - |  |
+| `operator_3` | `0x04..0x05` | 2 | [fm_synth_operator_level_feedback](#type-fm_synth_operator_level_feedback) | - |  |
+| `operator_4` | `0x06..0x07` | 2 | [fm_synth_operator_level_feedback](#type-fm_synth_operator_level_feedback) | - |  |
 
 ## Type: fm_synth_operator_level_feedback
 
@@ -303,10 +303,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `operator_1` | `0x00` | 1 | `u1`; [fm_synth_operator_mod_slot](parameters.md#enum-fm_synth_operator_mod_slot) | - |  |
-| `operator_2` | `0x01` | 1 | `u1`; [fm_synth_operator_mod_slot](parameters.md#enum-fm_synth_operator_mod_slot) | - |  |
-| `operator_3` | `0x02` | 1 | `u1`; [fm_synth_operator_mod_slot](parameters.md#enum-fm_synth_operator_mod_slot) | - |  |
-| `operator_4` | `0x03` | 1 | `u1`; [fm_synth_operator_mod_slot](parameters.md#enum-fm_synth_operator_mod_slot) | - |  |
+| `operator_1` | `0x00` | 1 | `u1`; [fm_synth_operator_mod_slot](#enum-fm_synth_operator_mod_slot) | - |  |
+| `operator_2` | `0x01` | 1 | `u1`; [fm_synth_operator_mod_slot](#enum-fm_synth_operator_mod_slot) | - |  |
+| `operator_3` | `0x02` | 1 | `u1`; [fm_synth_operator_mod_slot](#enum-fm_synth_operator_mod_slot) | - |  |
+| `operator_4` | `0x03` | 1 | `u1`; [fm_synth_operator_mod_slot](#enum-fm_synth_operator_mod_slot) | - |  |
 
 ## Type: fm_synth_mod_values
 
@@ -355,7 +355,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
 | `amp` | `0x00` | 1 | `u1` | - |  |
-| `limit` | `0x01` | 1 | `u1`; [limit_type](parameters.md#enum-limit_type) | - |  |
+| `limit` | `0x01` | 1 | `u1`; [limit_type](#enum-limit_type) | - |  |
 | `pan` | `0x02` | 1 | `u1` | - |  |
 
 ## Type: mixer_params

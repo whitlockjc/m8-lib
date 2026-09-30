@@ -7,8 +7,10 @@ firmware-versioned fixtures, and human-readable references generated from the
 schemas. It does not provide a user-facing M8 library or production
 reader/writer.
 
-My hopes are that this information helps others to build tooling for the M8
-community.
+This is an independent community project. It is not an official Dirtywave M8
+project and is not affiliated with or endorsed by Dirtywave. My hopes are that
+this information helps others to build tooling for the M8 community as easily
+as possible.
 
 ## Supported firmware ranges
 

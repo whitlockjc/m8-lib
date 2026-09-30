@@ -109,10 +109,10 @@ for (const fixture of instrumentFixtures) {
           [...bytes.subarray(offset + 1, offset + 7)],
           `${fixture} chord ${index} notes`)
       }
-      assert.deepEqual(Buffer.from(tail.unknownAfterChords), bytes.subarray(0xd5, 0xe5),
+      assert.deepEqual(Buffer.from(tail.unknown), bytes.subarray(0xd5, 0xe5),
         `${fixture} unknown after chords`)
     } else {
-      assert.deepEqual(Buffer.from(tail.unknownAfterModulators), bytes.subarray(0x65, 0xe5),
+      assert.deepEqual(Buffer.from(tail.unknown), bytes.subarray(0x65, 0xe5),
         `${fixture} unknown after modulators`)
     }
   }

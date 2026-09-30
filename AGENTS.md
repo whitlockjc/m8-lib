@@ -91,6 +91,7 @@ Use these top-level directories as the project grows:
   fixtures or schema evidence.
   Generated references mirror `schemas/` directly: `docs/6.5.x.md` links to
   shared `docs/common/` and `docs/file-versions/` components. Keep
+  `docs/fx_commands.md` as the generated, firmware-aware FX enum catalog.
   developer-facing design notes at the top level and research notes in
   `docs/research/`. Edit schemas, then run `npm run docs:generate`; do not edit generated
   references by hand. See `docs/DOCUMENTATION_GENERATION.md` for target setup.

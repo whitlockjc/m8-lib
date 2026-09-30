@@ -16,12 +16,12 @@ File schema version: `6.5.0`.
 
 ## Contents
 
-- [Layout](eq.md#layout)
-- [eq_settings](eq.md#type-eq_settings)
-- [instrument_eqs](eq.md#type-instrument_eqs)
-- [eq_band](eq.md#type-eq_band)
-- [eq_filter_type (enum)](eq.md#enum-eq_filter_type)
-- [eq_filter_mode (enum)](eq.md#enum-eq_filter_mode)
+- [Layout](#layout)
+- [eq_settings](#type-eq_settings)
+- [instrument_eqs](#type-instrument_eqs)
+- [eq_band](#type-eq_band)
+- [eq_filter_type (enum)](#enum-eq_filter_type)
+- [eq_filter_mode (enum)](#enum-eq_filter_mode)
 
 ## Layout
 
@@ -41,9 +41,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `low_band` | `0x00..0x05` | 6 | [eq_band](eq.md#type-eq_band) | - |  |
-| `mid_band` | `0x06..0x0b` | 6 | [eq_band](eq.md#type-eq_band) | - |  |
-| `high_band` | `0x0c..0x11` | 6 | [eq_band](eq.md#type-eq_band) | - |  |
+| `low_band` | `0x00..0x05` | 6 | [eq_band](#type-eq_band) | - | Low EQ band. |
+| `mid_band` | `0x06..0x0b` | 6 | [eq_band](#type-eq_band) | - | Mid EQ band. |
+| `high_band` | `0x0c..0x11` | 6 | [eq_band](#type-eq_band) | - | High EQ band. |
 
 ## Type: instrument_eqs
 
@@ -55,7 +55,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x8ff` | 2304 | [eq_settings](eq.md#type-eq_settings) | `repeat`: `expr`; `repeat-expr`: `128` |  |
+| `entries` | `0x00..0x8ff` | 2304 | [eq_settings](#type-eq_settings) | `repeat`: `expr`; `repeat-expr`: `128` | Three-band EQ storage. Each known EQ uses three adjacent 6-byte band records.  |
 
 ## Type: eq_band
 
@@ -71,10 +71,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `type_and_mode` | `0x00` | 1 | `u1` | - |  |
-| `frequency` | `0x01..0x02` | 2 | `u2` | - |  |
-| `gain` | `0x03..0x04` | 2 | `s2` | - |  |
-| `q` | `0x05` | 1 | `u1` | - |  |
+| `type_and_mode` | `0x00` | 1 | `u1` | - | Packed filter type and channel mode. |
+| `frequency` | `0x01..0x02` | 2 | `u2` | - | Band frequency stored as an unsigned little-endian integer. |
+| `gain` | `0x03..0x04` | 2 | `s2` | - | Signed band gain in hundredths. |
+| `q` | `0x05` | 1 | `u1` | - | Band Q value. |
 
 ### Instances
 
@@ -82,8 +82,8 @@ Value expressions do not consume bytes. Positioned instances read the specified 
 
 | Name | Type | Expression / Position / Rules | Description |
 | --- | --- | --- | --- |
-| `filter_type` | derived; [eq_filter_type](eq.md#enum-eq_filter_type) | `value`: `type_and_mode & 0x1f` |  |
-| `filter_mode` | derived; [eq_filter_mode](eq.md#enum-eq_filter_mode) | `value`: `type_and_mode >> 5` |  |
+| `filter_type` | derived; [eq_filter_type](#enum-eq_filter_type) | `value`: `type_and_mode & 0x1f` |  |
+| `filter_mode` | derived; [eq_filter_mode](#enum-eq_filter_mode) | `value`: `type_and_mode >> 5` |  |
 
 ## Enum: eq_filter_type
 

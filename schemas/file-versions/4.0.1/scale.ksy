@@ -12,10 +12,12 @@ doc: |
 seq:
   - id: enabled_notes
     type: u2
+    doc: Bitmask selecting the enabled intervals.
   - id: intervals
     type: interval
     repeat: expr
     repeat-expr: 12
+    doc: Twelve interval offsets in Scale View order.
   - id: name
     size: 16
     doc: |
@@ -35,3 +37,4 @@ types:
     seq:
       - id: offset
         type: s2
+        doc: Signed interval offset in hundredths of a semitone.

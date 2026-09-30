@@ -26,7 +26,28 @@ test('every reachable type, instance, and enum is documented', () => {
       for (const field of definition.seq || []) assert.ok(source.includes('`' + field.id + '`'))
       for (const name of Object.keys(definition.instances || {})) assert.ok(source.includes('`' + name + '`'))
     }
-    for (const name of Object.keys(context.data.enums || {})) assert.ok(source.includes(`## Enum: ${name}\n`))
+    for (const name of Object.keys(context.data.enums || {})) {
+      if (name === 'phrase_fx_command' || name.endsWith('_table_fx_command')) {
+        assert.ok(!source.includes(`## Enum: ${name}\n`))
+      } else assert.ok(source.includes(`## Enum: ${name}\n`))
+    }
+  }
+})
+
+test('adjacent unknown byte regions are represented as one field', () => {
+  for (const context of graph(load(target.entry))) {
+    for (const definition of [context.data, ...Object.values(context.data.types || {})]) {
+      const fields = definition.seq || []
+      for (let index = 1; index < fields.length; index++) {
+        const isUnknown = field => /^unknown(?:_\d+)?$/.test(field.id)
+        assert.ok(!(isUnknown(fields[index - 1]) && isUnknown(fields[index])),
+          `${context.file}: adjacent unknown fields ${fields[index - 1].id} and ${fields[index].id}`)
+      }
+    }
+  }
+  for (const version of ['6.0.1', '6.0.2']) {
+    const source = YAML.parse(fs.readFileSync(`schemas/file-versions/${version}/instrument.ksy`, 'utf8'))
+    assert.deepEqual(source.types.wavsynth_body_before_eq.seq.slice(0, 1), [{ id: 'unknown_0', size: 3 }])
   }
 })
 
@@ -35,7 +56,9 @@ test('absolute file offsets and relative repeated layouts are correct', () => {
   assert.match(page('/6.5.x.md'), /Header: 14 bytes\. Body: 46 bytes/)
   assert.match(page('/6.5.x.md'), /Header: 14 bytes\. Body: 343 bytes/)
   assert.match(page('/6.5.x.md'), /`instruments` \| `0x13a3e\.\.0x1a5bd/)
-  assert.match(page('/6.5.x.md'), /`unknown_after_reverb_eq` \| `0x1b6a6 onward` \| variable/)
+  assert.match(page('/6.5.x.md'), /`unknown_2` \| `0x1b6a6 onward` \| variable/)
+  assert.match(page('/6.5.x.md'), /`repeat`: `256` via `entries`/)
+  assert.match(page('/6.5.x.md'), /## Instrument/)
   assert.match(page('/instrument/table.md'), /`fx` \| `0x02\.\.0x07` \| 6/)
 })
 
@@ -48,9 +71,41 @@ test('dynamic strings, switches, processing expressions, and raw labels survive'
   assert.match(page('/common/file_header.md'), /schema_version_patch/)
 })
 
+test('FX values are generated once and linked from phrase and table references', () => {
+  const catalog = page('/fx_commands.md')
+  for (const firmware of ['6.5.x', '6.6.x']) assert.ok(catalog.includes(`## ${firmware}\n`))
+  for (const heading of ['Instrument (Current Instrument)', 'Instrument Mods', 'Mixer & Effects', 'Sequencer']) {
+    assert.ok(catalog.includes(`### ${heading}\n`))
+  }
+  assert.match(catalog, /\| `0x00` \| ARP \|/)
+  assert.match(catalog, /\| `0x1b` \| VMV \|/)
+  assert.match(catalog, /\| `0x83` \| OSC \|/)
+  assert.match(catalog, /No verified command-value enum is available yet/)
+  for (const suffix of ['/instrument/table.md', '/song/sequencing.md']) {
+    const source = page(suffix)
+    assert.match(source, /\[FX command reference\]\([^)]*fx_commands\.md\)/)
+    assert.doesNotMatch(source, /\| `0x83` \| OSC \|/)
+    assert.doesNotMatch(source, /^## Enum: .*fx_command$/m)
+  }
+})
+
 test('all generated cross-links resolve, including type and enum anchors', () => {
   assert.ok(verifyLinks(rendered) > 100)
   assert.throws(() => verifyLinks(new Map([[path.resolve('docs/bad.md'), '[bad](missing.md)']])), /broken link/)
+})
+
+test('generated contents links are local anchors to rendered headings', () => {
+  let checked = 0
+  for (const [file, source] of rendered) {
+    const contents = source.split('## Contents\n')[1]?.split('\n## ')[0]
+    if (!contents) continue
+    for (const [, href] of contents.matchAll(/^- \[[^\]\n]+\]\(([^)]+)\)$/gm)) {
+      assert.match(href, /^#[a-z0-9_-]+$/, `${file}: ${href}`)
+      checked++
+    }
+  }
+  assert.ok(checked > 20)
+  verifyLinks(rendered)
 })
 
 test('unknown length and unequal-size switch never yield fabricated offsets', () => {

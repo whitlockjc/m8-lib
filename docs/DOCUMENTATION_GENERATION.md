@@ -9,6 +9,10 @@ offsets. Component pages under `common/` and `file-versions/` use relative
 record offsets. Type, enum, import, and source links follow schema ownership.
 Shared component pages are generated once, independent of firmware provenance;
 their schema descriptions may still cite firmware-specific research evidence.
+The generated [FX command reference](fx_commands.md) is an additional page:
+it groups command enums from the schemas selected by each registered firmware
+entry. Phrase and Instrument Table pages link to it instead of repeating their
+FX enum values. Other enum definitions remain on their owning component pages.
 
 Design and workflow documents stay directly under `docs/`. Research notes and
 the active research backlog live in `docs/research/`.
@@ -25,7 +29,7 @@ Run `npm run docs:generate` for all registered targets, or
 every output without writing. `npm run verify` additionally checks generated
 cross-links, generation tests, and the existing fixture suite.
 
-All reference pages are generated in full, including nested types, repeated
+All reference pages are generated from schemas, including nested types, repeated
 fields, switch cases, enum values and original labels, schema descriptions,
 validation/storage attributes, and calculated instances. Edit Kaitai to change
 these facts, then regenerate. Do not edit generated Markdown.

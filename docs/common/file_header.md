@@ -16,8 +16,8 @@ this file, not necessarily the M8 firmware version used to create it.
 
 ## Contents
 
-- [Layout](file_header.md#layout)
-- [file_kind (enum)](file_header.md#enum-file_kind)
+- [Layout](#layout)
+- [file_kind (enum)](#enum-file_kind)
 
 ## Layout
 
@@ -33,7 +33,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `reserved_0` | `0x09` | 1 | `u1` | `valid`: `0` |  |
 | `schema_version_raw` | `0x0a..0x0b` | 2 | `u2` | - | Packed schema version as major/minor/patch nibbles. |
 | `reserved_1` | `0x0c` | 1 | `u1` | `valid`: `0` |  |
-| `file_kind` | `0x0d` | 1 | `u1`; [file_kind](file_header.md#enum-file_kind) | - |  |
+| `file_kind` | `0x0d` | 1 | `u1`; [file_kind](#enum-file_kind) | - |  |
 
 ### Instances
 

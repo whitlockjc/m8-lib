@@ -21,8 +21,8 @@ File schema version: `1.0.2`.
 
 ## Contents
 
-- [Layout](theme.md#layout)
-- [color](theme.md#type-color)
+- [Layout](#layout)
+- [color](#type-color)
 
 ## Layout
 
@@ -34,19 +34,19 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `background` | `0x00..0x02` | 3 | [color](theme.md#type-color) | - |  |
-| `text_empty` | `0x03..0x05` | 3 | [color](theme.md#type-color) | - |  |
-| `text_info` | `0x06..0x08` | 3 | [color](theme.md#type-color) | - |  |
-| `text_default` | `0x09..0x0b` | 3 | [color](theme.md#type-color) | - |  |
-| `text_value` | `0x0c..0x0e` | 3 | [color](theme.md#type-color) | - |  |
-| `text_titles` | `0x0f..0x11` | 3 | [color](theme.md#type-color) | - |  |
-| `play_markers` | `0x12..0x14` | 3 | [color](theme.md#type-color) | - |  |
-| `cursor` | `0x15..0x17` | 3 | [color](theme.md#type-color) | - |  |
-| `selection` | `0x18..0x1a` | 3 | [color](theme.md#type-color) | - |  |
-| `scope_slider` | `0x1b..0x1d` | 3 | [color](theme.md#type-color) | - |  |
-| `meter_low` | `0x1e..0x20` | 3 | [color](theme.md#type-color) | - |  |
-| `meter_mid` | `0x21..0x23` | 3 | [color](theme.md#type-color) | - |  |
-| `meter_peak` | `0x24..0x26` | 3 | [color](theme.md#type-color) | - |  |
+| `background` | `0x00..0x02` | 3 | [color](#type-color) | - | Background color. |
+| `text_empty` | `0x03..0x05` | 3 | [color](#type-color) | - | Color for empty text. |
+| `text_info` | `0x06..0x08` | 3 | [color](#type-color) | - | Color for informational text. |
+| `text_default` | `0x09..0x0b` | 3 | [color](#type-color) | - | Default text color. |
+| `text_value` | `0x0c..0x0e` | 3 | [color](#type-color) | - | Color for displayed values. |
+| `text_titles` | `0x0f..0x11` | 3 | [color](#type-color) | - | Color for titles. |
+| `play_markers` | `0x12..0x14` | 3 | [color](#type-color) | - | Color for play markers. |
+| `cursor` | `0x15..0x17` | 3 | [color](#type-color) | - | Cursor color. |
+| `selection` | `0x18..0x1a` | 3 | [color](#type-color) | - | Selection color. |
+| `scope_slider` | `0x1b..0x1d` | 3 | [color](#type-color) | - | Color for scopes and sliders. |
+| `meter_low` | `0x1e..0x20` | 3 | [color](#type-color) | - | Low meter color. |
+| `meter_mid` | `0x21..0x23` | 3 | [color](#type-color) | - | Mid meter color. |
+| `meter_peak` | `0x24..0x26` | 3 | [color](#type-color) | - | Peak meter color. |
 
 ## Type: color
 
@@ -59,6 +59,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `r` | `0x00` | 1 | `u1` | - |  |
-| `g` | `0x01` | 1 | `u1` | - |  |
-| `b` | `0x02` | 1 | `u1` | - |  |
+| `r` | `0x00` | 1 | `u1` | - | Red component. |
+| `g` | `0x01` | 1 | `u1` | - | Green component. |
+| `b` | `0x02` | 1 | `u1` | - | Blue component. |

@@ -46,7 +46,7 @@ for (const name of ['DEFAULT', 'MODFX_COMB', 'BOOKMARKS']) {
   assert.equal(song.instruments.entries.length, 128, `${name} instruments`)
   assert.equal(song.bookmarks.entries.length, 256, `${name} chain bookmark rows`)
   assert.equal(song.rowBookmarkColors.entries.length, 256, `${name} color bookmark rows`)
-  assert.deepEqual(Buffer.from(song.unknownAfterReverbEq), bytes.subarray(0x1b6a6, 0x1b6c6))
+  assert.deepEqual(Buffer.from(song.unknown2), bytes.subarray(0x1b6a6, 0x1b6c6))
   for (let row = 0; row < 256; row++) {
     assert.equal(song.bookmarks.entries[row].trackMask, bytes[0x1a97e + row], `${name} chain row ${row}`)
     assert.equal(song.rowBookmarkColors.entries[row].color, bytes[0x1b6c6 + row], `${name} color row ${row}`)
