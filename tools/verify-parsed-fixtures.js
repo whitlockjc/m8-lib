@@ -97,7 +97,7 @@ for (const fixture of instrumentFixtures) {
   if (name === 'NONE') {
     assert.deepEqual(Buffer.from(body.unknown), bytes.subarray(0x1d, 0xe5), `${fixture} NONE body`)
   } else {
-    assert.equal(body.modulators.slots.length, 4, `${fixture} modulator boundary`)
+    assert.equal(body.modulators.length, 4, `${fixture} modulator boundary`)
     if (name === 'SAM' || name === 'SAMS' || name === 'SAMB') {
       const region = bytes.subarray(0x65, 0xe5)
       const terminator = region.indexOf(0)
@@ -126,10 +126,10 @@ for (const fixture of instrumentFixtures) {
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/songs/INSTRUMENTS.m8s')
-  assert.equal(file.body.instruments.entries.length, 128, 'Song instrument count')
+  assert.equal(file.body.instruments.length, 128, 'Song instrument count')
   for (const [index, name] of [[0, 'WAV'], [127, 'HYP']]) {
     const standalone = parse(`fixtures/6.5.x/instruments/${name}_DEFAULT.m8i`)
-    const embedded = file.body.instruments.entries[index]
+    const embedded = file.body.instruments[index]
     const offset = 0x13a3e + index * 215
     assert.equal(embedded.generalSettings.type, standalone.file.body.instrument.generalSettings.type)
     assert.equal(embedded.body.eq, standalone.file.body.instrument.body.eq)
@@ -142,7 +142,7 @@ for (const fixture of instrumentFixtures) {
 {
   const song = parse('fixtures/6.5.x/songs/DEFAULT.m8s')
   const standalone = parse('fixtures/6.5.x/scales/CHROMATIC_DEFAULT.m8n')
-  const embedded = song.file.body.scales.entries[0]
+  const embedded = song.file.body.scales[0]
   const scale = standalone.file.body
   assert.equal(embedded.enabledNotes, scale.enabledNotes)
   assert.equal(embedded.tuningOffset, scale.tuningOffset)
@@ -153,7 +153,7 @@ for (const fixture of instrumentFixtures) {
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/songs/TABLES.m8s')
-  const tables = file.body.tables.entries
+  const tables = file.body.tables
   assert.equal(tables.length, 256, 'Song table count')
   for (const [index, table] of tables.entries()) {
     verifyTable(table, bytes, 0xba3e + index * 128, `Song table ${index}`)
@@ -196,7 +196,7 @@ for (const name of ['WAV', 'MAC', 'SAM', 'MID', 'FM', 'HYP', 'EXT']) {
   const observed = new Set()
   for (const variant of ['A', 'B']) {
     const { bytes, file } = parse(`fixtures/6.5.x/instruments/${name}_MODS_${variant}.m8i`)
-    const slots = file.body.instrument.body.modulators.slots
+    const slots = file.body.instrument.body.modulators
     assert.equal(slots.length, 4, `${name} modulation slots`)
 
     for (const [index, slot] of slots.entries()) {
@@ -338,29 +338,29 @@ for (const [name, offset, expected] of [
 
 {
   const { file } = parse('fixtures/6.5.x/songs/PHRASES.m8s')
-  const step = file.body.phrases.entries[0].steps[0]
+  const step = file.body.phrases[0].steps[0]
   assert.deepEqual(step.fx.map(({ command, value }) => [command, value]),
     [[0x00, 0xff], [0x45, 0xfe], [0x01, 0xfd]])
 }
 
 {
   const { file } = parse('fixtures/6.5.x/songs/MIDI_MAPPING.m8s')
-  assert.equal(file.body.midiMappings.entries.length, 128)
-  assert.equal(file.body.midiMappings.entries[0].channel, 1)
+  assert.equal(file.body.midiMappings.length, 128)
+  assert.equal(file.body.midiMappings[0].channel, 1)
 }
 
 {
   const { file } = parse('fixtures/6.5.x/songs/SONG_ROWS.m8s')
-  assert.deepEqual(file.body.rows.entries[0].tracks, [1, 2, 3, 4, 5, 6, 7, 8])
-  assert.deepEqual(file.body.rows.entries[255].tracks,
+  assert.deepEqual(file.body.rows[0].tracks, [1, 2, 3, 4, 5, 6, 7, 8])
+  assert.deepEqual(file.body.rows[255].tracks,
     [0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe])
 }
 
 {
   const { bytes, file } = parse('fixtures/6.5.x/songs/SCALES.m8s')
-  const first = file.body.scales.entries[0]
-  const last = file.body.scales.entries[15]
-  assert.equal(file.body.scales.entries.length, 16)
+  const first = file.body.scales[0]
+  const last = file.body.scales[15]
+  assert.equal(file.body.scales.length, 16)
   assert.equal(first.enabledNotes, bytes.readUInt16LE(0x1aa7e))
   assert.equal(first.intervals[0].offset, bytes.readInt16LE(0x1aa80))
   assert.deepEqual(Buffer.from(first.name), bytes.subarray(0x1aa98, 0x1aaa8))

@@ -25,15 +25,7 @@ FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: instrument_params
-
-`instrument_params`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

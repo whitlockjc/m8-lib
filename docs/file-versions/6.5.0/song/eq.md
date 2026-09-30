@@ -9,31 +9,22 @@ Byte order: `le`.
 Shared EQ layout for Song Instrument banks and Mix, Mod FX, Delay, and
 Reverb EQs in file schema version 6.5.0.
 
-
 File schema version: `6.5.0`.
 
 ## Contents
 
 - [Layout](#layout)
 - [settings](#type-settings)
-- [instrument_bank](#type-instrument_bank)
 - [band](#type-band)
 - [filter_type (enum)](#enum-filter_type)
 - [filter_mode (enum)](#enum-filter_mode)
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: settings
-
-`settings`
 
 Three-band EQ storage. Each known EQ uses three adjacent 6-byte band
 records.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -43,27 +34,12 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `mid_band` | `0x06..0x0b` | 6 | [band](#type-band) | - | Mid EQ band. |
 | `high_band` | `0x0c..0x11` | 6 | [band](#type-band) | - | High EQ band. |
 
-## Type: instrument_bank
-
-`instrument_bank`
-
-128 assignable Instrument EQ banks, each with the standard 18-byte EQ layout.
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x8ff` | 2304 | [settings](#type-settings) | `repeat`: `expr`; `repeat-expr`: `128` |  |
-
 ## Type: band
-
-`band`
 
 Six-byte EQ band record. The type and mode are packed into one byte: bits
 0..4 hold the filter type and bits 5..7 hold the filter mode. Frequency
 is stored as an unsigned little-endian integer. Gain is stored as signed
 hundredths, so 10.50 is stored as 1050.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

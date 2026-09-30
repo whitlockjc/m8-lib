@@ -17,10 +17,6 @@ File schema version: `6.0.2`.
 
 ## Layout
 
-Root record.
-
-
-
 ## Enum: shape
 
 `shape`

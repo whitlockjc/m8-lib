@@ -24,15 +24,6 @@ doc: |
   Song rows, phrases, chains, and grooves for file schema
   version 6.5.0. The Song body determines their positions.
 types:
-  grooves:
-    doc: |
-      Thirty-two grooves, each containing 16 one-byte step values.
-    seq:
-      - id: entries
-        type: groove
-        repeat: expr
-        repeat-expr: 32
-        doc: Thirty-two Song groove definitions.
   groove:
     doc: Sixteen-byte Groove record containing one byte per step.
     seq:
@@ -41,15 +32,6 @@ types:
         repeat: expr
         repeat-expr: 16
         doc: Sixteen groove step values.
-  phrases:
-    doc: |
-      Phrases indexed 0x00 through 0xfe; 0xff is an unset phrase reference.
-    seq:
-      - id: entries
-        type: phrase
-        repeat: expr
-        repeat-expr: 255
-        doc: Stored phrases indexed 0x00 through 0xfe.
   phrase:
     doc: One hundred forty-four byte Phrase record containing 16 phrase steps.
     seq:
@@ -80,15 +62,6 @@ types:
           Three shared FX slots. The UI groups commands as Sequencer,
           Mixer & Effects, Current Instrument, and Instrument Mods. Available
           labels depend on the surrounding instrument and modulation type.
-  rows:
-    doc: |
-      Song View storage of 256 rows, each with one chain index per track.
-    seq:
-      - id: entries
-        type: row
-        repeat: expr
-        repeat-expr: 256
-        doc: Song rows indexed 0x00 through 0xff.
   row:
     doc: |
       Eight-byte Song View row. Each byte stores the chain index assigned to a
@@ -99,16 +72,6 @@ types:
         repeat: expr
         repeat-expr: 8
         doc: Chain index for each of the eight tracks; 0xff is unset.
-  chains:
-    doc: |
-      Chain View storage. Chains have indexes 0x00 through 0xfe; 0xff is
-      the unset reference sentinel. Each chain stores 16 rows.
-    seq:
-      - id: entries
-        type: chain
-        repeat: expr
-        repeat-expr: 255
-        doc: Stored chains indexed 0x00 through 0xfe.
   chain:
     doc: Thirty-two-byte Chain View record containing 16 two-byte rows.
     seq:

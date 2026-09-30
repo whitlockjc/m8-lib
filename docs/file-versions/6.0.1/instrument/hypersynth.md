@@ -23,15 +23,7 @@ FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: instrument_params
-
-`instrument_params`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -46,10 +38,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: current_chord
 
-`current_chord`
-
-
-
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
@@ -58,10 +46,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `notes` | `0x01..0x06` | 6 | [chord_notes](#type-chord_notes) | - |  |
 
 ## Type: chord_notes
-
-`chord_notes`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -75,10 +59,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `note_6` | `0x05` | 1 | `u1` | - |  |
 
 ## Type: chord
-
-`chord`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

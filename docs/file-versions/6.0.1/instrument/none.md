@@ -17,5 +17,3 @@ File schema version: `6.0.1`.
 FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
-
-Root record.

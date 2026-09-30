@@ -9,7 +9,6 @@ Byte order: `le`.
 Scale body with an enabled-note bitmask, 12 interval offsets, a fixed-size
 name, and a tuning offset.
 
-
 File schema version: `4.0.1`.
 
 ## Contents
@@ -18,10 +17,6 @@ File schema version: `4.0.1`.
 - [interval](#type-interval)
 
 ## Layout
-
-Root record.
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -34,10 +29,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: interval
 
-`interval`
-
 Signed interval offset stored as hundredths of a semitone.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

@@ -9,7 +9,6 @@ Byte order: `le`.
 Theme body with 13 color triples. RGB versus HSV editing mode is not stored
 in the Theme file.
 
-
 File schema version: `1.0.2`.
 
 ## Contents
@@ -18,10 +17,6 @@ File schema version: `1.0.2`.
 - [color](#type-color)
 
 ## Layout
-
-Root record.
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -43,10 +38,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: color
 
-`color`
-
 Three adjacent color component bytes.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

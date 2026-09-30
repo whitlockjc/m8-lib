@@ -11,7 +11,6 @@ Standalone Instruments append one table; Songs store 256 tables separately.
 FX slots can use the M8 UI's Sequencer, Mixer & Effects, Current Instrument,
 and Instrument Mods command groups. Command labels depend on context.
 
-
 File schema version: `6.0.1`.
 
 ## Imports
@@ -27,10 +26,6 @@ FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
-Root record.
-
-
-
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
@@ -38,8 +33,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `rows` | `0x00..0x7f` | 128 | [row](#type-row) | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen rows of transpose, volume, and three FX slots. |
 
 ## Type: row
-
-`row`
 
 One eight-byte instrument table row.
 

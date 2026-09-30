@@ -30,15 +30,7 @@ FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: instrument_params
-
-`instrument_params`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -54,10 +46,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: operator_shapes
 
-`operator_shapes`
-
-
-
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
@@ -68,10 +56,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `operator_4` | `0x03` | 1 | `u1`; [operator_shape](#enum-operator_shape) | - |  |
 
 ## Type: operator_ratios
-
-`operator_ratios`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -84,10 +68,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: operator_ratio
 
-`operator_ratio`
-
-
-
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
@@ -96,10 +76,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `ratio_fine` | `0x01` | 1 | `u1` | - |  |
 
 ## Type: operator_level_feedbacks
-
-`operator_level_feedbacks`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -112,10 +88,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: operator_level_feedback
 
-`operator_level_feedback`
-
-
-
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
@@ -124,10 +96,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `feedback` | `0x01` | 1 | `u1` | - |  |
 
 ## Type: operator_mod_slots
-
-`operator_mod_slots`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -139,10 +107,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `operator_4` | `0x03` | 1 | `u1`; [operator_mod_slot](#enum-operator_mod_slot) | - |  |
 
 ## Type: mod_values
-
-`mod_values`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

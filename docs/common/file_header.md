@@ -9,17 +9,12 @@ Byte order: `le`.
 Header containing the M8 signature, file schema version, and file kind.
 The file schema version is distinct from the firmware version.
 
-
 ## Contents
 
 - [Layout](#layout)
 - [file_kind (enum)](#enum-file_kind)
 
 ## Layout
-
-Root record.
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

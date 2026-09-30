@@ -9,35 +9,27 @@ Byte order: `le`.
 Mixer, Effects Settings, and Mix & Limiter Scope layouts for Song file
 schema version 6.6.2. The Song body determines their positions.
 
-
 File schema version: `6.6.2`.
 
 ## Contents
 
 - [Layout](#layout)
 - [mixer](#type-mixer)
+- [sends](#type-sends)
 - [effects_and_scope](#type-effects_and_scope)
 - [mod_fx](#type-mod_fx)
 - [delay](#type-delay)
 - [reverb](#type-reverb)
 - [mix_limiter_scope](#type-mix_limiter_scope)
-- [sends](#type-sends)
 - [mod_fx_type (enum)](#enum-mod_fx_type)
 - [dj_filter_type (enum)](#enum-dj_filter_type)
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: mixer
-
-`mixer`
 
 Mixer and Mix & Limiter Scope storage. Offsets are relative to absolute
 file offset 0x00ce.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -61,14 +53,23 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `soft_clip` | `0x1e` | 1 | `u1` | - | 0x00 means OFF; 0x01 means ON.  |
 | `ott` | `0x1f` | 1 | `u1` | - | OTT amount. |
 
-## Type: effects_and_scope
+## Type: sends
 
-`effects_and_scope`
+Effect send levels for ModFX, Delay, and Reverb.
+
+Offsets are relative to the start of this record. Repeated-field sizes include all entries.
+
+| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
+| --- | --- | ---: | --- | --- | --- |
+| `mod_fx` | `0x00` | 1 | `u1` | - | ModFX send level. |
+| `delay` | `0x01` | 1 | `u1` | - | Delay send level. |
+| `reverb` | `0x02` | 1 | `u1` | - | Reverb send level. |
+
+## Type: effects_and_scope
 
 Shared storage region for the Effects Settings and Mix & Limiter Scope
 views. Storage order does not fully match the UI grouping; the Mod FX
 type byte is stored after the Mix & Limiter Scope OTT detail bytes.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -85,11 +86,8 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: mod_fx
 
-`mod_fx`
-
 Mod FX parameter storage from the Effects Settings View. The Mod FX type
 byte is stored later in the shared Effects/Mix & Limiter Scope region.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -101,8 +99,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `reverb_send` | `0x03` | 1 | `u1` | - | ModFX send to Reverb. |
 
 ## Type: delay
-
-`delay`
 
 Delay parameter storage from the Effects Settings View.
 
@@ -117,8 +113,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `reverb_send` | `0x04` | 1 | `u1` | - | Delay send to Reverb. |
 
 ## Type: reverb
-
-`reverb`
 
 Reverb parameter storage from the Effects Settings View.
 
@@ -135,11 +129,8 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: mix_limiter_scope
 
-`mix_limiter_scope`
-
 Mix & Limiter Scope storage for OTT detail controls from the Mix &
 Limiter Scope View.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -147,20 +138,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `ott_time` | `0x00` | 1 | `u1` | - | OTT time. |
 | `ott_color` | `0x01` | 1 | `u1` | - | OTT color. |
-
-## Type: sends
-
-`sends`
-
-Effect send levels for ModFX, Delay, and Reverb.
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `mod_fx` | `0x00` | 1 | `u1` | - | ModFX send level. |
-| `delay` | `0x01` | 1 | `u1` | - | Delay send level. |
-| `reverb` | `0x02` | 1 | `u1` | - | Reverb send level. |
 
 ## Enum: mod_fx_type
 

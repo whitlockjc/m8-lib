@@ -9,7 +9,6 @@ Byte order: `le`.
 Song rows, phrases, chains, and grooves for file schema
 version 6.5.0. The Song body determines their positions.
 
-
 File schema version: `6.5.0`.
 
 ## Imports
@@ -19,14 +18,10 @@ File schema version: `6.5.0`.
 ## Contents
 
 - [Layout](#layout)
-- [grooves](#type-grooves)
 - [groove](#type-groove)
-- [phrases](#type-phrases)
 - [phrase](#type-phrase)
 - [phrase_step](#type-phrase_step)
-- [rows](#type-rows)
 - [row](#type-row)
-- [chains](#type-chains)
 - [chain](#type-chain)
 - [chain_row](#type-chain_row)
 
@@ -34,26 +29,7 @@ FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
-Root record.
-
-
-
-## Type: grooves
-
-`grooves`
-
-Thirty-two grooves, each containing 16 one-byte step values.
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x1ff` | 512 | [groove](#type-groove) | `repeat`: `expr`; `repeat-expr`: `32` | Thirty-two Song groove definitions. |
-
 ## Type: groove
-
-`groove`
 
 Sixteen-byte Groove record containing one byte per step.
 
@@ -63,22 +39,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `steps` | `0x00..0x0f` | 16 | `u1` | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen groove step values. |
 
-## Type: phrases
-
-`phrases`
-
-Phrases indexed 0x00 through 0xfe; 0xff is an unset phrase reference.
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x8f6f` | 36720 | [phrase](#type-phrase) | `repeat`: `expr`; `repeat-expr`: `255` | Stored phrases indexed 0x00 through 0xfe. |
-
 ## Type: phrase
-
-`phrase`
 
 One hundred forty-four byte Phrase record containing 16 phrase steps.
 
@@ -90,11 +51,8 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: phrase_step
 
-`phrase_step`
-
 Nine-byte Phrase step. 0xff means unset for note, volume,
 instrument, and FX command bytes. FX value bytes default to 0x00.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -105,26 +63,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `instrument` | `0x02` | 1 | `u1` | - | Instrument index; 0xff is unset. |
 | `fx` | `0x03..0x08` | 6 | [fx_slot](../../../common/fx_slot.md#layout) | `repeat`: `expr`; `repeat-expr`: `3` | Three shared FX slots. The UI groups commands as Sequencer, Mixer &amp; Effects, Current Instrument, and Instrument Mods. Available labels depend on the surrounding instrument and modulation type.  |
 
-## Type: rows
-
-`rows`
-
-Song View storage of 256 rows, each with one chain index per track.
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x7ff` | 2048 | [row](#type-row) | `repeat`: `expr`; `repeat-expr`: `256` | Song rows indexed 0x00 through 0xff. |
-
 ## Type: row
-
-`row`
 
 Eight-byte Song View row. Each byte stores the chain index assigned to a
 track; tracks[0] is M8 Track 1. 0xff means unset.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -132,23 +74,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | --- | --- | ---: | --- | --- | --- |
 | `tracks` | `0x00..0x07` | 8 | `u1` | `repeat`: `expr`; `repeat-expr`: `8` | Chain index for each of the eight tracks; 0xff is unset. |
 
-## Type: chains
-
-`chains`
-
-Chain View storage. Chains have indexes 0x00 through 0xfe; 0xff is
-the unset reference sentinel. Each chain stores 16 rows.
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x1fdf` | 8160 | [chain](#type-chain) | `repeat`: `expr`; `repeat-expr`: `255` | Stored chains indexed 0x00 through 0xfe. |
-
 ## Type: chain
-
-`chain`
 
 Thirty-two-byte Chain View record containing 16 two-byte rows.
 
@@ -160,11 +86,8 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: chain_row
 
-`chain_row`
-
 Chain row storage. The phrase byte stores the referenced phrase index;
 0xff means unset.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

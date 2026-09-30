@@ -9,7 +9,6 @@ Byte order: `le`.
 Project page and MIDI Settings storage for Song file schema version 6.5.0.
 The Song body determines the Project settings position.
 
-
 File schema version: `6.5.0`.
 
 ## Contents
@@ -24,16 +23,9 @@ File schema version: `6.5.0`.
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: settings
 
-`settings`
-
 Project page settings.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -50,10 +42,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: midi
 
-`midi`
-
 MIDI Settings page storage.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -72,11 +61,8 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: sync
 
-`sync`
-
 Sync In and Sync Out storage. The M8 UI combines each clock boolean and
 transport byte into one displayed label.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

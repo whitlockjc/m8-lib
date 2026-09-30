@@ -209,28 +209,55 @@ function renderTarget (firmware, target, catalog = targets) {
   }
   const preamble = (file, heading) => [`# ${heading}`, '',
     link(file, path.join(output, 'README.md'), 'Documentation index'), '']
+  const orderedTypes = data => {
+    const types = data.types || {}
+    const seen = new Set()
+    const ordered = []
+    const visit = fields => {
+      for (const field of fields || []) {
+        const refs = typeof field.type === 'object' ? Object.values(field.type.cases) : [field.type]
+        for (const ref of refs) {
+          if (!Object.hasOwn(types, ref) || seen.has(ref)) continue
+          seen.add(ref)
+          ordered.push(ref)
+          visit(types[ref].seq)
+        }
+      }
+    }
+    visit(data.seq)
+    for (const name of Object.keys(types)) {
+      if (seen.has(name)) continue
+      seen.add(name)
+      ordered.push(name)
+      visit(types[name].seq)
+    }
+    return ordered
+  }
   const outputs = new Map([[fxFile(), renderFxCommands(firmware, target)]])
   for (const context of modules) {
     const file = pages.get(context)
     const data = context.data
+    const typeNames = orderedTypes(data)
     const lines = [...preamble(file, data.meta.id),
       `Source: ${link(file, context.file, path.relative(root, context.file))}.`, '',
-      `Byte order: ${code(data.meta.endian || 'unspecified')}.`, '', data.doc || '', '']
+      `Byte order: ${code(data.meta.endian || 'unspecified')}.`, '']
+    if (data.doc) lines.push(data.doc.trim(), '')
     const version = path.relative(schemaRoot, context.file).match(/^file-versions[/\\]([^/\\]+)/)?.[1]
     if (version) lines.push(`File schema version: ${code(version)}.`, '')
     if (context.imports.length) lines.push('## Imports', '', ...context.imports.map(imported =>
       `- ${link(file, pages.get(imported), imported.data.meta.id)}`), '')
     lines.push('## Contents', '', `- ${link(file, file, 'Layout', 'layout')}`,
-      ...Object.keys(data.types || {}).map(name => `- ${link(file, file, name, `type-${name}`)}`),
+      ...typeNames.map(name => `- ${link(file, file, name, `type-${name}`)}`),
       ...Object.keys(data.enums || {}).filter(name => !isFxEnum(name))
         .map(name => `- ${link(file, file, `${name} (enum)`, `enum-${name}`)}`), '')
     if (context.data.meta.id === 'fx_slot' || context.data.meta.id.startsWith('table_') ||
         Object.keys(data.enums || {}).some(isFxEnum)) {
       lines.push(`FX command values: ${link(file, fxFile(), 'FX command reference')}.`, '')
     }
-    const renderDefinition = (definition, heading, anchor) => {
+    const renderDefinition = (definition, anchor) => {
       const sectionTitle = anchor === 'layout' ? 'Layout' : `Type: ${anchor.slice(5)}`
-      lines.push(`## ${sectionTitle}`, '', heading, '', definition.doc || '', '')
+      lines.push(`## ${sectionTitle}`, '')
+      if (definition.doc) lines.push(definition.doc.trim(), '')
       if (definition.seq) lines.push('Offsets are relative to the start of this record. Repeated-field sizes include all entries.', '',
         ...layout(file, context, definition.seq), '')
       if (definition.instances) {
@@ -244,8 +271,8 @@ function renderTarget (firmware, target, catalog = targets) {
         !['meta', 'seq', 'instances', 'types', 'enums', 'doc'].includes(key)))
       if (Object.keys(extras).length) lines.push('Additional schema attributes:', '', '```json', JSON.stringify(extras, null, 2), '```', '')
     }
-    renderDefinition({ ...data, doc: undefined }, 'Root record.', 'layout')
-    for (const [name, definition] of Object.entries(data.types || {})) renderDefinition(definition, code(name), `type-${name}`)
+    renderDefinition({ ...data, doc: undefined }, 'layout')
+    for (const name of typeNames) renderDefinition(data.types[name], `type-${name}`)
     for (const [name, entries] of Object.entries(data.enums || {})) {
       if (isFxEnum(name)) continue
       lines.push(`## Enum: ${name}`, '', code(name), '', '| Stored Value | Identifier | M8 Label | Description |', '| --- | --- | --- | --- |')

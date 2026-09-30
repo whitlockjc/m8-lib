@@ -85,7 +85,9 @@ types:
         type: u1
         doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
       - id: modulators
-        type: modulators
+        type: modulation_6_0_1::slot
+        repeat: expr
+        repeat-expr: 4
       - id: unknown_2
         size: 128
   macrosynth_body:
@@ -106,7 +108,9 @@ types:
         type: u1
         doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
       - id: modulators
-        type: modulators
+        type: modulation_6_0_1::slot
+        repeat: expr
+        repeat-expr: 4
       - id: unknown_2
         size: 128
   sampler_body:
@@ -130,7 +134,9 @@ types:
         type: u1
         doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
       - id: modulators
-        type: modulators
+        type: modulation_6_0_1::slot
+        repeat: expr
+        repeat-expr: 4
       - id: sample_path
         type: sampler_6_0_1::sample_path
         size: 128
@@ -148,7 +154,9 @@ types:
         type: u1
         doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
       - id: modulators
-        type: modulators
+        type: modulation_6_0_1::slot
+        repeat: expr
+        repeat-expr: 4
       - id: unknown_1
         size: 128
   fm_synth_body:
@@ -169,7 +177,9 @@ types:
         type: u1
         doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
       - id: modulators
-        type: modulators
+        type: modulation_6_0_1::slot
+        repeat: expr
+        repeat-expr: 4
       - id: unknown_2
         size: 128
   hypersynth_body:
@@ -190,7 +200,9 @@ types:
         type: u1
         doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
       - id: modulators
-        type: modulators
+        type: modulation_6_0_1::slot
+        repeat: expr
+        repeat-expr: 4
       - id: chords
         type: hypersynth_6_0_1::chord
         repeat: expr
@@ -215,21 +227,11 @@ types:
         type: u1
         doc: Common instrument EQ assignment. 0x80 displays as --; 0x7f displays as 7F.
       - id: modulators
-        type: modulators
-      - id: unknown_2
-        size: 128
-  modulators:
-    doc: |
-      Shared Common Modulation Settings block. Four six-byte slots occupy
-      standalone offsets 0x4d..0x64 in all seven editable instrument types.
-      slots[0] is M8 modulation slot 1. NONE preserves the corresponding
-      bytes as unknown, without assigning modulation semantics.
-    seq:
-      - id: slots
         type: modulation_6_0_1::slot
         repeat: expr
         repeat-expr: 4
-
+      - id: unknown_2
+        size: 128
 enums:
   type:
     0x00:

@@ -9,41 +9,19 @@ Byte order: `le`.
 MIDI Mapping records and destination groups for Song file schema version
 6.5.0. The Song body determines the 128-entry table position.
 
-
 File schema version: `6.5.0`.
 
 ## Contents
 
 - [Layout](#layout)
-- [mappings](#type-mappings)
 - [mapping](#type-mapping)
 - [destination_type (enum)](#enum-destination_type)
 
 ## Layout
 
-Root record.
-
-
-
-## Type: mappings
-
-`mappings`
-
-MIDI Mapping page storage containing 128 mapping records.
-
-
-Offsets are relative to the start of this record. Repeated-field sizes include all entries.
-
-| Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
-| --- | --- | ---: | --- | --- | --- |
-| `entries` | `0x00..0x37f` | 896 | [mapping](#type-mapping) | `repeat`: `expr`; `repeat-expr`: `128` | Up to 128 MIDI control mappings. |
-
 ## Type: mapping
 
-`mapping`
-
 Seven-byte MIDI Mapping record.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

@@ -9,7 +9,6 @@ Byte order: `le`.
 Shared modulation slot storage for M8 Instrument file schema 6.0.1.
 Destination labels remain contextual to the enclosing instrument type.
 
-
 File schema version: `6.0.1`.
 
 ## Contents
@@ -29,20 +28,13 @@ File schema version: `6.0.1`.
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: slot
-
-`slot`
 
 Shared six-byte modulation slot: one packed type/destination byte, one
 amount byte, and four type-dependent parameter bytes. The first two
 bytes are Common Modulation Settings; params selects one of six
 modulation-type-specific structures. The slot layout is independent of
 the instrument-specific destination labels.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -63,8 +55,6 @@ Value expressions do not consume bytes. Positioned instances read the specified 
 
 ## Type: ahd_env_params
 
-`ahd_env_params`
-
 AHD ENV payload; fourth byte is preserved with unknown purpose.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -78,10 +68,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: adsr_env_params
 
-`adsr_env_params`
-
-
-
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
@@ -92,8 +78,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `release` | `0x03` | 1 | `u1` | - |  |
 
 ## Type: drum_env_params
-
-`drum_env_params`
 
 DRUM ENV payload; fourth byte is preserved with unknown purpose.
 
@@ -108,8 +92,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: lfo_params
 
-`lfo_params`
-
 LFO payload; fourth byte is preserved with unknown purpose.
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
@@ -123,10 +105,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: trig_env_params
 
-`trig_env_params`
-
-
-
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
@@ -137,8 +115,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `source` | `0x03` | 1 | `u1` | - |  |
 
 ## Type: tracking_params
-
-`tracking_params`
 
 TRACKING payload; fourth byte is preserved with unknown purpose.
 

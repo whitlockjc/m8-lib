@@ -7,15 +7,6 @@ doc: |
   MIDI Mapping records and destination groups for Song file schema version
   6.5.0. The Song body determines the 128-entry table position.
 types:
-  mappings:
-    doc: |
-      MIDI Mapping page storage containing 128 mapping records.
-    seq:
-      - id: entries
-        type: mapping
-        repeat: expr
-        repeat-expr: 128
-        doc: Up to 128 MIDI control mappings.
   mapping:
     doc: |
       Seven-byte MIDI Mapping record.

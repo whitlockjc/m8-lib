@@ -22,15 +22,7 @@ FX command values: [FX command reference](../../../common/fx_commands.md).
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: instrument_params
-
-`instrument_params`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -45,10 +37,6 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `degrade` | `0x06` | 1 | `u1` | - | Sampler degrade setting. |
 
 ## Type: sample_path
-
-`sample_path`
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

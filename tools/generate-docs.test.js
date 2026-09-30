@@ -86,9 +86,38 @@ test('absolute file offsets and relative repeated layouts are correct', () => {
   assert.match(page('/6.5.x.md'), /Header: 14 bytes\. Body: 343 bytes/)
   assert.match(page('/6.5.x.md'), /`instruments` \| `0x13a3e\.\.0x1a5bd/)
   assert.match(page('/6.5.x.md'), /`unknown_2` \| `0x1b6a6 onward` \| variable/)
-  assert.match(page('/6.5.x.md'), /`repeat`: `256` via `entries`/)
+  assert.match(page('/6.5.x.md'), /`tables` \|[^\n]*`repeat-expr`: `256`/)
   assert.match(page('/6.5.x.md'), /## Instrument/)
   assert.match(page('/instrument/table.md'), /`fx` \| `0x02\.\.0x07` \| 6/)
+})
+
+test('generated sections follow storage order without duplicate headings', () => {
+  const song = page('/6.5.0/song.md')
+  const sections = ['directory', 'bookmark_row', 'eqs']
+  const positions = sections.map(name => song.indexOf(`## Type: ${name}\n`))
+  assert.ok(positions.every(position => position >= 0))
+  assert.deepEqual(positions, [...positions].sort((a, b) => a - b))
+  assert.doesNotMatch(song, /Root record\.|## Type: ([^\n]+)\n\n`\1`/)
+  for (const version of ['6.5.0', '6.6.2']) {
+    const schema = YAML.parse(fs.readFileSync(`schemas/file-versions/${version}/song.ksy`, 'utf8'))
+    const bank = schema.types.eqs.seq.find(field => field.id === 'instrument')
+    assert.equal(bank.type, 'eq_6_5_0::settings')
+    assert.equal(bank.repeat, 'expr')
+    assert.equal(bank['repeat-expr'], 128)
+    for (const name of ['grooves', 'rows', 'phrases', 'chains', 'tables', 'instruments',
+      'midi_mappings', 'bookmarks', 'scales', ...(version === '6.6.2' ? ['row_bookmark_colors'] : [])]) {
+      const field = schema.seq.find(item => item.id === name)
+      assert.equal(field.repeat, 'expr', `${version} ${name}`)
+    }
+  }
+  for (const version of ['6.0.1', '6.0.2']) {
+    const schema = YAML.parse(fs.readFileSync(`schemas/file-versions/${version}/instrument.ksy`, 'utf8'))
+    for (const name of ['wavsynth', 'macrosynth', 'sampler', 'midi_out', 'fm_synth', 'hypersynth', 'external']) {
+      const field = schema.types[`${name}_body`].seq.find(item => item.id === 'modulators')
+      assert.equal(field.type, 'modulation_6_0_1::slot')
+      assert.equal(field['repeat-expr'], 4)
+    }
+  }
 })
 
 test('firmware indexes summarize fields without repeating linked type details or research links', () => {

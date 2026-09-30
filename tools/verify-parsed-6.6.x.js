@@ -45,14 +45,14 @@ for (const name of ['DEFAULT', 'MODFX_COMB', 'BOOKMARKS']) {
   const { bytes, file } = parse(`fixtures/6.6.x/songs/${name}.m8s`)
   const song = file.body
   assert.equal(bytes.length, 112582, `${name} length`)
-  assert.equal(song.rows.entries.length, 256, `${name} Song rows`)
-  assert.equal(song.instruments.entries.length, 128, `${name} instruments`)
-  assert.equal(song.bookmarks.entries.length, 256, `${name} chain bookmark rows`)
-  assert.equal(song.rowBookmarkColors.entries.length, 256, `${name} color bookmark rows`)
+  assert.equal(song.rows.length, 256, `${name} Song rows`)
+  assert.equal(song.instruments.length, 128, `${name} instruments`)
+  assert.equal(song.bookmarks.length, 256, `${name} chain bookmark rows`)
+  assert.equal(song.rowBookmarkColors.length, 256, `${name} color bookmark rows`)
   assert.deepEqual(Buffer.from(song.unknown2), bytes.subarray(0x1b6a6, 0x1b6c6))
   for (let row = 0; row < 256; row++) {
-    assert.equal(song.bookmarks.entries[row].trackMask, bytes[0x1a97e + row], `${name} chain row ${row}`)
-    assert.equal(song.rowBookmarkColors.entries[row].color, bytes[0x1b6c6 + row], `${name} color row ${row}`)
+    assert.equal(song.bookmarks[row].trackMask, bytes[0x1a97e + row], `${name} chain row ${row}`)
+    assert.equal(song.rowBookmarkColors[row].color, bytes[0x1b6c6 + row], `${name} color row ${row}`)
   }
   assert.equal(song.effectsAndScope.modFxType, name === 'MODFX_COMB' ? 0x03 : 0x00)
 }
@@ -61,13 +61,13 @@ for (const name of ['DEFAULT', 'MODFX_COMB', 'BOOKMARKS']) {
   const { file } = parse('fixtures/6.6.x/songs/BOOKMARKS.m8s')
   const song = file.body
   for (const [row, mask] of [[0, 0x55], [1, 0xaa], [254, 0x55], [255, 0xaa]]) {
-    assert.equal(song.bookmarks.entries[row].trackMask, mask)
+    assert.equal(song.bookmarks[row].trackMask, mask)
   }
   const colors = [5, 6, 7, 8, 9, 10, 11, 12, 4, 3, 2, 1]
   for (let row = 0; row < 256; row++) {
     const expected = row >= 1 && row <= 12 ? colors[row - 1]
       : row >= 0xf3 && row <= 0xfe ? colors[row - 0xf3] + 0x10 : 0
-    assert.equal(song.rowBookmarkColors.entries[row].color, expected, `row ${row}`)
+    assert.equal(song.rowBookmarkColors[row].color, expected, `row ${row}`)
   }
 }
 

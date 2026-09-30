@@ -10,7 +10,6 @@ Two-byte FX slot used by Phrase steps and Instrument Table rows. Command
 and argument bytes have the same layout in both places. The command label
 depends on its group, active instrument, and modulation type.
 
-
 ## Contents
 
 - [Layout](#layout)
@@ -18,10 +17,6 @@ depends on its group, active instrument, and modulation type.
 FX command values: [FX command reference](fx_commands.md).
 
 ## Layout
-
-Root record.
-
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

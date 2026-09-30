@@ -22,13 +22,7 @@ File schema version: `6.0.1`.
 
 ## Layout
 
-Root record.
-
-
-
 ## Type: custom_cc
-
-`custom_cc`
 
 Two-byte custom CC entry shared by MIDI Out and External.
 
@@ -41,13 +35,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: filter_params
 
-`filter_params`
-
 Shared three-byte Multi-mode Filter Parameters layout. The type byte is
 raw because valid labels depend on the instrument: filter_type lists
 0x00..0x07 for all filter-capable instruments and 0x08..0x0b for
 Wavsynth only. MIDI Out and NONE do not expose this group.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -59,12 +50,9 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: amp_params
 
-`amp_params`
-
 Shared three-byte Amplifier Settings layout: amp, limit, and pan.
 Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth, and External expose
 this group at type-dependent offsets. MIDI Out and NONE do not.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 
@@ -76,13 +64,10 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 ## Type: mixer_params
 
-`mixer_params`
-
 Shared four-byte instrument Mixer Parameters layout: dry, mod_fx,
 delay, and reverb. Wavsynth, Macrosynth, Sampler, FM Synth, Hypersynth,
 and External expose this group at type-dependent offsets. It is distinct
 from the Song's master Mixer; MIDI Out and NONE do not expose it.
-
 
 Offsets are relative to the start of this record. Repeated-field sizes include all entries.
 

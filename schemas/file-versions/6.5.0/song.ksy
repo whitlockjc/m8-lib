@@ -36,20 +36,37 @@ seq:
   - id: mixer
     type: mixer_effects_6_5_0::mixer
   - id: grooves
-    type: sequencing_6_5_0::grooves
+    type: sequencing_6_5_0::groove
+    repeat: expr
+    repeat-expr: 32
+    doc: Thirty-two groove definitions.
   - id: rows
-    type: sequencing_6_5_0::rows
+    type: sequencing_6_5_0::row
+    repeat: expr
+    repeat-expr: 256
+    doc: Song rows indexed 0x00 through 0xff.
   - id: phrases
-    type: sequencing_6_5_0::phrases
+    type: sequencing_6_5_0::phrase
+    repeat: expr
+    repeat-expr: 255
+    doc: Phrases indexed 0x00 through 0xfe; 0xff is an unset reference.
   - id: chains
-    type: sequencing_6_5_0::chains
+    type: sequencing_6_5_0::chain
+    repeat: expr
+    repeat-expr: 255
+    doc: Chains indexed 0x00 through 0xfe; 0xff is an unset reference.
   - id: tables
-    type: tables
+    type: table_6_0_1
+    repeat: expr
+    repeat-expr: 256
     doc: |
       Song table storage. Tables 0x00 through 0x7f correspond to Instruments
       0x00 through 0x7f by index.
   - id: instruments
-    type: instruments
+    type: instrument_6_0_1::data
+    repeat: expr
+    repeat-expr: 128
+    doc: Song instrument records using the standalone Instrument data layout.
   - id: effects_and_scope
     type: mixer_effects_6_5_0::effects_and_scope
   - id: unknown_1
@@ -58,11 +75,20 @@ seq:
       Preserved bytes between Effects/Mix & Limiter Scope storage and the MIDI
       Mapping table.
   - id: midi_mappings
-    type: midi_mapping_6_5_0::mappings
+    type: midi_mapping_6_5_0::mapping
+    repeat: expr
+    repeat-expr: 128
+    doc: Up to 128 MIDI control mappings.
   - id: bookmarks
-    type: bookmarks
+    type: bookmark_row
+    repeat: expr
+    repeat-expr: 256
+    doc: One chain-cell bookmark bitmask per Song row.
   - id: scales
-    type: scales
+    type: scale_4_0_1
+    repeat: expr
+    repeat-expr: 16
+    doc: Sixteen embedded Scale records without standalone file headers.
   - id: eqs
     type: eqs
     doc: Instrument and global effect EQ settings.
@@ -89,14 +115,6 @@ types:
       - id: reverb
         type: eq_6_5_0::settings
         doc: Reverb EQ.
-  bookmarks:
-    doc: |
-      Song View chain-cell bookmarks, with one bitmask byte per Song row.
-    seq:
-      - id: entries
-        type: bookmark_row
-        repeat: expr
-        repeat-expr: 256
   bookmark_row:
     doc: Bookmark state for one Song row. Bits 0..7 correspond to tracks 1..8.
     seq:
@@ -128,32 +146,3 @@ types:
       - id: trailing
         size: _io.size - _io.pos
         doc: Reserved directory-field capacity after the path terminator; preserve stored bytes.
-  tables:
-    doc: |
-      Song table storage at absolute offsets 0xba3e..0x13a3d. The region contains
-      256 fixed 128-byte tables using the same table structure appended to a
-      standalone Instrument file. Tables 0x00 through 0x7f are associated with
-      Instruments 0x00 through 0x7f by matching index.
-    seq:
-      - id: entries
-        type: table_6_0_1
-        repeat: expr
-        repeat-expr: 256
-  instruments:
-    doc: |
-      Song instrument storage at absolute offsets 0x13a3e..0x1a5bd. The region
-      contains 128 fixed 215-byte instrument records using the same structure as
-      the instrument portion of a standalone Instrument file.
-    seq:
-      - id: entries
-        type: instrument_6_0_1::data
-        repeat: expr
-        repeat-expr: 128
-  scales:
-    doc: |
-      Sixteen embedded Scale body records without standalone Scale file headers.
-    seq:
-      - id: entries
-        type: scale_4_0_1
-        repeat: expr
-        repeat-expr: 16

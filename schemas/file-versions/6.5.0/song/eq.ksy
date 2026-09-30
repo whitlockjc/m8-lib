@@ -21,13 +21,6 @@ types:
       - id: high_band
         type: band
         doc: High EQ band.
-  instrument_bank:
-    doc: 128 assignable Instrument EQ banks, each with the standard 18-byte EQ layout.
-    seq:
-      - id: entries
-        type: settings
-        repeat: expr
-        repeat-expr: 128
   band:
     doc: |
       Six-byte EQ band record. The type and mode are packed into one byte: bits
