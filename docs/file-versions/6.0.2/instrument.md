@@ -70,7 +70,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `type` | `0x00` | 1 | `u1`; [type](#enum-type) | - |  |
+| `type` | `0x00` | 1 | `u1`; [type](#enum-type) | `valid`: `{"any-of":["type::wavsynth","type::macrosynth","type::sampler","type::midi_out","type::fm_synth","type::hypersynth","type::external","type::none"]}` | Instrument type selecting a supported body layout, including NONE. |
 | `name` | `0x01..0x0c` | 12 | bytes | `size`: `12` | Fixed-size byte range for the instrument name. Padding bytes are preserved as stored.  |
 | `transpose` | `0x0d` | 1 | `u1` | - | Common instrument transpose setting. 0x01 means ON; 0x00 means OFF.  |
 | `table_tic` | `0x0e` | 1 | `u1` | - | Common instrument table TIC setting. |

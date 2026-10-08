@@ -51,6 +51,17 @@ types:
       - id: type
         type: u1
         enum: type
+        valid:
+          any-of:
+            - type::wavsynth
+            - type::macrosynth
+            - type::sampler
+            - type::midi_out
+            - type::fm_synth
+            - type::hypersynth
+            - type::external
+            - type::none
+        doc: Instrument type selecting a supported body layout, including NONE.
       - id: name
         size: 12
         doc: |
