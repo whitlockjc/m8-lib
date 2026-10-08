@@ -14,6 +14,13 @@ doc: |
 seq:
   - id: header
     type: file_header
+    valid:
+      expr: >-
+        (_.file_kind == file_header::file_kind::instrument and _.schema_version_raw == 0x0601) or
+        (_.file_kind == file_header::file_kind::scale and _.schema_version_raw == 0x0401) or
+        (_.file_kind == file_header::file_kind::song and _.schema_version_raw == 0x0650) or
+        (_.file_kind == file_header::file_kind::theme and _.schema_version_raw == 0x0102)
+    doc: File kind and schema version must match a supported body layout for this firmware range.
   - id: body
     type:
       switch-on: header.file_kind

@@ -52,6 +52,9 @@ function verify (firmwares) {
     try {
       fs.cpSync(path.join(root, 'schemas'), schemaDir, { recursive: true })
       run(compilerPath, ['-t', 'javascript', `${firmware}.ksy`], { cwd: schemaDir })
+      run(process.execPath, ['tools/verify-parsed-headers.js', firmware, schemaDir], {
+        env: { ...process.env, NODE_PATH: [path.join(root, 'node_modules'), process.env.NODE_PATH].filter(Boolean).join(path.delimiter) }
+      })
       run(process.execPath, [target.parsedFixtures, schemaDir], {
         env: { ...process.env, NODE_PATH: [path.join(root, 'node_modules'), process.env.NODE_PATH].filter(Boolean).join(path.delimiter) }
       })
