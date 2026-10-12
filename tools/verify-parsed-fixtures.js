@@ -368,4 +368,26 @@ for (const [name, offset, expected] of [
   assert.equal(last.enabledNotes, bytes.readUInt16LE(0x1ad30))
 }
 
+// The final unknown region is a fixed 32-byte part of the Song record.
+for (const fixture of fs.readdirSync('fixtures/6.5.x/songs').filter(name => name.endsWith('.m8s'))) {
+  const { bytes, file } = parse(`fixtures/6.5.x/songs/${fixture}`)
+  assert.equal(bytes.length, 0x1b6c6, `${fixture}: Song size`)
+  assert.deepEqual(Buffer.from(file.body.unknown2), bytes.subarray(0x1b6a6, 0x1b6c6),
+    `${fixture}: preserved trailing unknown bytes`)
+}
+
+{
+  const bytes = fs.readFileSync('fixtures/6.5.x/songs/DEFAULT.m8s')
+  // Synthetic truncations must fail even when only unknown bytes are missing.
+  for (const missing of [1, 16, 32]) {
+    assert.throws(() => new File65X(new KaitaiStream(bytes.subarray(0, bytes.length - missing))),
+      KaitaiStream.EOFError, `Song rejects ${missing} missing trailing bytes`)
+  }
+  const changed = Buffer.from(bytes)
+  for (let index = 0; index < 32; index++) changed[0x1b6a6 + index] = 0xa0 + index
+  const file = new File65X(new KaitaiStream(changed))
+  assert.deepEqual(Buffer.from(file.body.unknown2), changed.subarray(0x1b6a6),
+    'Song preserves arbitrary trailing unknown bytes')
+}
+
 console.log('parsed_fixtures\tok')

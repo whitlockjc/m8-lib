@@ -53,7 +53,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 | `bookmarks` | `0x1a970..0x1aa6f` | 256 | [bookmark_row](#type-bookmark_row) | `repeat`: `expr`; `repeat-expr`: `256` | One chain-cell bookmark bitmask per Song row. |
 | `scales` | `0x1aa70..0x1ad4f` | 736 | [scale_4_0_1](../4.0.1/scale.md#layout) | `repeat`: `expr`; `repeat-expr`: `16` | Sixteen embedded Scale records without standalone file headers. |
 | `eqs` | `0x1ad50..0x1b697` | 2376 | [eqs](#type-eqs) | - | Instrument and global effect EQ settings. |
-| `unknown_2` | `0x1b698 onward` | variable | bytes | `size-eos`: `true` |  |
+| `unknown_2` | `0x1b698..0x1b6b7` | 32 | bytes | `size`: `32` | Preserved 32-byte region following the EQ bank. |
 
 ## Type: directory
 

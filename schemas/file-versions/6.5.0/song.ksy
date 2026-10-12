@@ -93,7 +93,8 @@ seq:
     type: eqs
     doc: Instrument and global effect EQ settings.
   - id: unknown_2
-    size-eos: true
+    size: 32
+    doc: Preserved 32-byte region following the EQ bank.
 types:
   eqs:
     doc: Contiguous bank of 128 Instrument EQs followed by four global EQs.
