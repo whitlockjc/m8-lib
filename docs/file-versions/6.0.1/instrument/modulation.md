@@ -51,7 +51,7 @@ Value expressions do not consume bytes. Positioned instances read the specified 
 | Name | Type | Expression / Position / Rules | Description |
 | --- | --- | --- | --- |
 | `modulation_type` | derived; [type](#enum-type) | `value`: `type_and_destination >> 4` |  |
-| `destination` | derived | `value`: `type_and_destination & 0x0f` | Raw destination nibble shared by all modulation slots. Interpret it using the enclosing instrument type and its corresponding one of seven modulation destination enums in instrument.ksy. No single enum is valid for every instrument.  |
+| `destination` | derived | `value`: `type_and_destination & 0x0f` | Raw destination nibble shared by all modulation slots. Interpret it using the destination enum in the enclosing instrument's parameter schema (wavsynth, macrosynth, sampler, midi_out, fm_synth, hypersynth, or external). No single enum is valid for every instrument.  |
 
 ## Type: ahd_env_params
 

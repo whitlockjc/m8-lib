@@ -6,7 +6,7 @@ Source: [schemas/file-versions/6.0.1/instrument/none.ksy](../../../../schemas/fi
 
 Byte order: `le`.
 
-NONE specific parameters.
+Unset FX command value for NONE instruments.
 
 File schema version: `6.0.1`.
 

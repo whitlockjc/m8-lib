@@ -3,7 +3,7 @@ meta:
   endian: le
   license: Apache-2.0
   ks-version: 0.11
-doc: NONE specific parameters.
+doc: Unset FX command value for NONE instruments.
 enums:
   fx_command:
     0xff:

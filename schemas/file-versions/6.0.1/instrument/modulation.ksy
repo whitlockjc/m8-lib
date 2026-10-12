@@ -44,9 +44,9 @@ types:
         value: type_and_destination & 0x0f
         doc: |
           Raw destination nibble shared by all modulation slots. Interpret it
-          using the enclosing instrument type and its corresponding one of
-          seven modulation destination enums in instrument.ksy. No single
-          enum is valid for every instrument.
+          using the destination enum in the enclosing instrument's parameter
+          schema (wavsynth, macrosynth, sampler, midi_out, fm_synth, hypersynth,
+          or external). No single enum is valid for every instrument.
   ahd_env_params:
     doc: AHD ENV payload; fourth byte is preserved with unknown purpose.
     seq:
