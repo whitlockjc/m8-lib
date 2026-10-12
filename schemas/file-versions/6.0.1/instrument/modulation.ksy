@@ -17,8 +17,10 @@ types:
     seq:
       - id: type_and_destination
         type: u1
+        valid:
+          expr: (_ >> 4) <= 5
         doc: |
-          Packed byte: high nibble stores modulation type, low nibble stores
+          Packed byte: high nibble stores modulation type (0x00..0x05), low nibble stores
           destination. Destination labels are instrument-specific.
       - id: amount
         type: u1

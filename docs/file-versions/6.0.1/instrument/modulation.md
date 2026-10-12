@@ -40,7 +40,7 @@ Offsets are relative to the start of this record. Repeated-field sizes include a
 
 | Name | Offset / Range | Size (bytes) | Type | Storage / Validation | Description |
 | --- | --- | ---: | --- | --- | --- |
-| `type_and_destination` | `0x00` | 1 | `u1` | - | Packed byte: high nibble stores modulation type, low nibble stores destination. Destination labels are instrument-specific.  |
+| `type_and_destination` | `0x00` | 1 | `u1` | `valid`: `{"expr":"(_ >> 4) <= 5"}` | Packed byte: high nibble stores modulation type (0x00..0x05), low nibble stores destination. Destination labels are instrument-specific.  |
 | `amount` | `0x01` | 1 | `u1` | - | Modulation amount. |
 | `params` | `0x02..0x05` | 4 | switch on `modulation_type`: `type::ahd_env`: [ahd_env_params](#type-ahd_env_params); `type::adsr_env`: [adsr_env_params](#type-adsr_env_params); `type::drum_env`: [drum_env_params](#type-drum_env_params); `type::lfo`: [lfo_params](#type-lfo_params); `type::trig_env`: [trig_env_params](#type-trig_env_params); `type::tracking`: [tracking_params](#type-tracking_params) | - | Four-byte payload interpreted according to the modulation type. |
 
