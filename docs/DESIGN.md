@@ -1,12 +1,13 @@
 # m8-lib Design
 
-This document is the starting point for a fresh, language-agnostic approach to
-Dirtywave M8 file schemas.
+This document describes the language-agnostic design of the Dirtywave M8 file
+schemas and the scope of ongoing schema review.
 
-This is a rough draft. It is expected to change as fixture-based research
-reveals how M8 files are actually structured.
+Schemas, fixtures, generated references, and verification are implemented for
+6.5.x and 6.6.x. Exact verified releases are listed in [the README](../README.md).
+Further fixture-based research may refine the layouts and their interpretation.
 
-Firmware-specific documentation targets and the process for adding 6.6.x are
+Firmware-specific documentation targets and the process for adding targets are
 defined in [Documentation Generation](DOCUMENTATION_GENERATION.md). Existing
 6.5.x references remain stable; new targets get separate firmware entry pages
 and reuse component documents according to their schema imports. Generated
@@ -208,19 +209,18 @@ for the file header schema version where the change appears. Later firmware
 entry schemas can reuse that component until another fixture-proven change
 requires a new one.
 
-The initial target is `6.5.x` because it is currently practical to generate
-fixtures from M8 headless. Use `6.6.x` as the first follow-on line to validate
-schema reuse and version-specific overrides once suitable fixtures are
-available.
-
-For the first milestone, start with a shared header schema and a `6.5.x` entry
-schema. The header schema should identify the M8 file header schema version and
-file type.
+Both `6.5.x` and `6.6.x` are registered targets with separate entry schemas
+and verification suites. Their shared header identifies the file schema
+version and kind; each entry validates that combination before reading the
+selected body layout. Registration verifies the committed fixtures, not every
+possible value or reused field. Broader 6.6.x evidence collection remains in
+[the 6.6.x research plan](6.6.x-PLAN.md).
 
 ## Research Plan
 
-Research should start with current M8 6.5.x files, using the latest available
-6.5 patch or letter release for fixtures.
+Continue targeted research for both supported firmware ranges. Record the exact
+patch or letter release for each fixture, and treat a fixture refresh as a
+separate verification event.
 
 For each file type, collect:
 
@@ -244,16 +244,11 @@ that are outside the fixture's intentional UI changes. Ignored ranges must be
 documented as preserved unknown/state bytes and tracked for later research, not
 treated as known fields.
 
-The first research objective is to map visible M8 UI fields to byte ranges.
-
-The first implementation objective is to define and verify the common M8 file
-header. All M8 file types share this header, and the file type byte determines
-whether the body is an instrument, scale, song, or theme.
-
-Research should proceed file type by file type until the 6.5.x portable file
-set is structurally mapped. Instrument is considered structurally complete for
-the current fixture evidence: remaining FX command-family coverage and semantic
-classification of preserved bytes should not block Song research.
+The common header and all four portable file bodies are represented in the
+schemas. Continue mapping UI-visible semantics and checking reused layouts
+against controlled fixture changes. Structural coverage includes preserved
+unknown regions; it does not establish their meaning or complete coverage of
+FX commands and parameter values.
 
 M8 strings should be modeled as fixed-size byte ranges. The UI-visible text may
 use only part of the range. Padding bytes and maximum stored length should be
@@ -276,16 +271,16 @@ Known finding:
   be modeled as color triples plus any other fixture-proven fields; editing
   mode is outside the file schemas.
 
-## Post-Song Schema Review
+## Ongoing Schema Review
 
-Defer broad schema reorganization until after the Song file is structurally
-mapped. Song is expected to expose the final reuse boundaries because it embeds
-or references many structures that also appear in standalone files.
+Song embeds or references structures that also appear in standalone files.
+Review these relationships together when changing shared components.
 
 The manual-aligned schema split is implemented. The generated
-[6.5.x reference](6.5.x.md) follows those reusable component boundaries.
+[6.5.x](6.5.x.md) and [6.6.x](6.6.x.md) references follow those reusable
+component boundaries.
 
-After Song research, review the schemas and documentation for shared components:
+Continue reviewing the schemas and documentation for shared components:
 
 - Instrument body and embedded Song instrument storage,
 - instrument table row and FX slot storage,
@@ -372,10 +367,10 @@ representation is stable enough to support them.
 
 ## Deferred Decisions
 
-These decisions do not need to block the initial draft or the first header
-schema milestone. They should be resolved through research and small prototypes.
+These decisions remain open and should be resolved through research and small
+prototypes as downstream implementation requirements become concrete.
 
 - How fixture evidence should be referenced from schemas.
 - How screenshots and UI labels should be organized.
-- Which schema-derived verification artifacts should be committed versus rebuilt
-  on demand.
+- Whether downstream implementations need committed schema-derived artifacts;
+  the current verification suite compiles temporary parsers on demand.

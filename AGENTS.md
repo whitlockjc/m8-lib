@@ -192,10 +192,11 @@ If generated files are ever committed here, document:
 Schema work should be verified with tools and fixtures, preferably without
 requiring generated language-specific libraries.
 
-This repository should eventually provide scripts or tools that run a full
-schema-verification suite.
+Run `npm run verify` after changes. The suite checks both registered firmware
+targets, including schema compilation, fixture mappings, parsed values,
+parser regression checks, and generated documentation consistency.
 
-Verification should eventually prove:
+Continue expanding verification to prove:
 
 - known fixture files can be decoded by schema-level tooling,
 - decoded fields match documented expectations,
@@ -220,4 +221,9 @@ If verification cannot be run, state why.
 
 ## Current Status
 
-This project is in the planning stage. Start with `docs/DESIGN.md`.
+This project maintains schemas, fixtures, generated references, and verification
+for firmware 6.5.x and 6.6.x. See `README.md` for the exact verified releases
+and `docs/DESIGN.md` for the design and ongoing review scope. Support is bounded
+by the committed fixture evidence; semantic research and broader 6.6.x
+compatibility checks remain open. Language-specific reader/writer libraries
+are downstream work.

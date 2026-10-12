@@ -3,12 +3,14 @@
 ## Layout
 
 Generated references mirror `schemas/` directly: every reachable `.ksy` has
-a corresponding `.md` under `docs/`. Start with [6.5.x](6.5.x.md), which records
+a corresponding `.md` under `docs/`. Start with [6.5.x](6.5.x.md) or
+[6.6.x](6.6.x.md), each of which records
 firmware provenance, links to the four file schemas, and shows absolute file
 offsets. Component pages under `common/` and `file-versions/` use relative
 record offsets. Type, enum, import, and source links follow schema ownership.
 Shared component pages are generated once, independent of firmware provenance;
-their schema descriptions may still cite firmware-specific research evidence.
+their schema descriptions describe stored data, while research notes retain
+firmware-specific evidence and interpretation.
 The generated [FX command reference](common/fx_commands.md) lives alongside
 other shared components while the command catalogs selected by each firmware
 entry are identical. Generation fails on conflicting shared output, so a
@@ -41,8 +43,9 @@ for compact layout tables. Linked type descriptions stay on their component
 pages rather than being repeated in field rows. Research notes are indexed
 separately from generated references.
 
-Unknown lengths stay variable. In particular, Song's `size-eos` remainder is
-not converted to a fixed size just because current fixtures have a fixed length.
+Lengths come from the canonical schemas. Fixed-size unknown regions retain
+their declared sizes; genuinely variable lengths remain variable. The generator
+does not infer sizes from fixtures.
 Null-terminated strings keep their dynamic inner positions while their outer
 fixed-capacity fields retain schema-defined sizes. Instances with value
 expressions consume no storage. No new storage semantics are inferred during
@@ -56,7 +59,10 @@ An unknown target fails rather than silently using the latest schema.
 Full checks detect obsolete component pages without deleting them. Developer
 documents at the top level are not treated as generated outputs.
 
-## Adding 6.6.x
+## Adding A Firmware Target
+
+Both 6.5.x and 6.6.x are already registered. The steps below use 6.6.x paths
+as an example; substitute the new firmware range when adding another target.
 
 1. Collect fixtures under `fixtures/6.6.x/` with exact firmware provenance.
    Inspect file-header versions separately from firmware versions.
