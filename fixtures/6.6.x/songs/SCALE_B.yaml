@@ -1,0 +1,24 @@
+fileType: song
+firmware: 6.6.3C
+screen: project.scales
+# Baseline: SCALE_A.m8s. Scale slot 00 matches the standalone pair.
+ignoredRanges:
+  - name: project.unknownTrailingState
+    offset: 0x00bd
+    size: 1
+    reason: unrelated preserved Project state changed from 0x49 to 0x3c during save
+changes:
+  - name: project.name
+    offset: 0x009a
+    original: 0x41
+    new: 0x42
+  - name: scales[0].name
+    offset: 0x1aa9e
+    original: 0x41
+    new: 0x42
+  - name: scales[0].tuningOffset
+    offset: 0x1aaa8
+    originalBytes: 00 00 00 00
+    newBytes: 00 00 80 3f
+    originalLabel: "440.00"
+    newLabel: "441.00"

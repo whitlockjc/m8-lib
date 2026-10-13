@@ -30,3 +30,11 @@ The Song manifest records both name changes and Shape, with the unrelated
 unknown Project-state byte recorded separately. Screenshots have not been
 supplied. This completes the byte comparison for this pair, not general
 embedded Instrument coverage.
+
+The 6.6.3C `SCALE_A/B.m8n` and `SCALE_A/B.m8s` pairs were imported on
+2026-10-13. Each 46-byte standalone Scale body equals Song slot `00`.
+The tuning offset changes from 0.0 to 1.0, consistent with the requested
+440.00 to 441.00 Hz edit. Manifests account for names and tuning, with the
+unknown Song state byte recorded separately. Screenshots were omitted by
+user choice. Source paths, hashes, and evidence limits are in the targeted
+findings. Slot `0F` is not covered by this capture.

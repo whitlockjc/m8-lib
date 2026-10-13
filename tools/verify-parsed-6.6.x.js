@@ -117,4 +117,32 @@ for (const [kind, fixture, expectedSize] of [
   assert.ok(file.body)
 }
 
+for (const [suffix, tuning] of [['A', 0], ['B', 1]]) {
+  const scale = parse(`fixtures/6.6.x/scales/SCALE_${suffix}.m8n`)
+  const song = parse(`fixtures/6.6.x/songs/SCALE_${suffix}.m8s`)
+  const embedded = song.file.body.scales[0]
+  assert.equal(scale.bytes.length, 60)
+  assert.equal(song.bytes.length, 112582)
+  assert.equal(song.file.body.scales.length, 16)
+  assert.equal(scale.file.body.tuningOffset, tuning)
+  assert.equal(embedded.tuningOffset, tuning)
+  assert.deepEqual(song.bytes.subarray(0x1aa7e, 0x1aaac), scale.bytes.subarray(14),
+    `SCALE_${suffix}: complete embedded record matches export`)
+  assert.equal(embedded.enabledNotes, scale.file.body.enabledNotes)
+  assert.deepEqual(embedded.intervals.map(interval => interval.offset),
+    scale.file.body.intervals.map(interval => interval.offset))
+  assert.deepEqual(Buffer.from(embedded.name), Buffer.from(scale.file.body.name))
+  assert.equal(Buffer.from(embedded.name).subarray(0, 7).toString('ascii'), `SCALE_${suffix}`)
+}
+
+for (const [kind, extension, expected] of [
+  ['scales', 'm8n', [0x2e, 0x3a, 0x3b]],
+  ['songs', 'm8s', [0x9a, 0xbd, 0x1aa9e, 0x1aaaa, 0x1aaab]]
+]) {
+  const before = parse(`fixtures/6.6.x/${kind}/SCALE_A.${extension}`).bytes
+  const after = parse(`fixtures/6.6.x/${kind}/SCALE_B.${extension}`).bytes
+  assert.deepEqual([...before.keys()].filter(offset => before[offset] !== after[offset]), expected,
+    `Scale pair: all changed ${kind} bytes accounted for`)
+}
+
 console.log('parsed_fixtures_6.6.x\tok')
