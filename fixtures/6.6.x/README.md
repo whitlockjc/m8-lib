@@ -38,3 +38,10 @@ The tuning offset changes from 0.0 to 1.0, consistent with the requested
 unknown Song state byte recorded separately. Screenshots were omitted by
 user choice. Source paths, hashes, and evidence limits are in the targeted
 findings. Slot `0F` is not covered by this capture.
+
+The subsequent 6.6.3C `songs/SCALE_F_A.m8s` and `songs/SCALE_F_B.m8s`
+fixtures load the existing A/B Scale exports into slot `0F`. Each complete
+last Scale record matches its corresponding standalone body. The manifest
+accounts for name and tuning changes and separately records the unknown
+Project-state byte. Both Scale bank boundaries are now covered for this
+tuning edit; other Scale parameter changes remain outside this evidence.

@@ -31,7 +31,7 @@ test('6.6.x has its own schema versions and fixture evidence', () => {
     instrument: '6.0.2', scale: '4.0.1', song: '6.6.2', theme: '1.0.2'
   })
   const files = fixtureFiles(target)
-  assert.equal(files.length, 22)
+  assert.equal(files.length, 24)
   for (const file of files) assert.doesNotThrow(() => verifyHeader(readHeader(file), target))
-  assert.equal(verifyFixtureMetadata(target), 7)
+  assert.equal(verifyFixtureMetadata(target), 8)
 })

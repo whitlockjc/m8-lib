@@ -145,4 +145,28 @@ for (const [kind, extension, expected] of [
     `Scale pair: all changed ${kind} bytes accounted for`)
 }
 
+for (const [suffix, tuning] of [['A', 0], ['B', 1]]) {
+  const scale = parse(`fixtures/6.6.x/scales/SCALE_${suffix}.m8n`)
+  const song = parse(`fixtures/6.6.x/songs/SCALE_F_${suffix}.m8s`)
+  assert.equal(song.bytes.length, 112582)
+  assert.equal(song.file.body.scales.length, 16)
+  const embedded = song.file.body.scales[15]
+  assert.equal(embedded.tuningOffset, tuning)
+  assert.equal(embedded.enabledNotes, scale.file.body.enabledNotes)
+  assert.deepEqual(embedded.intervals.map(interval => interval.offset),
+    scale.file.body.intervals.map(interval => interval.offset))
+  assert.deepEqual(Buffer.from(embedded.name), Buffer.from(scale.file.body.name))
+  assert.deepEqual(song.bytes.subarray(0x1ad30, 0x1ad5e), scale.bytes.subarray(14),
+    `SCALE_F_${suffix}: complete last Scale record matches export`)
+}
+
+{
+  const before = parse('fixtures/6.6.x/songs/SCALE_F_A.m8s').bytes
+  const after = parse('fixtures/6.6.x/songs/SCALE_F_B.m8s').bytes
+  assert.deepEqual([...before.keys()].filter(offset => before[offset] !== after[offset]),
+    [0x9c, 0xbd, 0x1ad50, 0x1ad5c, 0x1ad5d], 'last Scale pair: all changed bytes accounted for')
+  assert.deepEqual(before.subarray(0x1ad5e), after.subarray(0x1ad5e),
+    'EQ bank and subsequent bytes are unchanged')
+}
+
 console.log('parsed_fixtures_6.6.x\tok')
