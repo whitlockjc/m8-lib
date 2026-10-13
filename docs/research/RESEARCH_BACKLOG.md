@@ -3,6 +3,12 @@
 This document tracks observed M8 behavior that needs targeted fixture evidence
 before it can become schema documentation.
 
+Unless stated otherwise, the entries below describe 6.5.x evidence from
+firmware 6.5.2C. Broader 6.6.x compatibility work is tracked in the
+[6.6.x research plan](../6.6.x-PLAN.md). Parser regression checks using
+synthetic bytes validate tooling behavior; they do not establish M8 UI behavior
+or replace device-generated fixtures.
+
 ## Theme Color Mode
 
 Status: resolved; outside M8 files
@@ -149,9 +155,9 @@ Implication:
 Needed research:
 
 - Create fixtures that exercise additional destination types and destination
-  parameter labels after Mixer, EQ, and Effects pages are mapped.
-- Decide whether generated readers should expose the raw 7-byte mapping record
-  directly, or add destination-specific decoded views on top of it.
+  parameter labels, using the mapped Mixer, EQ, and Effects layouts as context.
+- Keep the raw 7-byte mapping record in the schema. Decide whether downstream
+  readers should add destination-specific decoded views during API planning.
 
 ## Song Table Association
 
@@ -258,12 +264,16 @@ Observation:
 - Sampler fixtures store `/Samples/Kick.wav` starting at `0x65`.
 - The current schema reserves `0x65..0xe4` as a fixed 128-byte sample path
   range.
+- [Parsed-string verification](../../tools/verify-parsed-strings.js) checks
+  path and trailing-byte preservation for both firmware targets. Synthetic
+  empty and 127-byte paths parse within that field; missing terminators fail.
 
 Implication:
 
 - The start offset and stored path bytes are fixture-verified.
 - The maximum stored path length remains provisional until a longer sample path
-  fixture verifies the boundary.
+  fixture verifies device behavior at the boundary. Synthetic parser checks
+  do not close this research item.
 
 Needed research:
 
@@ -287,9 +297,9 @@ Implication:
 
 - These bytes should remain represented as preserved unknown/reserved regions in
   the raw schema.
-- The Instrument schema can be treated as complete for moving on to Song work,
-  because byte-level fidelity does not depend on assigning semantic names to
-  every preserved byte.
+- Semantic classification can remain deferred while schema review and
+  downstream reader planning continue, because byte-level fidelity does not
+  depend on assigning semantic names to every preserved byte.
 
 Needed research:
 
@@ -299,7 +309,7 @@ Needed research:
 Resolved comparison:
 
 - `INSTRUMENTS.m8s` verifies that embedded Wavsynth and Hypersynth records use
-  the same 215-byte `instrumentData` structure as standalone Instrument files.
+  the same 215-byte instrument record as standalone Instrument files.
   Their only differences from the corresponding standalone defaults are the
   unset embedded names. This comparison does not assign new semantics to the
   remaining preserved bytes.
@@ -333,6 +343,9 @@ Observation:
 - Older <https://github.com/whitlockjc/m8-js> reference code reads shared
   filter, amp, and mixer groups after its MIDI Out custom CC table, but its
   expected offsets do not match the current 6.5.x fixture evidence.
+- `MID_MODS_A.m8i`, `MID_MODS_B.m8i`, and `MID_TABLE.m8i` already cover
+  controlled modulation and table changes. These do not establish semantics
+  for the post-CC unknown region.
 
 Implication:
 
@@ -343,10 +356,11 @@ Implication:
 
 Needed research:
 
-- Create MIDI Out fixtures that exercise any available pages beyond the visible
-  params screen, especially MODS, table, and EQ-adjacent behavior.
-- Compare MIDI Out instances embedded in Song files once Song instrument regions
-  are mapped.
+- Use the existing modulation and table fixtures as baselines for targeted
+  experiments that could explain `0x3a..0x4b`, including EQ-adjacent behavior
+  where exposed by the UI.
+- Compare MIDI Out instances embedded in Song files with standalone instances,
+  using the mapped Song instrument region.
 
 ## FX Command Families
 
@@ -362,6 +376,14 @@ Observation:
   command byte values for Current Instrument commands.
 - Instrument Mods command labels can change based on the target modulator slot
   and selected modulation type.
+- The 6.5.2C [INST_MODS_FX manifest](../../fixtures/6.5.x/songs/INST_MODS_FX.yaml)
+  records 30 Phrase FX slots covering five parameters for each of the six
+  modulation types. [Verification](../../tools/verify-instrument-mod-fx.js)
+  checks those stored values and labels against the schema catalog of 20
+  slot/parameter command bytes (`0x92..0xa5`). The fixture uses AHD ENV,
+  ADSR ENV, DRUM ENV, and LFO in slots 1–4 of a Wavsynth, and TRIG ENV and
+  TRACKING in slots 1–2 of a Macrosynth. It does not cover every combination
+  of modulation type, slot, and instrument.
 - `NONE_TABLE.m8i` verifies that NONE tables use the same FX slot shape, but all
   FX slots in that fixture remain unset.
 
@@ -372,18 +394,19 @@ Implication:
 - Command decoding and validation should be contextual. The valid labels may
   depend on whether the slot is in a phrase or table, and on the active
   instrument for Current Instrument and Instrument Mods commands.
-- Instrument Mods should be modeled as modulator-specific command sets, not one
-  flat command set.
+- The schemas already separate Instrument Mods slot/parameter command bytes
+  from the contextual labels selected by modulation type.
 
 Needed research:
 
-- Create fixtures that exercise Current Instrument and Instrument Mods commands
-  in phrase FX slots.
+- Create fixtures that exercise Current Instrument commands in Phrase FX slots.
+- Extend Instrument Mods Phrase coverage to additional type/slot/instrument
+  combinations where needed, using `INST_MODS_FX.m8s` as the existing baseline.
 - Create fixtures that exercise Sequencer, Mixer & Effects, Current Instrument,
   and Instrument Mods commands in instrument table FX slots.
 - Create a NONE table fixture with non-Current-Instrument commands selected.
-- For Instrument Mods, create fixtures that cover every modulation type:
-  `AHD ENV`, `ADSR ENV`, `DRUM ENV`, `LFO`, `TRIG ENV`, and `TRACKING`.
+- Verify Instrument Mods value ranges and behavior; the existing examples
+  establish stored command/value pairs, not complete argument semantics.
 - Promote verified command byte values into schema/doc references only after
   fixture mapping accounts for every changed byte.
 
@@ -404,6 +427,8 @@ Observation:
 - Current Instrument and Instrument Mods commands are contextual: available
   commands and value semantics may depend on the active instrument, target
   modulator slot, and modulation type.
+- `INST_MODS_FX.m8s` supplies Instrument Mods command/label examples for all
+  six modulation types in selected Phrase contexts, as described above.
 
 Implication:
 
@@ -419,9 +444,9 @@ Needed research:
   labels, and unset sentinel with targeted Phrase fixtures.
 - Document the valid FX value range, labels, and relative or absolute behavior
   for every Sequencer and Mixer & Effects command.
-- Verify Current Instrument and Instrument Mods command availability in Phrase
-  FX slots, including how the active instrument and selected modulation type
-  affect command labels and value semantics.
+- Verify Current Instrument command availability in Phrase FX slots. Extend
+  the existing Instrument Mods examples to uncovered contexts and argument
+  semantics, including effects of the active instrument and modulation type.
 - Document runtime behavior that cannot be expressed by the raw binary schema,
   including command interactions and context-dependent interpretation, in the
   generated semantic or API documentation when that layer is designed.

@@ -41,6 +41,43 @@ for (const name of ['NONE', 'WAV', 'MAC', 'SAM', 'FM', 'HYP', 'MID', 'EXT']) {
   assert.equal(bytes[0x39], 0x0b)
 }
 
+{
+  const before = parse('fixtures/6.6.x/instruments/HYP_EMB_A.m8i')
+  const after = parse('fixtures/6.6.x/instruments/HYP_EMB_B.m8i')
+  for (const [entry, suffix, shape] of [[before, 'A', 0x00], [after, 'B', 0x0b]]) {
+    assert.equal(entry.bytes.length, 357)
+    assert.equal(entry.file.body.instrument.generalSettings.type, 5)
+    assert.deepEqual(Buffer.from(entry.file.body.instrument.generalSettings.name),
+      Buffer.from(`HYP_EMB_${suffix}\0\0\0`, 'ascii'))
+    assert.equal(entry.file.body.instrument.body.shape, shape)
+    assert.equal(entry.file.body.table.rows.length, 16)
+    const song = parse(`fixtures/6.6.x/songs/HYP_EMB_${suffix}.m8s`)
+    const embedded = song.file.body.instruments[127]
+    assert.equal(song.bytes.length, 112582)
+    assert.equal(song.file.body.instruments.length, 128)
+    assert.equal(embedded.generalSettings.type, 5)
+    assert.equal(embedded.body.shape, shape)
+    assert.deepEqual(Buffer.from(embedded.generalSettings.name),
+      Buffer.from(entry.file.body.instrument.generalSettings.name))
+    assert.deepEqual(Buffer.from(song.file.body.projectSettings.name),
+      Buffer.from(`HYP_EMB_${suffix}\0\0\0`, 'ascii'))
+    // Fixture comparison proves equality of the entire record, not only Shape.
+    const recordOffset = 0x13a3e + 127 * 215
+    assert.deepEqual(song.bytes.subarray(recordOffset, recordOffset + 215), entry.bytes.subarray(14, 229))
+    const tableOffset = 0xba3e + 127 * 128
+    assert.deepEqual(song.bytes.subarray(tableOffset, tableOffset + 128), entry.bytes.subarray(229, 357))
+    const tableValues = table => table.rows.map(row => [row.transpose, row.volume,
+      ...row.fx.flatMap(fx => [fx.command, fx.value])])
+    assert.deepEqual(tableValues(song.file.body.tables[127]), tableValues(entry.file.body.table))
+  }
+  const changed = [...before.bytes.keys()].filter(offset => before.bytes[offset] !== after.bytes[offset])
+  assert.deepEqual(changed, [0x17, 0x39], 'export pair changes only name and Shape')
+  const songBefore = parse('fixtures/6.6.x/songs/HYP_EMB_A.m8s').bytes
+  const songAfter = parse('fixtures/6.6.x/songs/HYP_EMB_B.m8s').bytes
+  assert.deepEqual([...songBefore.keys()].filter(offset => songBefore[offset] !== songAfter[offset]),
+    [0x9c, 0xbd, 0x1a4f0, 0x1a512], 'Song pair changes names, unknown state, and Shape')
+}
+
 for (const name of ['DEFAULT', 'MODFX_COMB', 'BOOKMARKS']) {
   const { bytes, file } = parse(`fixtures/6.6.x/songs/${name}.m8s`)
   const song = file.body
